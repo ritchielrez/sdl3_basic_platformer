@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.10)
-project(learn_sdl3)
+project(sdl3_basic_platformer)
 set(CMAKE_CXX_STANDARD 20)
 
 set(SDL3_URL https://github.com/libsdl-org/SDL/releases/download/release-3.4.0/SDL3-devel-3.4.0-)
