@@ -53,7 +53,10 @@ void Player::update(const SDLState& sdlState, float dt) {
 }
 
 void Player::collision(float dt) {
-  const SDL_FRect playerRect{.x = pos.x, .y = pos.y, .w = w, .h = h};
+  const SDL_FRect playerCollider{.x = pos.x + collider.x,
+                                 .y = pos.y + collider.y,
+                                 .w = collider.w,
+                                 .h = collider.h};
   SDL_FRect collidedRect{0};
   SDL_FRect intersectionRect{0};
 
@@ -63,7 +66,7 @@ void Player::collision(float dt) {
     collidedRect.w = staticTile.w;
     collidedRect.h = staticTile.h;
 
-    if (SDL_GetRectIntersectionFloat(&playerRect, &collidedRect,
+    if (SDL_GetRectIntersectionFloat(&playerCollider, &collidedRect,
                                      &intersectionRect)) {
       if (intersectionRect.w < intersectionRect.h) {
         if (vel.x > 0) {
@@ -90,7 +93,7 @@ void Player::collision(float dt) {
     collidedRect.h = dynTile.h;
 
     // TODO:Implement collision behaviour of player with moving platform tiles.
-    if (SDL_GetRectIntersectionFloat(&playerRect, &collidedRect,
+    if (SDL_GetRectIntersectionFloat(&playerCollider, &collidedRect,
                                      &intersectionRect)) {
     }
   }
