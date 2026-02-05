@@ -179,7 +179,7 @@ void createPlayer(const SDLState &sdlState,
 
   Game::player.pos = glm::vec2(0, sdlState.logHeight - 64);
   Game::player.tex = resourceManager.getPlayerTex();
-  Game::player.maxSpeed = glm::vec2(100.0f, 0);
+  Game::player.maxSpeedX = 100.0f;
   Game::player.w = PLAYER_SIZE;
   Game::player.h = PLAYER_SIZE;
   Game::player.accel = glm::vec2(300, 0);
@@ -217,7 +217,6 @@ void loadTileMap(const SDLState &sdlState,
           staticTile.collider.y = 0;
           staticTile.collider.w = staticTile.w;
           staticTile.collider.h = staticTile.h;
-          staticTile.maxSpeed = glm::vec2(0, 0);
           staticTile.anims = std::vector<Frames>{Frames(
               glm::vec2(0, Game::TILE_SIZE), Game::TILE_SIZE, Game::TILE_SIZE)};
           Game::staticTiles.push_back(staticTile);

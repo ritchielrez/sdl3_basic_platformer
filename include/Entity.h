@@ -6,7 +6,7 @@
 #include "SDLState.h"
 
 struct Entity {
-  glm::vec2 pos, vel, maxSpeed;
+  glm::vec2 pos, vel;
   float w, h;
   SDL_FRect collider;
   SDL_Texture *tex;
@@ -17,7 +17,6 @@ struct Entity {
   Entity()
       : pos(glm::vec2(0)),
         vel(glm::vec2(0)),
-        maxSpeed(glm::vec2(0)),
         w(0),
         h(0),
         collider(0),
