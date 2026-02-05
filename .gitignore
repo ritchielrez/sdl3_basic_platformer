@@ -59,8 +59,5 @@ dkms.conf
 .zed/
 .vs/
 
-# Assets
-assets/
-
 # Rad debugger files
 raddbg
