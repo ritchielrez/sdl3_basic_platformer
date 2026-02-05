@@ -115,19 +115,7 @@ int main(int argc, char **argv) {
     SDL_RenderClear(sdlState.renderer);
 
     // Update
-    // for (auto &layer : gameState.layers) {
-    //   for (Entity &entity : layer) {
-    //     if (entity.currAnim != -1) {
-    //       entity.anims[entity.currAnim].step(dt);
-    //     }
-    //     updateEntity(sdlState, entity, dt);
-    //   }
-    // }
     Game::player.anims[Game::player.currAnim].step(dt);
-    // updateEntity(sdlState, Game::player, dt);
-    // for (auto &tile : Game::tiles) {
-    //   updateEntity(sdlState, tile, dt);
-    // }
     Game::player.update(sdlState, dt);
 
     // Render
