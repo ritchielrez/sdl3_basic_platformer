@@ -122,6 +122,11 @@ int main(int argc, char **argv) {
           // between consecutive key down events.
         case SDL_EVENT_KEY_DOWN: {
           if (event.key.scancode == SDL_SCANCODE_F1) Game::debug = !Game::debug;
+          Game::player.handleKeyInput(sdlState, event.key.scancode, true);
+          break;
+        }
+        case SDL_EVENT_KEY_UP: {
+          Game::player.handleKeyInput(sdlState, event.key.scancode, false);
           break;
         }
       }
@@ -132,7 +137,12 @@ int main(int argc, char **argv) {
     SDL_RenderClear(sdlState.renderer);
 
     // Update
-    Game::player.anims[Game::player.currAnim].step(dt);
+
+    // Only animate the player if the current animation has multiple frames.
+    // If it has one frame, the timer length/duration is set to 0.
+    if (Game::player.anims[Game::player.currAnim].getLen() != 0) {
+      Game::player.anims[Game::player.currAnim].step(dt);
+    }
     Game::player.update(sdlState, dt);
 
     // Render
@@ -181,10 +191,13 @@ void createPlayer(const SDLState &sdlState,
   }
   playerAnims[PlayerAnim::run] =
       Frames(16, 2.0f, playerRunTexCoords, PLAYER_SIZE, PLAYER_SIZE);
+  playerAnims[PlayerAnim::jump] = Frames(
+      glm::vec2(2 * PLAYER_SIZE, 5 * PLAYER_SIZE), PLAYER_SIZE, PLAYER_SIZE);
 
   Game::player.pos = glm::vec2(0, sdlState.logHeight - 64);
   Game::player.tex = resourceManager.getPlayerTex();
   Game::player.maxSpeedX = 100.0f;
+  Game::player.jumpAccel = -125.0f;
   Game::player.w = PLAYER_SIZE;
   Game::player.h = PLAYER_SIZE;
   Game::player.accel = glm::vec2(300, 0);

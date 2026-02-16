@@ -1,5 +1,7 @@
 #include "Player.h"
 
+#include <SDL3/SDL.h>
+
 #include "Game.h"
 #include "Log.h"
 #include "SDLState.h"
@@ -47,7 +49,7 @@ void Player::update(const SDLState& sdlState, float dt) {
     vel.x = currDir * maxSpeedX;
   }
 
-  vel.y += 100 * dt;
+  vel.y += 150 * dt;
   pos += vel * dt;
   collision(dt);
 }
@@ -57,9 +59,11 @@ void Player::collision(float dt) {
                                  .y = pos.y + collider.y,
                                  .w = collider.w,
                                  .h = collider.h};
+  SDL_FRect groundSensor{0};
   SDL_FRect collidedRect{0};
   SDL_FRect intersectionRect{0};
 
+  bool foundGround = false;
   for (auto& staticTile : Game::staticTiles) {
     collidedRect.x = staticTile.pos.x;
     collidedRect.y = staticTile.pos.y;
@@ -84,6 +88,16 @@ void Player::collision(float dt) {
         vel.y = 0;
       }
     }
+
+    groundSensor.x = playerCollider.x;
+    groundSensor.y = playerCollider.y + playerCollider.h;
+    groundSensor.w = playerCollider.w;
+    groundSensor.h = 1;
+
+    if (SDL_GetRectIntersectionFloat(&groundSensor, &collidedRect,
+                                     &intersectionRect)) {
+      foundGround = true;
+    }
   }
 
   for (auto& dynTile : Game::dynTiles) {
@@ -95,6 +109,33 @@ void Player::collision(float dt) {
     // TODO:Implement collision behaviour of player with moving platform tiles.
     if (SDL_GetRectIntersectionFloat(&playerCollider, &collidedRect,
                                      &intersectionRect)) {
+    }
+  }
+
+  if (grounded != foundGround) {
+    grounded = foundGround;
+    if (foundGround) {
+      currAnim = PlayerAnim::run;
+    }
+  }
+}
+
+void Player::handleKeyInput(const SDLState& sdlState, SDL_Scancode key,
+                            bool keyDown) {
+  switch (currAnim) {
+    case PlayerAnim::idle: {
+      if (key == SDL_SCANCODE_SPACE && keyDown) {
+        currAnim = PlayerAnim::jump;
+        vel.y += jumpAccel;
+      }
+      break;
+    }
+    case PlayerAnim::run: {
+      if (key == SDL_SCANCODE_SPACE && keyDown) {
+        currAnim = PlayerAnim::jump;
+        vel.y += jumpAccel;
+      }
+      break;
     }
   }
 }
