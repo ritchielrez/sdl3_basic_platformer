@@ -23,12 +23,6 @@ enum Tiles {
 
 }
 
-// bool Game::debug;
-// std::array<uint16_t, Game::MAP_COLS * Game::MAP_ROWS> map{0};
-// Player Game::player;
-// std::vector<StaticTile> Game::staticTiles;
-// std::vector<DynTile> Game::dynTiles;
-
 struct Game {
   static constexpr float TILE_SIZE = 16.0f;
   static constexpr size_t MAP_ROWS = 5;
