@@ -2,24 +2,17 @@ cmake_minimum_required(VERSION 3.10)
 project(sdl3_basic_platformer)
 set(CMAKE_CXX_STANDARD 20)
 
-set(SDL3_URL https://github.com/libsdl-org/SDL/releases/download/release-3.4.0/SDL3-devel-3.4.0-)
 set(SDL3_IMAGE_URL https://github.com/libsdl-org/SDL_image/releases/download/release-3.4.0/SDL3_image-devel-3.4.0-)
 
 if(MSVC)
-  string(APPEND SDL3_URL VC.zip)
   string(APPEND SDL3_IMAGE_URL VC.zip)
 elseif(MINGW)
-  string(APPEND SDL3_URL mingw.zip)
   string(APPEND SDL3_IMAGE_URL mingw.zip)
 else()
   message(FATAL_ERROR "This platform is not support yet.")
 endif()
 
 include(FetchContent)
-FetchContent_Populate(
-  sdl3
-  URL ${SDL3_URL}
-)
 FetchContent_Populate(
   sdl3_image
   URL ${SDL3_IMAGE_URL}
@@ -39,11 +32,11 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(fmt)
 
-list(APPEND CMAKE_PREFIX_PATH "${sdl3_SOURCE_DIR}/cmake")
 list(APPEND CMAKE_PREFIX_PATH "${sdl3_image_SOURCE_DIR}/cmake")
 
-find_package(SDL3)
 find_package(SDL3_image)
+set(SDL_STATIC on)
+add_subdirectory(vendor/SDL)
 
 if(MSVC)
   if(NOT CMAKE_GENERATOR STREQUAL "Ninja")
@@ -65,6 +58,7 @@ endif()
 target_link_libraries(main PUBLIC $<$<BOOL:${MINGW}>:ws2_32>)
 target_link_libraries(main PUBLIC SDL3::SDL3)
 target_link_libraries(main PUBLIC SDL3_image::SDL3_image)
+target_link_libraries(main PUBLIC SDL3::SDL3-static)
 target_link_libraries(main PUBLIC glm::glm)
 target_link_libraries(main PUBLIC fmt::fmt)
 
