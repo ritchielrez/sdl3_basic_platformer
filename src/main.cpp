@@ -1,6 +1,6 @@
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_main.h>
-#include <SDL3_image/SDL_image.h>
+#include <stb_image.h>
 
 #include <array>
 #include <cassert>
@@ -27,8 +27,7 @@ class ResourceManager {
   ResourceManager()
       : playerTex(nullptr), worldTex(nullptr), platformsTex(nullptr) {}
   ResourceManager(SDLState &sdlState) {
-    playerTex = IMG_LoadTexture(sdlState.renderer, "assets/sprites/knight.png");
-    SDL_SetTextureScaleMode(playerTex, SDL_SCALEMODE_NEAREST);
+    playerTex = loadTex(sdlState, "assets/sprites/knight.png");
 
     if (!playerTex) {
       SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error",
@@ -36,9 +35,7 @@ class ResourceManager {
       exit(1);
     }
 
-    worldTex =
-        IMG_LoadTexture(sdlState.renderer, "assets/sprites/world_tileset.png");
-    SDL_SetTextureScaleMode(worldTex, SDL_SCALEMODE_NEAREST);
+    worldTex = loadTex(sdlState, "assets/sprites/world_tileset.png");
 
     if (!worldTex) {
       SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error",
@@ -46,9 +43,7 @@ class ResourceManager {
       exit(1);
     }
 
-    platformsTex =
-        IMG_LoadTexture(sdlState.renderer, "assets/sprites/platforms.png");
-    SDL_SetTextureScaleMode(platformsTex, SDL_SCALEMODE_NEAREST);
+    platformsTex = loadTex(sdlState, "assets/sprites/platforms.png");
 
     if (!platformsTex) {
       SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error",
@@ -56,6 +51,28 @@ class ResourceManager {
                                nullptr);
       exit(1);
     }
+  }
+
+  SDL_Texture *loadTex(const SDLState &sdlState,
+                       const std::string_view &filePath) {
+    int width = 0;
+    int height = 0;
+    int channels = 0;
+    stbi_uc *pixData =
+        stbi_load(filePath.data(), &width, &height, &channels, 4);
+
+    // NOTE: SDL_Surface and SDL_Texture are pretty much the same, except
+    // SDL_Surface stores texture data in RAM whereas SDL_Texture stores texture
+    // data in GPU VRAM.
+    SDL_Surface *surface = SDL_CreateSurfaceFrom(
+        width, height, SDL_PIXELFORMAT_RGBA32, pixData, width * 4);
+    SDL_Texture *tex = SDL_CreateTextureFromSurface(sdlState.renderer, surface);
+    SDL_SetTextureScaleMode(tex, SDL_SCALEMODE_NEAREST);
+
+    SDL_DestroySurface(surface);
+    stbi_image_free(pixData);
+
+    return tex;
   }
 
   SDL_Texture *getPlayerTex() const { return playerTex; }
