@@ -100,12 +100,24 @@ int main(int argc, char **argv) {
           break;
         }
         case SDL_EVENT_MOUSE_MOTION: {
+          if (!SDL_ConvertEventToRenderCoordinates(sdlState.renderer, &event)) {
+            SDL_ShowSimpleMessageBox(
+                SDL_MESSAGEBOX_ERROR, "Error",
+                "Could not convert event to render coordinates", nullptr);
+            return 1;
+          }
           mu_input_mousemove(&mu_ctx, static_cast<int>(event.motion.x),
                              static_cast<int>(event.motion.y));
           break;
         }
         case SDL_EVENT_MOUSE_BUTTON_DOWN:
         case SDL_EVENT_MOUSE_BUTTON_UP: {
+          if (!SDL_ConvertEventToRenderCoordinates(sdlState.renderer, &event)) {
+            SDL_ShowSimpleMessageBox(
+                SDL_MESSAGEBOX_ERROR, "Error",
+                "Could not convert event to render coordinates", nullptr);
+            return 1;
+          }
           const char b = btn_map[event.button.button - 1];
           if (event.type == SDL_EVENT_MOUSE_BUTTON_DOWN)
             mu_input_mousedown(&mu_ctx, static_cast<int>(event.button.x),
