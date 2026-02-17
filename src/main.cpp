@@ -1,7 +1,5 @@
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_main.h>
-#include <SDL3_ttf/SDL_ttf.h>
-#include <microui.h>
 
 #include <array>
 #include <cassert>
@@ -18,16 +16,31 @@
 #include "StaticTile.h"
 #include "defer.h"
 
-mu_Context mu_ctx{0};
+#define FONT_HEIGHT 8.0f
 
+#define IMGUI
+
+#ifdef MICROUI
+#include <SDL3_ttf/SDL_ttf.h>
+#include <microui.h>
+mu_Context mu_ctx{0};
+#elif defined(IMGUI)
+#include <backends/imgui_impl_sdl3.h>
+#include <imgui.h>
+#include <imgui_impl_sdlrenderer3.h>
+#endif
+
+#ifdef MICROUI
 TTF_Font *ttf_font = nullptr;
 TTF_TextEngine *ttf_engine = nullptr;
 
 const char btn_map[]{MU_MOUSE_LEFT, MU_MOUSE_MIDDLE, MU_MOUSE_RIGHT};
+#endif
 
 void createPlayer(const SDLState &, const ResourceManager &);
 void loadTileMap(const SDLState &, const ResourceManager &);
 
+#ifdef MICROUI
 int text_width(mu_Font mu_font, const char *str, int len) {
   if (len == -1) {
     len = 0;
@@ -39,9 +52,8 @@ int text_width(mu_Font mu_font, const char *str, int len) {
   return 0;
 }
 
-#define FONT_HEIGHT 8.0f
-
 int text_height(mu_Font mu_font) { return static_cast<int>(FONT_HEIGHT); }
+#endif
 
 int main(int argc, char **argv) {
   if (!SDL_Init(SDL_INIT_VIDEO)) {
@@ -51,6 +63,10 @@ int main(int argc, char **argv) {
   }
   defer(SDL_Quit());
 
+  SDLState sdlState{"learn_sdl3", SDL_WINDOW_RESIZABLE, nullptr};
+  ResourceManager resourceManager{sdlState};
+
+#ifdef MICROUI
   if (!TTF_Init()) {
     SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error",
                              "Could not initialize SDL3_ttf", nullptr);
@@ -64,22 +80,38 @@ int main(int argc, char **argv) {
     return 1;
   }
 
-  SDLState sdlState{"learn_sdl3", SDL_WINDOW_RESIZABLE, nullptr};
-  ResourceManager resourceManager{sdlState};
-
   ttf_engine = TTF_CreateRendererTextEngine(sdlState.renderer);
   if (!ttf_engine) {
     SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error",
                              "Could not create text engine", nullptr);
     return 1;
   }
+#endif
 
   createPlayer(sdlState, resourceManager);
   loadTileMap(sdlState, resourceManager);
 
+#ifdef MICROUI
   mu_init(&mu_ctx);
   mu_ctx.text_width = text_width;
   mu_ctx.text_height = text_height;
+#elif defined(IMGUI)
+  IMGUI_CHECKVERSION();
+  ImGui::CreateContext();
+  ImGuiIO &io = ImGui::GetIO();
+  io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
+
+  ImGui::StyleColorsDark();
+
+  ImGuiStyle &style = ImGui::GetStyle();
+
+  ImGui_ImplSDL3_InitForSDLRenderer(sdlState.win, sdlState.renderer);
+  ImGui_ImplSDLRenderer3_Init(sdlState.renderer);
+  defer(ImGui_ImplSDLRenderer3_Shutdown(); ImGui_ImplSDL3_Shutdown();
+        ImGui::DestroyContext(););
+
+  io.Fonts->AddFontFromFileTTF("assets/fonts/PixelOperator8.ttf");
+#endif
 
   uint64_t prevTime = SDL_GetTicks();
   bool running = true;
@@ -89,6 +121,9 @@ int main(int argc, char **argv) {
 
     SDL_Event event{0};
     while (SDL_PollEvent(&event)) {
+#ifdef IMGUI
+      ImGui_ImplSDL3_ProcessEvent(&event);
+#endif
       switch (event.type) {
         case SDL_EVENT_QUIT: {
           running = false;
@@ -100,6 +135,7 @@ int main(int argc, char **argv) {
           break;
         }
         case SDL_EVENT_MOUSE_MOTION: {
+#ifdef MICROUI
           if (!SDL_ConvertEventToRenderCoordinates(sdlState.renderer, &event)) {
             SDL_ShowSimpleMessageBox(
                 SDL_MESSAGEBOX_ERROR, "Error",
@@ -108,10 +144,12 @@ int main(int argc, char **argv) {
           }
           mu_input_mousemove(&mu_ctx, static_cast<int>(event.motion.x),
                              static_cast<int>(event.motion.y));
+#endif
           break;
         }
         case SDL_EVENT_MOUSE_BUTTON_DOWN:
         case SDL_EVENT_MOUSE_BUTTON_UP: {
+#ifdef MICROUI
           if (!SDL_ConvertEventToRenderCoordinates(sdlState.renderer, &event)) {
             SDL_ShowSimpleMessageBox(
                 SDL_MESSAGEBOX_ERROR, "Error",
@@ -125,6 +163,7 @@ int main(int argc, char **argv) {
           if (event.type == SDL_EVENT_MOUSE_BUTTON_UP)
             mu_input_mouseup(&mu_ctx, static_cast<int>(event.button.x),
                              static_cast<int>(event.button.y), b);
+#endif
           break;
         }
         // NOTE: Keyboard events are better if you do not want multiple key
@@ -142,6 +181,7 @@ int main(int argc, char **argv) {
       }
     }
 
+#ifdef MICROUI
     mu_begin(&mu_ctx);
     if (mu_begin_window(&mu_ctx, "My Window", mu_rect(10, 10, 140, 86))) {
       int rows[]{60, -1};
@@ -165,6 +205,19 @@ int main(int argc, char **argv) {
       mu_end_window(&mu_ctx);
     }
     mu_end(&mu_ctx);
+#elif defined(IMGUI)
+    ImGui_ImplSDLRenderer3_NewFrame();
+    ImGui_ImplSDL3_NewFrame();
+    ImGui::NewFrame();
+
+    ImGui::Begin("My Window");
+    if (ImGui::Button("Button1")) {
+      Log::debug("Button1 pressed\n");
+    }
+    ImGui::End();
+
+    ImGui::Render();
+#endif
 
     // Clear screen
     SDL_SetRenderDrawColor(sdlState.renderer, 20, 152, 220, 255);
@@ -188,6 +241,7 @@ int main(int argc, char **argv) {
       dynTile.draw(sdlState);
     }
 
+#ifdef MICROUI
     mu_Command *mu_cmd = nullptr;
     while (mu_next_command(&mu_ctx, &mu_cmd)) {
       switch (mu_cmd->type) {
@@ -226,6 +280,16 @@ int main(int argc, char **argv) {
         }
       }
     }
+#elif defined(IMGUI)
+    SDL_SetRenderLogicalPresentation(sdlState.renderer, 0, 0,
+                                     SDL_LOGICAL_PRESENTATION_DISABLED);
+    ImGui_ImplSDLRenderer3_RenderDrawData(ImGui::GetDrawData(),
+                                          sdlState.renderer);
+
+    SDL_SetRenderLogicalPresentation(sdlState.renderer, sdlState.logWidth,
+                                     sdlState.logHeight,
+                                     SDL_LOGICAL_PRESENTATION_LETTERBOX);
+#endif
 
     // Swap buffers
     SDL_RenderPresent(sdlState.renderer);
