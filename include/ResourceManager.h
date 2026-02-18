@@ -1,7 +1,10 @@
+#pragma once
+
 #include <SDL3/SDL.h>
 #include <stb_image.h>
 
 #include <cstdlib>
+#include <string_view>
 
 class ResourceManager {
   SDL_Texture *playerTex;
