@@ -100,6 +100,7 @@ int main(int argc, char **argv) {
   ImGui::CreateContext();
   ImGuiIO &io = ImGui::GetIO();
   io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
+  io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
 
   ImGui::StyleColorsDark();
 
@@ -210,10 +211,10 @@ int main(int argc, char **argv) {
     ImGui_ImplSDL3_NewFrame();
     ImGui::NewFrame();
 
-    ImGui::Begin("My Window");
-    if (ImGui::Button("Button1")) {
-      Log::debug("Button1 pressed\n");
-    }
+    // This ensures the dockspace does not cover the entire screen, so the
+    // actual game can seen behind the windows.
+    ImGui::DockSpaceOverViewport(0, nullptr,
+                                 ImGuiDockNodeFlags_PassthruCentralNode);
     ImGui::End();
 
     ImGui::Render();
