@@ -9,8 +9,7 @@
 #include "StaticTile.h"
 
 namespace Tiles {
-
-enum Tiles {
+enum {
   GRASS = 1,
   DIRT,
   BRIDGE1,
@@ -20,7 +19,6 @@ enum Tiles {
   TREE2,
   TREE3,
 };
-
 }
 
 struct Game {
