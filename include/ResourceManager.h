@@ -64,5 +64,9 @@ class ResourceManager {
   SDL_Texture *getWorldTex() const { return worldTex; }
   SDL_Texture *getPlatformTex() const { return platformsTex; }
 
-  ~ResourceManager() { SDL_DestroyTexture(playerTex); }
+  ~ResourceManager() {
+    SDL_DestroyTexture(playerTex);
+    SDL_DestroyTexture(worldTex);
+    SDL_DestroyTexture(platformsTex);
+  }
 };
