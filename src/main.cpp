@@ -15,6 +15,7 @@
 #include "SDLState.h"
 #include "StaticTile.h"
 #include "defer.h"
+#include "UI.h"
 
 #define FONT_HEIGHT 8.0f
 #include <backends/imgui_impl_sdl3.h>
@@ -35,22 +36,7 @@ int main(int argc, char **argv) {
   Game::createPlayer(sdlState, resourceManager);
   Game::loadTileMap(sdlState, resourceManager);
 
-  IMGUI_CHECKVERSION();
-  ImGui::CreateContext();
-  ImGuiIO &io = ImGui::GetIO();
-  io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
-  io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
-
-  ImGui::StyleColorsDark();
-
-  ImGuiStyle &style = ImGui::GetStyle();
-
-  ImGui_ImplSDL3_InitForSDLRenderer(sdlState.win, sdlState.renderer);
-  ImGui_ImplSDLRenderer3_Init(sdlState.renderer);
-  defer(ImGui_ImplSDLRenderer3_Shutdown(); ImGui_ImplSDL3_Shutdown();
-        ImGui::DestroyContext(););
-
-  io.Fonts->AddFontFromFileTTF("assets/fonts/PixelOperator8.ttf");
+  UI ui{sdlState};
 
   uint64_t prevTime = SDL_GetTicks();
   bool running = true;
