@@ -1,5 +1,8 @@
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_main.h>
+#include <backends/imgui_impl_sdl3.h>
+#include <imgui.h>
+#include <imgui_impl_sdlrenderer3.h>
 
 #include <array>
 #include <cassert>
@@ -14,13 +17,8 @@
 #include "ResourceManager.h"
 #include "SDLState.h"
 #include "StaticTile.h"
-#include "defer.h"
 #include "UI.h"
-
-#define FONT_HEIGHT 8.0f
-#include <backends/imgui_impl_sdl3.h>
-#include <imgui.h>
-#include <imgui_impl_sdlrenderer3.h>
+#include "defer.h"
 
 int main(int argc, char **argv) {
   if (!SDL_Init(SDL_INIT_VIDEO)) {
@@ -36,7 +34,7 @@ int main(int argc, char **argv) {
   Game::createPlayer(sdlState, resourceManager);
   Game::loadTileMap(sdlState, resourceManager);
 
-  UI ui{sdlState};
+  UI ui{sdlState, 14.0f};
 
   uint64_t prevTime = SDL_GetTicks();
   bool running = true;
