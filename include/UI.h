@@ -48,6 +48,38 @@ struct UI {
 
     io.Fonts->AddFontFromFileTTF("assets/fonts/PixelOperator8.ttf", fontHeight);
   }
+
+  void newFrame() {
+    ImGui_ImplSDLRenderer3_NewFrame();
+    ImGui_ImplSDL3_NewFrame();
+    ImGui::NewFrame();
+
+    // This ensures the dockspace does not cover the entire screen, so the
+    // actual game can seen behind the windows.
+    ImGui::DockSpaceOverViewport(0, nullptr,
+                                 ImGuiDockNodeFlags_PassthruCentralNode);
+  }
+
+  void drawFrame() {
+    ImGui::Begin("My Window");
+    if (ImGui::Button("Button1")) {
+      Log::debug("Button1 pressed\n");
+    }
+    ImGui::End();
+
+    ImGui::Render();
+  }
+
+  void presentFrame(const SDLState &sdlState) {
+    SDL_SetRenderLogicalPresentation(sdlState.renderer, 0, 0,
+                                     SDL_LOGICAL_PRESENTATION_DISABLED);
+    ImGui_ImplSDLRenderer3_RenderDrawData(ImGui::GetDrawData(),
+                                          sdlState.renderer);
+    SDL_SetRenderLogicalPresentation(sdlState.renderer, sdlState.logWidth,
+                                     sdlState.logHeight,
+                                     SDL_LOGICAL_PRESENTATION_LETTERBOX);
+  }
+
   ~UI() {
     ImGui_ImplSDLRenderer3_Shutdown();
     ImGui_ImplSDL3_Shutdown();

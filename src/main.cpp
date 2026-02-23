@@ -70,22 +70,8 @@ int main(int argc, char **argv) {
       }
     }
 
-    ImGui_ImplSDLRenderer3_NewFrame();
-    ImGui_ImplSDL3_NewFrame();
-    ImGui::NewFrame();
-
-    // This ensures the dockspace does not cover the entire screen, so the
-    // actual game can seen behind the windows.
-    ImGui::DockSpaceOverViewport(0, nullptr,
-                                 ImGuiDockNodeFlags_PassthruCentralNode);
-
-    // ImGui::Begin("My Window");
-    // if (ImGui::Button("Button1")) {
-    //   Log::debug("Button1 pressed\n");
-    // }
-    // ImGui::End();
-
-    ImGui::Render();
+    ui.newFrame();
+    ui.drawFrame();
 
     // Clear screen
     SDL_SetRenderDrawColor(sdlState.renderer, 20, 152, 220, 255);
@@ -109,13 +95,7 @@ int main(int argc, char **argv) {
       dynTile.draw(sdlState);
     }
 
-    SDL_SetRenderLogicalPresentation(sdlState.renderer, 0, 0,
-                                     SDL_LOGICAL_PRESENTATION_DISABLED);
-    ImGui_ImplSDLRenderer3_RenderDrawData(ImGui::GetDrawData(),
-                                          sdlState.renderer);
-    SDL_SetRenderLogicalPresentation(sdlState.renderer, sdlState.logWidth,
-                                     sdlState.logHeight,
-                                     SDL_LOGICAL_PRESENTATION_LETTERBOX);
+    ui.presentFrame(sdlState);
 
     // Swap buffers
     SDL_RenderPresent(sdlState.renderer);
