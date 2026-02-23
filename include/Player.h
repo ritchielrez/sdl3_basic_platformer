@@ -4,7 +4,7 @@
 #include "SDLState.h"
 
 namespace PlayerAnim {
-enum Anims { idle, run, jump };
+enum { idle, run, jump };
 }
 
 struct Player : public Entity {
