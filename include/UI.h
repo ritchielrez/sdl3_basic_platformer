@@ -4,6 +4,9 @@
 #include <imgui.h>
 #include <imgui_impl_sdlrenderer3.h>
 
+#include <string>
+
+#include "Game.h"
 #include "SDLState.h"
 
 struct UI {
@@ -60,12 +63,31 @@ struct UI {
                                  ImGuiDockNodeFlags_PassthruCentralNode);
   }
 
-  void drawFrame() {
-    ImGui::Begin("My Window");
-    if (ImGui::Button("Button1")) {
-      Log::debug("Button1 pressed\n");
+  void drawPlayerInfo() {
+    ImGui::Begin("Player");
+    {
+      std::string playerState{8, 0};
+      switch (Game::player.currAnim) {
+        case PlayerAnim::idle: {
+          playerState = "idle";
+          break;
+        }
+        case PlayerAnim::run: {
+          playerState = "run";
+          break;
+        }
+        case PlayerAnim::jump: {
+          playerState = "jump";
+          break;
+        }
+      }
+      ImGui::Text("State: %s", playerState.c_str());
     }
     ImGui::End();
+  }
+
+  void drawFrame() {
+    drawPlayerInfo();
 
     ImGui::Render();
   }
