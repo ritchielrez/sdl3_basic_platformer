@@ -4,6 +4,7 @@
 #include <imgui.h>
 #include <imgui_impl_sdlrenderer3.h>
 
+#include <functional>
 #include <string>
 
 #include "Game.h"
@@ -81,7 +82,17 @@ struct UI {
           break;
         }
       }
+      ImGui::Text("Velocity: (%f, %f)", Game::player.vel.x, Game::player.vel.y);
       ImGui::Text("State: %s", playerState.c_str());
+    }
+    ImGui::End();
+  }
+
+  void drawPlayerInfoCustom(std::function<void()> drawFunc) {
+    newFrame();
+    ImGui::Begin("Player");
+    {
+      drawFunc();
     }
     ImGui::End();
   }

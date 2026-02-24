@@ -1,10 +1,12 @@
 #include "Player.h"
 
 #include <SDL3/SDL.h>
+#include <imgui.h>
 
 #include "Game.h"
 #include "Log.h"
 #include "SDLState.h"
+#include "UI.h"
 
 void Player::update(const SDLState& sdlState, float dt) {
   float currDir = 0;
@@ -63,6 +65,7 @@ void Player::collision(float dt) {
   SDL_FRect collidedRect{0};
   SDL_FRect intersectionRect{0};
 
+  bool collided = false;
   bool foundGround = false;
   for (auto& staticTile : Game::staticTiles) {
     collidedRect.x = staticTile.pos.x;
@@ -72,6 +75,7 @@ void Player::collision(float dt) {
 
     if (SDL_GetRectIntersectionFloat(&playerCollider, &collidedRect,
                                      &intersectionRect)) {
+      collided = true;
       if (intersectionRect.w < intersectionRect.h) {
         if (vel.x > 0) {
           pos.x -= intersectionRect.w;
@@ -109,7 +113,11 @@ void Player::collision(float dt) {
     // TODO:Implement collision behaviour of player with moving platform tiles.
     if (SDL_GetRectIntersectionFloat(&playerCollider, &collidedRect,
                                      &intersectionRect)) {
+      collided = true;
     }
+  }
+
+  if (Game::debug) {
   }
 
   if (grounded != foundGround) {

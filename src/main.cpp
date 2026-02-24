@@ -44,7 +44,7 @@ int main(int argc, char **argv) {
 
     SDL_Event event{0};
     while (SDL_PollEvent(&event)) {
-      ImGui_ImplSDL3_ProcessEvent(&event);
+      if (Game::debug) ImGui_ImplSDL3_ProcessEvent(&event);
       switch (event.type) {
         case SDL_EVENT_QUIT: {
           running = false;
@@ -70,8 +70,10 @@ int main(int argc, char **argv) {
       }
     }
 
-    ui.newFrame();
-    ui.drawFrame();
+    if (Game::debug) {
+      ui.newFrame();
+      ui.drawFrame();
+    }
 
     // Clear screen
     SDL_SetRenderDrawColor(sdlState.renderer, 20, 152, 220, 255);
@@ -95,7 +97,9 @@ int main(int argc, char **argv) {
       dynTile.draw(sdlState);
     }
 
-    ui.presentFrame(sdlState);
+    if (Game::debug) {
+      ui.presentFrame(sdlState);
+    }
 
     // Swap buffers
     SDL_RenderPresent(sdlState.renderer);
