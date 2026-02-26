@@ -67,34 +67,7 @@ struct UI {
 
   void drawPlayerInfo() {
     ImGui::Begin("Player");
-    {
-      std::string playerState{8, 0};
-      switch (Game::player.currAnim) {
-        case PlayerAnim::idle: {
-          playerState = "idle";
-          break;
-        }
-        case PlayerAnim::run: {
-          playerState = "run";
-          break;
-        }
-        case PlayerAnim::jump: {
-          playerState = "jump";
-          break;
-        }
-      }
-      ImGui::Text("Velocity: (%f, %f)", Game::player.vel.x, Game::player.vel.y);
-      ImGui::Text("State: %s", playerState.c_str());
-    }
-    ImGui::End();
-  }
-
-  void drawPlayerInfoCustom(std::function<void()> drawFunc) {
-    newFrame();
-    ImGui::Begin("Player");
-    {
-      drawFunc();
-    }
+    ImGui::Text(Game::player.inspect().c_str());
     ImGui::End();
   }
 

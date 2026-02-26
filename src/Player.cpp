@@ -65,7 +65,7 @@ void Player::collision(float dt) {
   SDL_FRect collidedRect{0};
   SDL_FRect intersectionRect{0};
 
-  bool collided = false;
+  collided = false;
   bool foundGround = false;
   for (auto& staticTile : Game::staticTiles) {
     collidedRect.x = staticTile.pos.x;
@@ -92,6 +92,10 @@ void Player::collision(float dt) {
         vel.y = 0;
       }
     }
+
+    // ImGui::BeginChild("Player");
+    // ImGui::Text("Collision: %s", collided ? "true" : "false");
+    // ImGui::EndChild();
 
     groundSensor.x = playerCollider.x;
     groundSensor.y = playerCollider.y + playerCollider.h;
