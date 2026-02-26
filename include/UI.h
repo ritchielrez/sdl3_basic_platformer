@@ -18,7 +18,7 @@ struct UI {
 
   UI() = delete;
 
-  UI(const SDLState &sdlState) {
+  UI(const SDLState &sdlState, const std::string_view fontPath) {
     fontHeight = 18.0f;
 
     IMGUI_CHECKVERSION();
@@ -33,9 +33,10 @@ struct UI {
     ImGui_ImplSDL3_InitForSDLRenderer(sdlState.win, sdlState.renderer);
     ImGui_ImplSDLRenderer3_Init(sdlState.renderer);
 
-    io.Fonts->AddFontFromFileTTF("assets/fonts/PixelOperator8.ttf", fontHeight);
+    io.Fonts->AddFontFromFileTTF(fontPath.data(), fontHeight);
   }
-  UI(const SDLState &sdlState, const float fontHeight) {
+  UI(const SDLState &sdlState, const std::string_view fontPath,
+     const float fontHeight) {
     this->fontHeight = fontHeight;
 
     IMGUI_CHECKVERSION();
@@ -50,7 +51,7 @@ struct UI {
     ImGui_ImplSDL3_InitForSDLRenderer(sdlState.win, sdlState.renderer);
     ImGui_ImplSDLRenderer3_Init(sdlState.renderer);
 
-    io.Fonts->AddFontFromFileTTF("assets/fonts/PixelOperator8.ttf", fontHeight);
+    io.Fonts->AddFontFromFileTTF(fontPath.data(), fontHeight);
   }
 
   void newFrame() {

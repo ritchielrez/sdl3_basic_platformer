@@ -34,7 +34,7 @@ int main(int argc, char **argv) {
   Game::createPlayer(sdlState, resourceManager);
   Game::loadTileMap(sdlState, resourceManager);
 
-  UI ui{sdlState, 14.0f};
+  UI ui{sdlState, "assets/fonts/Roboto-Regular.ttf", 20.0f};
 
   uint64_t prevTime = SDL_GetTicks();
   bool running = true;
