@@ -93,10 +93,6 @@ void Player::collision(float dt) {
       }
     }
 
-    // ImGui::BeginChild("Player");
-    // ImGui::Text("Collision: %s", collided ? "true" : "false");
-    // ImGui::EndChild();
-
     groundSensor.x = playerCollider.x;
     groundSensor.y = playerCollider.y + playerCollider.h;
     groundSensor.w = playerCollider.w;
@@ -119,9 +115,6 @@ void Player::collision(float dt) {
                                      &intersectionRect)) {
       collided = true;
     }
-  }
-
-  if (Game::debug) {
   }
 
   if (grounded != foundGround) {
