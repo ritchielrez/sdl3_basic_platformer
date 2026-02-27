@@ -120,6 +120,7 @@ void Player::collision(float dt) {
   if (grounded != foundGround) {
     grounded = foundGround;
     if (foundGround) {
+      Log::debug("Player found ground: true\n");
       currAnim = PlayerAnim::run;
     }
   }
