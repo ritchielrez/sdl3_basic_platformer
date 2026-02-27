@@ -19,9 +19,9 @@ endif()
 add_executable(main src/main.cpp src/Entity.cpp src/Player.cpp)
 target_include_directories(main PRIVATE include)
 
-# if (CMAKE_BUILD_TYPE STREQUAL "Debug" OR CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo")
-#   target_compile_definitions(main PRIVATE DEBUG)
-# endif()
+if (CMAKE_BUILD_TYPE STREQUAL "Debug" OR CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo")
+  target_compile_definitions(main PRIVATE DEBUG)
+endif()
 
 if(WIN32)
   target_compile_definitions(main PRIVATE NOMINMAX WIN32_LEAN_AND_MEAN)
