@@ -18,7 +18,7 @@ struct UI {
 
   UI() = delete;
 
-  UI(const SDLState &sdlState, const std::string_view fontPath) {
+  UI(const SDLState &sdlState, const std::string_view &fontPath) {
     fontHeight = 18.0f;
 
     IMGUI_CHECKVERSION();
@@ -35,7 +35,7 @@ struct UI {
 
     io.Fonts->AddFontFromFileTTF(fontPath.data(), fontHeight);
   }
-  UI(const SDLState &sdlState, const std::string_view fontPath,
+  UI(const SDLState &sdlState, const std::string_view &fontPath,
      const float fontHeight) {
     this->fontHeight = fontHeight;
 
