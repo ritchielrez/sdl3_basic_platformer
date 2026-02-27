@@ -59,7 +59,9 @@ int main(int argc, char **argv) {
         // down events in a single frame. With events, there is a delay
         // between consecutive key down events.
         case SDL_EVENT_KEY_DOWN: {
+#ifdef DEBUG
           if (event.key.scancode == SDL_SCANCODE_F1) Game::debug = !Game::debug;
+#endif
           Game::player.handleKeyInput(sdlState, event.key.scancode, true);
           break;
         }
