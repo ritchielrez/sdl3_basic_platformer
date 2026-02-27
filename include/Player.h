@@ -34,6 +34,10 @@ struct Player : public Entity {
         playerState = "run";
         break;
       }
+      case PlayerAnim::slide: {
+        playerState = "slide";
+        break;
+      }
       case PlayerAnim::jump: {
         playerState = "jump";
         break;
