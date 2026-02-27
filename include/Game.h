@@ -63,6 +63,8 @@ struct Game {
         Frames(16, 2.0f, playerRunTexCoords, PLAYER_SIZE, PLAYER_SIZE);
     playerAnims[PlayerAnim::jump] = Frames(
         glm::vec2(2 * PLAYER_SIZE, 5 * PLAYER_SIZE), PLAYER_SIZE, PLAYER_SIZE);
+    playerAnims[PlayerAnim::slide] = Frames(
+        glm::vec2(2 * PLAYER_SIZE, 2 * PLAYER_SIZE), PLAYER_SIZE, PLAYER_SIZE);
 
     player.pos = glm::vec2(0, sdlState.logHeight - 64);
     player.tex = resourceManager.getPlayerTex();

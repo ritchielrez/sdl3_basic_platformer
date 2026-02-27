@@ -42,6 +42,16 @@ void Player::update(const SDLState& sdlState, float dt) {
       if (!currDir) {
         currAnim = PlayerAnim::idle;
       }
+
+      if (vel.x * dir < 0 && grounded) {
+        currAnim = PlayerAnim::slide;
+      }
+      break;
+    }
+    case PlayerAnim::slide: {
+      if (vel.x * dir >= 0 || !grounded) {
+        currAnim = PlayerAnim::run;
+      }
       break;
     }
   }
