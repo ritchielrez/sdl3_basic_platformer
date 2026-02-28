@@ -143,17 +143,11 @@ void Player::collision(float dt) {
 void Player::handleKeyInput(const SDLState& sdlState, SDL_Scancode key,
                             bool keyDown) {
   switch (currAnim) {
-    case PlayerAnim::idle: {
-      if (key == SDL_SCANCODE_SPACE && keyDown) {
-        currAnim = PlayerAnim::jump;
-        vel.y += jumpAccel;
-      }
-      break;
-    }
+    case PlayerAnim::idle:
     case PlayerAnim::run: {
       if (key == SDL_SCANCODE_SPACE && keyDown) {
         currAnim = PlayerAnim::jump;
-        vel.y += jumpAccel;
+        vel.y = jumpVel;
       }
       break;
     }
