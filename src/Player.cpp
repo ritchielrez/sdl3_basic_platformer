@@ -67,10 +67,10 @@ void Player::update(const SDLState& sdlState, float dt) {
 }
 
 void Player::collision(float dt) {
-  const SDL_FRect playerCollider{.x = pos.x + collider.x,
-                                 .y = pos.y + collider.y,
-                                 .w = collider.w,
-                                 .h = collider.h};
+  SDL_FRect playerCollider{.x = pos.x + collider.x,
+                           .y = pos.y + collider.y,
+                           .w = collider.w,
+                           .h = collider.h};
   SDL_FRect groundSensor{0};
   SDL_FRect collidedRect{0};
   SDL_FRect intersectionRect{0};
@@ -102,6 +102,10 @@ void Player::collision(float dt) {
         vel.y = 0;
       }
     }
+
+    // Recalculate playerCollider after the player has moved due to collision.
+    playerCollider.x = pos.x + collider.x;
+    playerCollider.y = pos.y + collider.y;
 
     groundSensor.x = playerCollider.x;
     groundSensor.y = playerCollider.y + playerCollider.h;
