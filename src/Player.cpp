@@ -16,6 +16,10 @@ void Player::update(const SDLState& sdlState, float dt) {
   if (sdlState.keys[SDL_SCANCODE_D]) {
     currDir += 1;
   }
+  if (grounded && sdlState.keys[SDL_SCANCODE_SPACE]) {
+    vel.y = jumpVel;
+    currAnim = PlayerAnim::jump;
+  }
   if (currDir) {
     dir = currDir;
   }
@@ -61,7 +65,7 @@ void Player::update(const SDLState& sdlState, float dt) {
     vel.x = currDir * maxSpeedX;
   }
 
-  vel.y += 150 * dt;
+  if (!grounded) vel.y += 150 * dt;
   pos += vel * dt;
   collision(dt);
 }
@@ -135,20 +139,6 @@ void Player::collision(float dt) {
     grounded = foundGround;
     if (foundGround) {
       currAnim = PlayerAnim::run;
-    }
-  }
-}
-
-void Player::handleKeyInput(const SDLState& sdlState, SDL_Scancode key,
-                            bool keyDown) {
-  switch (currAnim) {
-    case PlayerAnim::idle:
-    case PlayerAnim::run: {
-      if (key == SDL_SCANCODE_SPACE && keyDown) {
-        currAnim = PlayerAnim::jump;
-        vel.y = jumpVel;
-      }
-      break;
     }
   }
 }
