@@ -32,6 +32,7 @@ struct Game {
   static inline Player player{};
   static inline std::vector<StaticTile> staticTiles{};
   static inline std::vector<DynTile> dynTiles{};
+  static inline SDL_FRect camera{};
 
  private:
   static inline void createPlayer(const SDLState &sdlState,
@@ -126,10 +127,12 @@ struct Game {
     createPlayer(sdlState, resourceManager);
     loadTileMap(sdlState, resourceManager);
 
+    camera.w = sdlState.logWidth;
+    camera.h = sdlState.logHeight;
+    camera.x = (player.pos.x + TILE_SIZE / 2) - camera.w / 2;
+    camera.y = 0;
+    camera.h = sdlState.logHeight;
+    camera.x = (player.pos.x + TILE_SIZE / 2) - camera.w / 2;
+    camera.y = 0;
   }
-};
- public:
-  Game(const SDLState &sdlState, const ResourceManager &resourceManager) {
-    createPlayer(sdlState, resourceManager);
-    loadTileMap(sdlState, resourceManager);
 };
