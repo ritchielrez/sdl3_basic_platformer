@@ -33,6 +33,7 @@ struct Game {
   static inline std::vector<StaticTile> staticTiles{};
   static inline std::vector<DynTile> dynTiles{};
 
+ private:
   static inline void createPlayer(const SDLState &sdlState,
                                   const ResourceManager &resourceManager) {
     constexpr size_t PLAYER_IDLE_FRAMES = 4;
@@ -119,4 +120,16 @@ struct Game {
       }
     }
   }
+
+ public:
+  Game(const SDLState &sdlState, const ResourceManager &resourceManager) {
+    createPlayer(sdlState, resourceManager);
+    loadTileMap(sdlState, resourceManager);
+
+  }
+};
+ public:
+  Game(const SDLState &sdlState, const ResourceManager &resourceManager) {
+    createPlayer(sdlState, resourceManager);
+    loadTileMap(sdlState, resourceManager);
 };

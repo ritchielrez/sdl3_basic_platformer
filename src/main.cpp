@@ -30,10 +30,7 @@ int main(int argc, char **argv) {
 
   SDLState sdlState{"learn_sdl3", SDL_WINDOW_RESIZABLE, nullptr};
   ResourceManager resourceManager{sdlState};
-
-  Game::createPlayer(sdlState, resourceManager);
-  Game::loadTileMap(sdlState, resourceManager);
-
+  Game game{sdlState, resourceManager};
   UI ui{sdlState, "assets/fonts/Roboto-Regular.ttf", 20.0f};
 
   uint64_t prevTime = SDL_GetTicks();
@@ -44,7 +41,7 @@ int main(int argc, char **argv) {
 
     SDL_Event event{0};
     while (SDL_PollEvent(&event)) {
-      if (Game::debug) ImGui_ImplSDL3_ProcessEvent(&event);
+      if (game.debug) ImGui_ImplSDL3_ProcessEvent(&event);
       switch (event.type) {
         case SDL_EVENT_QUIT: {
           running = false;
@@ -60,19 +57,14 @@ int main(int argc, char **argv) {
         // between consecutive key down events.
         case SDL_EVENT_KEY_DOWN: {
 #ifdef DEBUG
-          if (event.key.scancode == SDL_SCANCODE_F1) Game::debug = !Game::debug;
+          if (event.key.scancode == SDL_SCANCODE_F1) game.debug = !game.debug;
 #endif
-          Game::player.handleKeyInput(sdlState, event.key.scancode, true);
-          break;
-        }
-        case SDL_EVENT_KEY_UP: {
-          Game::player.handleKeyInput(sdlState, event.key.scancode, false);
           break;
         }
       }
     }
 
-    if (Game::debug) {
+    if (game.debug) {
       ui.newFrame();
       ui.drawFrame();
     }
@@ -85,21 +77,21 @@ int main(int argc, char **argv) {
 
     // Only animate the player if the current animation has multiple frames.
     // If it has one frame, the timer length/duration is set to 0.
-    if (Game::player.anims[Game::player.currAnim].getLen() != 0) {
-      Game::player.anims[Game::player.currAnim].step(dt);
+    if (game.player.anims[game.player.currAnim].getLen() != 0) {
+      game.player.anims[game.player.currAnim].step(dt);
     }
-    Game::player.update(sdlState, dt);
+    game.player.update(sdlState, dt);
 
     // Render
-    Game::player.draw(sdlState);
-    for (auto &staticTile : Game::staticTiles) {
+    game.player.draw(sdlState);
+    for (auto &staticTile : game.staticTiles) {
       staticTile.draw(sdlState);
     }
-    for (auto &dynTile : Game::dynTiles) {
+    for (auto &dynTile : game.dynTiles) {
       dynTile.draw(sdlState);
     }
 
-    if (Game::debug) {
+    if (game.debug) {
       ui.presentFrame(sdlState);
     }
 
