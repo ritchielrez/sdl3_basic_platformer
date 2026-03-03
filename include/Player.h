@@ -21,8 +21,6 @@ struct Player : public Entity {
   void update(const SDLState& sdlState, float dt);
   void collision(float dt);
 
-  void handleKeyInput(const SDLState& sdlState, SDL_Scancode key, bool keyDown);
-
   std::string inspect() {
     std::string playerState{8, 0};
     switch (currAnim) {
@@ -44,7 +42,8 @@ struct Player : public Entity {
       }
     }
     return fmt::format(
-        "Velocity: ({}, {})\nState: {}\nCollision: {}\nGrounded: {}\n", vel.x,
-        vel.y, playerState, collided, grounded);
+        "Position: ({}, {})\nVelocity: ({}, {})\nState: {}\nCollision: "
+        "{}\nGrounded: {}\n",
+        pos.x, pos.y, vel.x, vel.y, playerState, collided, grounded);
   }
 };
