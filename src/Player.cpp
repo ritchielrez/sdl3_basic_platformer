@@ -30,13 +30,13 @@ void Player::update(const SDLState& sdlState, float dt) {
         currAnim = PlayerAnim::run;
       } else {
         if (vel.x) {
-          const float factor = vel.x > 0 ? -1.5f : 1.5f;
-          float amount = factor * accel.x * dt;
+          const float deaccelFactor = vel.x > 0 ? -1.5f : 1.5f;
+          float deaccelVel = deaccelFactor * accel.x * dt;
 
-          if (glm::abs(vel.x) < glm::abs(amount)) {
+          if (glm::abs(vel.x) < glm::abs(deaccelVel)) {
             vel.x = 0;
           } else {
-            vel.x += amount;
+            vel.x += deaccelVel;
           }
         }
       }
@@ -68,6 +68,7 @@ void Player::update(const SDLState& sdlState, float dt) {
   if (!grounded) vel.y += 150 * dt;
   pos += vel * dt;
   collision(dt);
+  Game::cam.x += vel.x * 0.5f * dt;
 }
 
 void Player::collision(float dt) {

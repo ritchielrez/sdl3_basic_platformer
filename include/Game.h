@@ -32,7 +32,8 @@ struct Game {
   static inline Player player{};
   static inline std::vector<StaticTile> staticTiles{};
   static inline std::vector<DynTile> dynTiles{};
-  static inline SDL_FRect camera{};
+  static inline SDL_FRect cam{};
+  static inline float camMaxSpeedX = 0;
 
  private:
   static inline void createPlayer(const SDLState &sdlState,
@@ -123,16 +124,15 @@ struct Game {
   }
 
  public:
+  Game() = delete;
+
   Game(const SDLState &sdlState, const ResourceManager &resourceManager) {
     createPlayer(sdlState, resourceManager);
     loadTileMap(sdlState, resourceManager);
 
-    camera.w = sdlState.logWidth;
-    camera.h = sdlState.logHeight;
-    camera.x = (player.pos.x + TILE_SIZE / 2) - camera.w / 2;
-    camera.y = 0;
-    camera.h = sdlState.logHeight;
-    camera.x = (player.pos.x + TILE_SIZE / 2) - camera.w / 2;
-    camera.y = 0;
+    cam.w = sdlState.logWidth;
+    cam.h = sdlState.logHeight;
+    cam.x = 0;
+    cam.y = 0;
   }
 };
