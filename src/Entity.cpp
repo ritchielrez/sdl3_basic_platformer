@@ -13,7 +13,7 @@ void Entity::draw(const SDLState &sdlState) {
                 .w = currFrame.getFrameWidth(),
                 .h = currFrame.getFrameHeight()};
   SDL_FRect dst{
-      .x = pos.x - Game::camera.x, .y = pos.y - Game::camera.y, .w = w, .h = h};
+      .x = pos.x - Game::cam.x, .y = pos.y - Game::cam.y, .w = w, .h = h};
 
   SDL_FlipMode flipMode = dir == -1 ? SDL_FLIP_HORIZONTAL : SDL_FLIP_NONE;
   SDL_RenderTextureRotated(sdlState.renderer, tex, &src, &dst, 0, nullptr,
@@ -21,8 +21,8 @@ void Entity::draw(const SDLState &sdlState) {
 
   if (Game::debug) {
     SDL_FRect colliderRect{0};
-    colliderRect.x = pos.x + collider.x - Game::camera.x;
-    colliderRect.y = pos.y + collider.y - Game::camera.y;
+    colliderRect.x = pos.x + collider.x - Game::cam.x;
+    colliderRect.y = pos.y + collider.y - Game::cam.y;
     colliderRect.w = collider.w;
     colliderRect.h = collider.h;
     SDL_SetRenderDrawColor(sdlState.renderer, 255, 0, 0, 128);
