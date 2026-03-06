@@ -33,7 +33,6 @@ struct Game {
   static inline std::vector<StaticTile> staticTiles{};
   static inline std::vector<DynTile> dynTiles{};
   static inline SDL_FRect cam{};
-  static inline float camMaxSpeedX = 0;
 
  private:
   static inline void createPlayer(const SDLState &sdlState,
