@@ -123,9 +123,7 @@ struct Game {
   }
 
  public:
-  Game() = delete;
-
-  Game(const SDLState &sdlState, const ResourceManager &resourceManager) {
+  void init(const SDLState &sdlState, const ResourceManager &resourceManager) {
     createPlayer(sdlState, resourceManager);
     loadTileMap(sdlState, resourceManager);
 

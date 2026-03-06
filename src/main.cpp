@@ -30,7 +30,8 @@ int main(int argc, char **argv) {
 
   SDLState sdlState{"learn_sdl3", SDL_WINDOW_RESIZABLE, nullptr};
   ResourceManager resourceManager{sdlState};
-  Game game{sdlState, resourceManager};
+  Game game;
+  game.init(sdlState, resourceManager);
   UI ui{sdlState, "assets/fonts/Roboto-Regular.ttf", 20.0f};
 
   uint64_t prevTime = SDL_GetTicks();
