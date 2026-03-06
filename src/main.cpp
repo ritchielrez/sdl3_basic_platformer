@@ -65,10 +65,8 @@ int main(int argc, char **argv) {
       }
     }
 
-    if (game.debug) {
-      debugUI.newFrame();
-      debugUI.drawFrame();
-    }
+    debugUI.newFrame();
+    debugUI.drawFrame();
 
     // Clear screen
     SDL_SetRenderDrawColor(sdlState.renderer, 20, 152, 220, 255);
@@ -92,9 +90,7 @@ int main(int argc, char **argv) {
       dynTile.draw(sdlState);
     }
 
-    if (game.debug) {
-      debugUI.presentFrame(sdlState);
-    }
+    debugUI.presentFrame(sdlState);
 
     // Swap buffers
     SDL_RenderPresent(sdlState.renderer);

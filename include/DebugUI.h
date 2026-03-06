@@ -55,6 +55,8 @@ struct DebugUI {
   }
 
   void newFrame() {
+    if (!Game::debug) return;
+
     ImGui_ImplSDLRenderer3_NewFrame();
     ImGui_ImplSDL3_NewFrame();
     ImGui::NewFrame();
@@ -66,18 +68,23 @@ struct DebugUI {
   }
 
   void drawPlayerInfo() {
+    if (!Game::debug) return;
+
     ImGui::Begin("Player");
     ImGui::Text(Game::player.inspect().c_str());
     ImGui::End();
   }
 
   void drawFrame() {
+    if (!Game::debug) return;
+
     drawPlayerInfo();
 
     ImGui::Render();
   }
 
   void presentFrame(const SDLState &sdlState) {
+    if (!Game::debug) return;
     SDL_SetRenderLogicalPresentation(sdlState.renderer, 0, 0,
                                      SDL_LOGICAL_PRESENTATION_DISABLED);
     ImGui_ImplSDLRenderer3_RenderDrawData(ImGui::GetDrawData(),
