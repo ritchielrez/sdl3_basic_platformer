@@ -1,10 +1,10 @@
 #pragma once
 
 #include <backends/imgui_impl_sdl3.h>
+#include <fmt/core.h>
 #include <imgui.h>
 #include <imgui_impl_sdlrenderer3.h>
 
-#include <functional>
 #include <string>
 
 #include "Game.h"
@@ -75,10 +75,20 @@ struct DebugUI {
     ImGui::End();
   }
 
+  void drawCameraInfo() {
+    if (!Game::debug) return;
+
+    ImGui::Begin("Camera");
+    ImGui::Text(
+        fmt::format("Position: ({}, {})\n", Game::cam.x, Game::cam.y).c_str());
+    ImGui::End();
+  }
+
   void drawFrame() {
     if (!Game::debug) return;
 
     drawPlayerInfo();
+    drawCameraInfo();
 
     ImGui::Render();
   }
