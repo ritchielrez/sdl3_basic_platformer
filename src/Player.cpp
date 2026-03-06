@@ -1,12 +1,10 @@
 #include "Player.h"
 
 #include <SDL3/SDL.h>
-#include <imgui.h>
 
 #include "Game.h"
 #include "Log.h"
 #include "SDLState.h"
-#include "UI.h"
 
 void Player::update(const SDLState& sdlState, float dt) {
   float currDir = 0;

@@ -10,6 +10,7 @@
 #include <string_view>
 #include <vector>
 
+#include "DebugUI.h"
 #include "DynTile.h"
 #include "Game.h"
 #include "Log.h"
@@ -17,7 +18,6 @@
 #include "ResourceManager.h"
 #include "SDLState.h"
 #include "StaticTile.h"
-#include "UI.h"
 #include "defer.h"
 
 int main(int argc, char **argv) {
@@ -32,7 +32,7 @@ int main(int argc, char **argv) {
   ResourceManager resourceManager{sdlState};
   Game game;
   game.init(sdlState, resourceManager);
-  UI ui{sdlState, "assets/fonts/Roboto-Regular.ttf", 20.0f};
+  DebugUI debugUI{sdlState, "assets/fonts/Roboto-Regular.ttf", 20.0f};
 
   uint64_t prevTime = SDL_GetTicks();
   bool running = true;
@@ -66,8 +66,8 @@ int main(int argc, char **argv) {
     }
 
     if (game.debug) {
-      ui.newFrame();
-      ui.drawFrame();
+      debugUI.newFrame();
+      debugUI.drawFrame();
     }
 
     // Clear screen
@@ -93,7 +93,7 @@ int main(int argc, char **argv) {
     }
 
     if (game.debug) {
-      ui.presentFrame(sdlState);
+      debugUI.presentFrame(sdlState);
     }
 
     // Swap buffers

@@ -10,15 +10,15 @@
 #include "Game.h"
 #include "SDLState.h"
 
-struct UI {
+struct DebugUI {
   ImGuiIO io;
   ImGuiStyle style;
 
   float fontHeight;
 
-  UI() = delete;
+  DebugUI() = delete;
 
-  UI(const SDLState &sdlState, const std::string_view &fontPath) {
+  DebugUI(const SDLState &sdlState, const std::string_view &fontPath) {
     fontHeight = 18.0f;
 
     IMGUI_CHECKVERSION();
@@ -35,8 +35,8 @@ struct UI {
 
     io.Fonts->AddFontFromFileTTF(fontPath.data(), fontHeight);
   }
-  UI(const SDLState &sdlState, const std::string_view &fontPath,
-     const float fontHeight) {
+  DebugUI(const SDLState &sdlState, const std::string_view &fontPath,
+          const float fontHeight) {
     this->fontHeight = fontHeight;
 
     IMGUI_CHECKVERSION();
@@ -87,7 +87,7 @@ struct UI {
                                      SDL_LOGICAL_PRESENTATION_LETTERBOX);
   }
 
-  ~UI() {
+  ~DebugUI() {
     ImGui_ImplSDLRenderer3_Shutdown();
     ImGui_ImplSDL3_Shutdown();
     ImGui::DestroyContext();
