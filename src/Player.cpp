@@ -2,6 +2,9 @@
 
 #include <SDL3/SDL.h>
 
+#define GLM_ENABLE_EXPERIMENTAL
+#include <glm/gtx/compatibility.hpp>
+
 #include "Game.h"
 #include "Log.h"
 #include "SDLState.h"
@@ -59,14 +62,31 @@ void Player::update(const SDLState& sdlState, float dt) {
   }
 
   vel += currDir * accel * dt;
-  if (glm::abs(vel.x) > maxSpeedX) {
-    vel.x = currDir * maxSpeedX;
-  }
+  vel.x = glm::clamp(vel.x, -maxSpeedX, maxSpeedX);
 
-  if (!grounded) vel.y += 150 * dt;
+  constexpr float gravVel = 150.0f;
+  if (!grounded) vel.y += gravVel * dt;
+
   pos += vel * dt;
   collision(dt);
-  Game::cam.x += vel.x * 0.5f * dt;
+
+  float rightRuler = Game::cam.w * 0.75f;
+  float leftRuler = Game::cam.w * 0.25f;
+  float playerScreenX = pos.x - Game::cam.x;
+
+  if (currDir == 1 && playerScreenX >= leftRuler) {
+    Game::cam.x = pos.x - leftRuler;
+  } else if (currDir == -1 && playerScreenX <= rightRuler) {
+    Game::cam.x = pos.x - rightRuler;
+  }
+
+  if (Game::debug) {
+    SDL_SetRenderDrawColor(sdlState.renderer, 0, 255, 0, 128);
+    SDL_RenderLine(sdlState.renderer, Game::cam.w / 4, 0, Game::cam.w / 4,
+                   Game::cam.h);
+    SDL_RenderLine(sdlState.renderer, Game::cam.w * 3 / 4, 0,
+                   Game::cam.w * 3 / 4, Game::cam.h);
+  }
 }
 
 void Player::collision(float dt) {

@@ -13,11 +13,16 @@ enum { idle, run, jump, slide };
 
 struct Player : public Entity {
   glm::vec2 accel;
-  float jumpVel;
+  float jumpVel, gravVel;
   float maxSpeedX;
   bool collided, grounded;
 
-  Player() : accel(glm::vec2(0)), jumpVel(0), maxSpeedX(0), grounded(false) {}
+  Player()
+      : accel(glm::vec2(0)),
+        jumpVel(0),
+        maxSpeedX(0),
+        collided(false),
+        grounded(false) {}
   void update(const SDLState& sdlState, float dt);
   void collision(float dt);
 

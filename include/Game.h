@@ -26,7 +26,7 @@ enum {
 struct Game {
   static constexpr float TILE_SIZE = 16.0f;
   static constexpr size_t MAP_ROWS = 5;
-  static constexpr size_t MAP_COLS = 50;
+  static constexpr size_t MAP_COLS = 200;
   static inline bool debug = false;
   static inline uint16_t map[MAP_ROWS][MAP_COLS];
   static inline Player player{};
