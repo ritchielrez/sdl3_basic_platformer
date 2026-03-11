@@ -74,15 +74,15 @@ void Player::update(const SDLState& sdlState, float dt) {
   float leftRuler = Game::cam.w * 0.25f;
   float playerScreenX = pos.x - Game::cam.x;
 
-  float targetX = Game::cam.x;
+  float camVelX = 0;
 
   if (currDir == 1 && playerScreenX >= leftRuler) {
-    targetX = pos.x - leftRuler;
+    camVelX = 1.5f * maxSpeedX;
   } else if (currDir == -1 && playerScreenX <= rightRuler) {
-    targetX = pos.x - rightRuler;
+    camVelX = -1.5f * maxSpeedX;
   }
 
-  Game::cam.x = glm::lerp(Game::cam.x, targetX, 2 * dt);
+  Game::cam.x += camVelX * dt;
 
   if (Game::debug) {
     SDL_SetRenderDrawColor(sdlState.renderer, 0, 255, 0, 128);
