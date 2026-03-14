@@ -123,7 +123,8 @@ struct Game {
   }
 
  public:
-  void init(const SDLState &sdlState, const ResourceManager &resourceManager) {
+  static inline void init(const SDLState &sdlState,
+                          const ResourceManager &resourceManager) {
     createPlayer(sdlState, resourceManager);
     loadTileMap(sdlState, resourceManager);
 
@@ -131,5 +132,12 @@ struct Game {
     cam.h = sdlState.logHeight;
     cam.x = 0;
     cam.y = 0;
+  }
+  static inline void reset(const SDLState &sdlState,
+                           const ResourceManager &resourceManager) {
+    player = Player();
+    staticTiles.clear();
+    dynTiles.clear();
+    init(sdlState, resourceManager);
   }
 };

@@ -1,6 +1,7 @@
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_main.h>
 #include <backends/imgui_impl_sdl3.h>
+#include <fmt/base.h>
 #include <imgui.h>
 #include <imgui_impl_sdlrenderer3.h>
 
@@ -96,6 +97,12 @@ int main(int argc, char **argv) {
     SDL_RenderPresent(sdlState.renderer);
 
     prevTime = nowTime;
+
+    if (Game::player.pos.y >= sdlState.logHeight + 150.0f) {
+      game.reset(sdlState, resourceManager);
+      fmt::print("You died.\n");
+      continue;
+    }
   }
 
   return 0;
