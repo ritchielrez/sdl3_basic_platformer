@@ -70,24 +70,14 @@ void Player::update(const SDLState& sdlState, float dt) {
   pos += vel * dt;
   collision(dt);
 
-  float rightRuler = Game::cam.w * 0.75f;
-  float leftRuler = Game::cam.w * 0.25f;
-  float playerScreenX = pos.x - Game::cam.x;
+  float camRuler = (sdlState.logWidth - w) / 2;
 
-  float camVelX = 0;
-
-  if (currDir == 1 && playerScreenX >= leftRuler) {
-    camVelX = 1.5f * maxSpeedX;
-  } else if (currDir == -1 && playerScreenX <= rightRuler) {
-    camVelX = -1.5f * maxSpeedX;
+  if (!passedCamRuler && pos.x >= camRuler) {
+    passedCamRuler = true;
   }
 
-  Game::cam.x += camVelX * dt;
-
-  if (Game::debug) {
-    SDL_SetRenderDrawColor(sdlState.renderer, 0, 255, 0, 128);
-    SDL_RenderLine(sdlState.renderer, leftRuler, 0, leftRuler, Game::cam.h);
-    SDL_RenderLine(sdlState.renderer, rightRuler, 0, rightRuler, Game::cam.h);
+  if (passedCamRuler) {
+    Game::cam.x = glm::lerp(Game::cam.x, pos.x - camRuler, 10.0f * dt);
   }
 }
 

@@ -15,7 +15,7 @@ struct Player : public Entity {
   glm::vec2 accel;
   float jumpVel, gravVel;
   float maxSpeedX;
-  bool collided, grounded;
+  bool collided, grounded, passedCamRuler;
 
   Player()
       : accel(glm::vec2(0)),
