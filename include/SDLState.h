@@ -7,7 +7,7 @@ struct SDLState {
   SDL_Renderer *renderer;
   const bool *keys;
   uint32_t winWidth = 1280, winHeight = 720;
-  static constexpr uint32_t logWidth = 640, logHeight = 360;
+  static constexpr uint32_t logWidth = 320, logHeight = 180;
 
   SDLState() : win(nullptr), renderer(nullptr), keys(nullptr) {}
   SDLState(const char *winTitle, SDL_WindowFlags winFlags,
