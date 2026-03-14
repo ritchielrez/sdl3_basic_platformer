@@ -64,18 +64,15 @@ void Player::update(const SDLState& sdlState, float dt) {
   vel += currDir * accel * dt;
   vel.x = glm::clamp(vel.x, -maxSpeedX, maxSpeedX);
 
-  constexpr float gravVel = 150.0f;
-  if (!grounded) vel.y += gravVel * dt;
+  constexpr float gravity = 980.0f;
+  if (!grounded) vel.y += gravity * dt;
 
   pos += vel * dt;
   collision(dt);
 
   float camRuler = (sdlState.logWidth - w) / 2;
 
-  if (!passedCamRuler && pos.x >= camRuler) {
-    passedCamRuler = true;
-  }
-
+  if (!passedCamRuler && pos.x >= camRuler) passedCamRuler = true;
   if (passedCamRuler) {
     Game::cam.x = glm::lerp(Game::cam.x, pos.x - camRuler, 10.0f * dt);
   }
