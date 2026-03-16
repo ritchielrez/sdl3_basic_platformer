@@ -12,7 +12,8 @@
 
 namespace Tiles {
 enum {
-  GRASS = 1,
+  NONE,
+  GRASS,
   DIRT,
   BRIDGE1,
   BRIDGE2,
@@ -20,6 +21,7 @@ enum {
   TREE1,
   TREE2,
   TREE3,
+  COIN,
 };
 }
 
@@ -28,7 +30,7 @@ struct Game {
   static constexpr size_t MAP_ROWS = 5;
   static constexpr size_t MAP_COLS = 200;
   static inline bool debug = false;
-  static inline uint16_t map[MAP_ROWS][MAP_COLS];
+  static inline uint16_t map[MAP_ROWS][MAP_COLS]{Tiles::NONE};
   static inline Player player{};
   static inline std::vector<StaticTile> staticTiles{};
   static inline std::vector<DynTile> dynTiles{};
@@ -113,7 +115,7 @@ struct Game {
             staticTiles.push_back(staticTile);
             break;
           }
-          case 0:
+          case Tiles::NONE:
             break;
           default:
             assert(false && "Unreachable");
