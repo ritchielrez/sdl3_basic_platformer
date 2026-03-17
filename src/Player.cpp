@@ -47,14 +47,20 @@ void Player::update(const SDLState& sdlState, float dt) {
         currAnim = PlayerAnim::idle;
       }
 
+      // NOTE: If `vel.x` and `dir` have different signs, their product is less
+      // than zero.
       if (vel.x * dir < 0 && grounded) {
         currAnim = PlayerAnim::slide;
       }
       break;
     }
     case PlayerAnim::slide: {
-      if (vel.x * dir >= 0 || !grounded) {
+      // NOTE: If `vel.x` and `currDir` have the same signs, their product is
+      // greater than zero.
+      if (vel.x * currDir > 0 && grounded) {
         currAnim = PlayerAnim::run;
+      } else if (vel.x * currDir == 0 && grounded) {
+        currAnim = PlayerAnim::idle;
       }
       break;
     }
