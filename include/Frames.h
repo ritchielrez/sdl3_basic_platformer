@@ -24,14 +24,14 @@ class Frames {
         texCoords(1, texCoord) {}
   Frames(int frameCount, float len, std::vector<glm::vec2> &&texCoords,
          float frameWidth, float frameHeight)
-      : timer(len),
+      : timer(len * frameCount),
         frameCount(frameCount),
         frameWidth(frameWidth),
         frameHeight(frameHeight),
         texCoords(texCoords) {}
   Frames(int frameCount, float len, std::vector<glm::vec2> &texCoords,
          float frameWidth, float frameHeight)
-      : timer(len),
+      : timer(len * frameCount),
         frameCount(frameCount),
         frameWidth(frameWidth),
         frameHeight(frameHeight),
