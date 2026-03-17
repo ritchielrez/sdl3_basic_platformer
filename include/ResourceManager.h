@@ -7,14 +7,25 @@
 #include <string_view>
 
 class ResourceManager {
+  SDL_Texture *coinTex;
   SDL_Texture *playerTex;
   SDL_Texture *worldTex;
   SDL_Texture *platformsTex;
 
  public:
   ResourceManager()
-      : playerTex(nullptr), worldTex(nullptr), platformsTex(nullptr) {}
+      : coinTex(nullptr),
+        playerTex(nullptr),
+        worldTex(nullptr),
+        platformsTex(nullptr) {}
   ResourceManager(SDLState &sdlState) {
+    coinTex = loadTex(sdlState, "assets/sprites/coin.png");
+    if (!coinTex) {
+      SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error",
+                               "Coin texture could not be loaded", nullptr);
+      exit(1);
+    }
+
     playerTex = loadTex(sdlState, "assets/sprites/knight.png");
     if (!playerTex) {
       SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error",
@@ -60,11 +71,13 @@ class ResourceManager {
     return tex;
   }
 
+  SDL_Texture *getCoinTex() const { return coinTex; }
   SDL_Texture *getPlayerTex() const { return playerTex; }
   SDL_Texture *getWorldTex() const { return worldTex; }
   SDL_Texture *getPlatformTex() const { return platformsTex; }
 
   ~ResourceManager() {
+    SDL_DestroyTexture(coinTex);
     SDL_DestroyTexture(playerTex);
     SDL_DestroyTexture(worldTex);
     SDL_DestroyTexture(platformsTex);

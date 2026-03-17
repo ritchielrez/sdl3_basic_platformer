@@ -4,6 +4,7 @@
 #include <glm/glm.hpp>
 #include <vector>
 
+#include "Coin.h"
 #include "DynTile.h"
 #include "Player.h"
 #include "ResourceManager.h"
@@ -34,6 +35,7 @@ struct Game {
   static inline Player player{};
   static inline std::vector<StaticTile> staticTiles{};
   static inline std::vector<DynTile> dynTiles{};
+  static inline std::vector<Coin> coins{};
   static inline SDL_FRect cam{};
 
  private:
@@ -47,7 +49,7 @@ struct Game {
     playerAnims.resize(5);
 
     playerAnims[PlayerAnim::idle] = Frames(
-        PLAYER_IDLE_FRAMES, 0.5f,
+        PLAYER_IDLE_FRAMES, 0.15f,
         std::vector<glm::vec2>{
             glm::vec2(0 * PLAYER_SIZE, 0.0f), glm::vec2(1 * PLAYER_SIZE, 0.0f),
             glm::vec2(2 * PLAYER_SIZE, 0.0f), glm::vec2(3 * PLAYER_SIZE, 0.0f)},
@@ -63,8 +65,8 @@ struct Game {
         playerRunTexCoords[i].y = 3 * PLAYER_SIZE;
       }
     }
-    playerAnims[PlayerAnim::run] =
-        Frames(16, 2.0f, playerRunTexCoords, PLAYER_SIZE, PLAYER_SIZE);
+    playerAnims[PlayerAnim::run] = Frames(
+        PLAYER_RUN_FRAMES, 0.1f, playerRunTexCoords, PLAYER_SIZE, PLAYER_SIZE);
     playerAnims[PlayerAnim::jump] = Frames(
         glm::vec2(2 * PLAYER_SIZE, 5 * PLAYER_SIZE), PLAYER_SIZE, PLAYER_SIZE);
     playerAnims[PlayerAnim::slide] = Frames(
@@ -93,8 +95,11 @@ struct Game {
       }
     }
 
+    map[2][5] = Tiles::COIN;
+
     staticTiles.reserve(100);
     dynTiles.reserve(100);
+    coins.reserve(100);
 
     for (uint16_t r = 0; r < MAP_ROWS; r++) {
       for (uint16_t c = 0; c < MAP_COLS; c++) {
@@ -113,6 +118,31 @@ struct Game {
             staticTile.anims = std::vector<Frames>{
                 Frames(glm::vec2(0, TILE_SIZE), TILE_SIZE, TILE_SIZE)};
             staticTiles.push_back(staticTile);
+            break;
+          }
+          case Tiles::COIN: {
+            Coin coin{};
+            coin.pos = glm::vec2(
+                c * TILE_SIZE, sdlState.logHeight - (MAP_ROWS - r) * TILE_SIZE);
+            coin.tex = resourceManager.getCoinTex();
+            coin.w = TILE_SIZE;
+            coin.h = TILE_SIZE;
+            coin.collider.x = 0;
+            coin.collider.y = 0;
+            coin.collider.w = coin.w;
+            coin.collider.h = coin.h;
+
+            constexpr size_t COIN_ANIM_FRAMES = 12;
+
+            std::vector<glm::vec2> coinTexCoords{COIN_ANIM_FRAMES};
+            for (size_t i = 0; i < COIN_ANIM_FRAMES; i++) {
+              coinTexCoords[i].x = i * TILE_SIZE;
+              coinTexCoords[i].y = 0;
+            }
+            coin.anims = {Frames(COIN_ANIM_FRAMES, 0.1f, coinTexCoords,
+                                 TILE_SIZE, TILE_SIZE)};
+            coin.currAnim = 0;
+            coins.push_back(coin);
             break;
           }
           case Tiles::NONE:

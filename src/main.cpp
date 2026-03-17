@@ -81,6 +81,9 @@ int main(int argc, char **argv) {
       game.player.anims[game.player.currAnim].step(dt);
     }
     game.player.update(sdlState, dt);
+    for (auto &coin : game.coins) {
+      coin.anims[coin.currAnim].step(dt);
+    }
 
     // Render
     game.player.draw(sdlState);
@@ -89,6 +92,9 @@ int main(int argc, char **argv) {
     }
     for (auto &dynTile : game.dynTiles) {
       dynTile.draw(sdlState);
+    }
+    for (auto &coin : game.coins) {
+      coin.draw(sdlState);
     }
 
     debugUI.presentFrame(sdlState);
