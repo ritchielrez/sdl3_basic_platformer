@@ -17,28 +17,27 @@ void Player::update(const SDLState& sdlState, float dt) {
   if (sdlState.keys[SDL_SCANCODE_D]) {
     currDir += 1;
   }
+  if (currDir) {
+    dir = currDir;
+  }
+
   if (grounded && sdlState.keys[SDL_SCANCODE_SPACE]) {
     vel.y = jumpVel;
     currAnim = PlayerAnim::jump;
-  }
-  if (currDir) {
-    dir = currDir;
   }
 
   switch (currAnim) {
     case PlayerAnim::idle: {
       if (currDir) {
         currAnim = PlayerAnim::run;
-      } else {
-        if (vel.x) {
-          const float deaccelFactor = vel.x > 0 ? -1.5f : 1.5f;
-          float deaccelVel = deaccelFactor * accel.x * dt;
+      } else if (vel.x) {
+        const float deaccelFactor = vel.x > 0 ? -1.5f : 1.5f;
+        float deaccelVel = deaccelFactor * accel.x * dt;
 
-          if (glm::abs(vel.x) < glm::abs(deaccelVel)) {
-            vel.x = 0;
-          } else {
-            vel.x += deaccelVel;
-          }
+        if (glm::abs(vel.x) < glm::abs(deaccelVel)) {
+          vel.x = 0;
+        } else {
+          vel.x += deaccelVel;
         }
       }
       break;
