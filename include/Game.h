@@ -127,10 +127,10 @@ struct Game {
             coin.tex = resourceManager.getCoinTex();
             coin.w = TILE_SIZE;
             coin.h = TILE_SIZE;
-            coin.collider.x = 0;
-            coin.collider.y = 0;
-            coin.collider.w = coin.w;
-            coin.collider.h = coin.h;
+            coin.collider.x = 5.0f;
+            coin.collider.y = 5.0f;
+            coin.collider.w = 6.0f;
+            coin.collider.h = 6.0f;
 
             constexpr size_t COIN_ANIM_FRAMES = 12;
 

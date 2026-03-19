@@ -148,6 +148,21 @@ void Player::collision(float dt) {
     }
   }
 
+  for (size_t i = 0; i < Game::coins.size(); i++) {
+    collidedRect.x = Game::coins[i].pos.x;
+    collidedRect.y = Game::coins[i].pos.y;
+    collidedRect.w = Game::coins[i].w;
+    collidedRect.h = Game::coins[i].h;
+
+    if (SDL_GetRectIntersectionFloat(&playerCollider, &collidedRect,
+                                     &intersectionRect)) {
+      collided = true;
+      Game::coins[i] = Game::coins.back();
+      Game::coins.pop_back();
+      i--;
+    }
+  }
+
   if (grounded != foundGround) {
     grounded = foundGround;
     if (foundGround) {
