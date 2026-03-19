@@ -5,8 +5,6 @@
 #include "Game.h"
 
 namespace Log {
-// TODO: Maybe move this to UI, so instead of logging to console it will log in
-// the in game UI.
 template <typename... T>
 void debug(fmt::format_string<T...> fmt, T &&...args) {
   if (Game::debug) {

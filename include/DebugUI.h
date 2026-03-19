@@ -1,5 +1,5 @@
 #pragma once
-
+#ifdef DEBUG
 #include <backends/imgui_impl_sdl3.h>
 #include <fmt/core.h>
 #include <imgui.h>
@@ -110,3 +110,4 @@ struct DebugUI {
     ImGui::DestroyContext();
   }
 };
+#endif

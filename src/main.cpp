@@ -1,9 +1,14 @@
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_main.h>
-#include <backends/imgui_impl_sdl3.h>
 #include <fmt/base.h>
+
+#ifdef DEBUG
+#include <backends/imgui_impl_sdl3.h>
 #include <imgui.h>
 #include <imgui_impl_sdlrenderer3.h>
+
+#include "DebugUI.h"
+#endif
 
 #include <array>
 #include <cassert>
@@ -11,7 +16,6 @@
 #include <string_view>
 #include <vector>
 
-#include "DebugUI.h"
 #include "DynTile.h"
 #include "Game.h"
 #include "Log.h"
@@ -33,7 +37,10 @@ int main(int argc, char **argv) {
   ResourceManager resourceManager{sdlState};
   Game game;
   game.init(sdlState, resourceManager);
+
+#ifdef DEBUG
   DebugUI debugUI{sdlState, "assets/fonts/Roboto-Regular.ttf", 20.0f};
+#endif
 
   uint64_t prevTime = SDL_GetTicks();
   bool running = true;
@@ -43,7 +50,9 @@ int main(int argc, char **argv) {
 
     SDL_Event event{0};
     while (SDL_PollEvent(&event)) {
+#ifdef DEBUG
       if (game.debug) ImGui_ImplSDL3_ProcessEvent(&event);
+#endif
       switch (event.type) {
         case SDL_EVENT_QUIT: {
           running = false;
@@ -66,8 +75,10 @@ int main(int argc, char **argv) {
       }
     }
 
+#ifdef DEBUG
     debugUI.newFrame();
     debugUI.drawFrame();
+#endif
 
     // Clear screen
     SDL_SetRenderDrawColor(sdlState.renderer, 20, 152, 220, 255);
@@ -97,7 +108,9 @@ int main(int argc, char **argv) {
       coin.draw(sdlState);
     }
 
+#ifdef DEBUG
     debugUI.presentFrame(sdlState);
+#endif
 
     // Swap buffers
     SDL_RenderPresent(sdlState.renderer);
