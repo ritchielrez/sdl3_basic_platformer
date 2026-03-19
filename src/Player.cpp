@@ -79,7 +79,7 @@ void Player::update(const SDLState& sdlState, float dt) {
 
   if (!passedCamRuler && pos.x >= camRuler) passedCamRuler = true;
   if (passedCamRuler) {
-    Game::cam.x = glm::lerp(Game::cam.x, pos.x - camRuler, 10.0f * dt);
+    Game::cam.x = pos.x - camRuler;
   }
 }
 
