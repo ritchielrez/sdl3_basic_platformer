@@ -58,6 +58,14 @@ struct SDLState {
     }
   }
   ~SDLState() {
+    TTF_DestroyRendererTextEngine(textEngine);
+    TTF_CloseFont(font);
+    TTF_Quit();
+
+    TTF_DestroyRendererTextEngine(textEngine);
+    TTF_CloseFont(font);
+    TTF_Quit();
+
     SDL_DestroyWindow(win);
     SDL_DestroyRenderer(renderer);
   }
