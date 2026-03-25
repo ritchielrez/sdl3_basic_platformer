@@ -117,7 +117,7 @@ int main(int argc, char **argv) {
 
     prevTime = nowTime;
 
-    if (Game::player.pos.y >= sdlState.logHeight + 150.0f) {
+    if (Game::player.pos.y >= sdlState.logicalHeight + 150.0f) {
       game.reset(sdlState, resourceManager);
       fmt::print("You died.\n");
       continue;

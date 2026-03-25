@@ -72,7 +72,7 @@ struct Game {
     playerAnims[PlayerAnim::slide] = Frames(
         glm::vec2(2 * PLAYER_SIZE, 2 * PLAYER_SIZE), PLAYER_SIZE, PLAYER_SIZE);
 
-    player.pos = glm::vec2(0, sdlState.logHeight - 64);
+    player.pos = glm::vec2(0, sdlState.logicalHeight - 64);
     player.tex = resourceManager.getPlayerTex();
     player.maxSpeedX = 100.0f;
     player.jumpVel = -300.0f;
@@ -107,7 +107,7 @@ struct Game {
           case Tiles::DIRT: {
             StaticTile staticTile{};
             staticTile.pos = glm::vec2(
-                c * TILE_SIZE, sdlState.logHeight - (MAP_ROWS - r) * TILE_SIZE);
+                c * TILE_SIZE, sdlState.logicalHeight - (MAP_ROWS - r) * TILE_SIZE);
             staticTile.tex = resourceManager.getWorldTex();
             staticTile.w = TILE_SIZE;
             staticTile.h = TILE_SIZE;
@@ -123,7 +123,7 @@ struct Game {
           case Tiles::COIN: {
             Coin coin{};
             coin.pos = glm::vec2(
-                c * TILE_SIZE, sdlState.logHeight - (MAP_ROWS - r) * TILE_SIZE);
+                c * TILE_SIZE, sdlState.logicalHeight - (MAP_ROWS - r) * TILE_SIZE);
             coin.tex = resourceManager.getCoinTex();
             coin.w = TILE_SIZE;
             coin.h = TILE_SIZE;
@@ -160,8 +160,8 @@ struct Game {
     createPlayer(sdlState, resourceManager);
     loadTileMap(sdlState, resourceManager);
 
-    cam.w = sdlState.logWidth;
-    cam.h = sdlState.logHeight;
+    cam.w = sdlState.logicalWidth;
+    cam.h = sdlState.logicalHeight;
     cam.x = 0;
     cam.y = 0;
   }

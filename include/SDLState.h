@@ -11,7 +11,7 @@ struct SDLState {
   TTF_TextEngine *textEngine;
   const bool *keys;
   uint32_t winWidth = 1280, winHeight = 720;
-  static constexpr uint32_t logWidth = 320, logHeight = 180;
+  static constexpr uint32_t logicalWidth = 320, logicalHeight = 180;
 
   SDLState() : win(nullptr), renderer(nullptr), keys(nullptr) {}
   SDLState(const char *winTitle, SDL_WindowFlags winFlags,
@@ -30,7 +30,7 @@ struct SDLState {
       exit(1);
     }
 
-    SDL_SetRenderLogicalPresentation(renderer, logWidth, logHeight,
+    SDL_SetRenderLogicalPresentation(renderer, logicalWidth, logicalHeight,
                                      SDL_LOGICAL_PRESENTATION_LETTERBOX);
     // Tell SDL how to use the alpha values.
     SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
@@ -58,10 +58,6 @@ struct SDLState {
     }
   }
   ~SDLState() {
-    TTF_DestroyRendererTextEngine(textEngine);
-    TTF_CloseFont(font);
-    TTF_Quit();
-
     TTF_DestroyRendererTextEngine(textEngine);
     TTF_CloseFont(font);
     TTF_Quit();

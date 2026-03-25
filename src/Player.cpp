@@ -75,7 +75,7 @@ void Player::update(const SDLState& sdlState, float dt) {
   pos += vel * dt;
   collision(dt);
 
-  float camRuler = (sdlState.logWidth - w) / 2;
+  float camRuler = (sdlState.logicalWidth - w) / 2;
 
   if (!passedCamRuler && pos.x >= camRuler) passedCamRuler = true;
   if (passedCamRuler) {

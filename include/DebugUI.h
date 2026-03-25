@@ -99,8 +99,8 @@ struct DebugUI {
                                      SDL_LOGICAL_PRESENTATION_DISABLED);
     ImGui_ImplSDLRenderer3_RenderDrawData(ImGui::GetDrawData(),
                                           sdlState.renderer);
-    SDL_SetRenderLogicalPresentation(sdlState.renderer, sdlState.logWidth,
-                                     sdlState.logHeight,
+    SDL_SetRenderLogicalPresentation(sdlState.renderer, sdlState.logicalWidth,
+                                     sdlState.logicalHeight,
                                      SDL_LOGICAL_PRESENTATION_LETTERBOX);
   }
 
