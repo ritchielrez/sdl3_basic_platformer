@@ -1,10 +1,14 @@
 #pragma once
 
 #include <SDL3/SDL.h>
+#include <SDL3_ttf/SDL_ttf.h>
+#include <SDL3_ttf/SDL_textengine.h>
 
 struct SDLState {
   SDL_Window *win;
   SDL_Renderer *renderer;
+  TTF_Font *font;
+  TTF_TextEngine *textEngine;
   const bool *keys;
   uint32_t winWidth = 1280, winHeight = 720;
   static constexpr uint32_t logWidth = 320, logHeight = 180;
@@ -32,6 +36,26 @@ struct SDLState {
     SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
 
     keys = SDL_GetKeyboardState(nullptr);
+
+    if (!TTF_Init()) {
+      SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error",
+                               "Could not initialize SDL_ttf", nullptr);
+      exit(1);
+    }
+
+    font = TTF_OpenFont("assets/fonts/PixelOperator8.ttf", 18.0f);
+    if (!font) {
+      SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error",
+                               "Could not open font", nullptr);
+      exit(1);
+    }
+
+    textEngine = TTF_CreateRendererTextEngine(renderer);
+    if (!textEngine) {
+      SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error",
+                               "Could not create text engine", nullptr);
+      exit(1);
+    }
   }
   ~SDLState() {
     SDL_DestroyWindow(win);
