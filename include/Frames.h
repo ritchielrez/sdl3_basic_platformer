@@ -5,7 +5,7 @@
 #include <glm/glm.hpp>
 #include <vector>
 
-#include "timer.h"
+#include "Timer.h"
 
 class Frames {
   Timer timer;
