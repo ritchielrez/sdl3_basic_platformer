@@ -71,7 +71,7 @@ struct DebugUI {
     if (!Game::debug) return;
 
     ImGui::Begin("Player");
-    ImGui::Text(Game::player.inspect().c_str());
+    ImGui::Text("%s", Game::player.inspect().c_str());
     ImGui::End();
   }
 
@@ -79,7 +79,7 @@ struct DebugUI {
     if (!Game::debug) return;
 
     ImGui::Begin("Camera");
-    ImGui::Text(
+    ImGui::Text("%s",
         fmt::format("Position: ({}, {})\n", Game::cam.x, Game::cam.y).c_str());
     ImGui::End();
   }
