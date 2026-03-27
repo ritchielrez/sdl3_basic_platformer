@@ -10,6 +10,7 @@
 #include "ResourceManager.h"
 #include "SDLState.h"
 #include "StaticTile.h"
+#include "Text.h"
 
 namespace Tiles {
 enum {
@@ -37,6 +38,7 @@ struct Game {
   static inline std::vector<DynTile> dynTiles{};
   static inline std::vector<Coin> coins{};
   static inline SDL_FRect cam{};
+  static inline Text coinText{};
 
  private:
   static inline void createPlayer(const SDLState &sdlState,
@@ -164,6 +166,9 @@ struct Game {
     cam.h = sdlState.logicalHeight;
     cam.x = 0;
     cam.y = 0;
+
+    coinText = Text(sdlState, "Coin: ", glm::vec2(0, 0));
+    // Text(const SDLState &sdlState, const std::string_view str, const glm::vec2& pos) : str(str), pos(pos) {
   }
   static inline void reset(const SDLState &sdlState,
                            const ResourceManager &resourceManager) {

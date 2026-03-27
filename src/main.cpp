@@ -109,6 +109,8 @@ int main(int argc, char **argv) {
       coin.draw(sdlState);
     }
 
+    Game::coinText.draw();
+
 #ifdef DEBUG
     debugUI.presentFrame(sdlState);
 #endif
