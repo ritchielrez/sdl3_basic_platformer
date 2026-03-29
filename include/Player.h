@@ -22,7 +22,8 @@ struct Player : public Entity {
         jumpVel(0),
         maxSpeedX(0),
         collided(false),
-        grounded(false) {}
+        grounded(false),
+        passedCamRuler(false) {}
   void update(const SDLState& sdlState, float dt);
   void collision(float dt);
 
