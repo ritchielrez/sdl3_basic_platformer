@@ -169,7 +169,6 @@ struct Game {
     cam.y = 0;
 
     coinText = Text(sdlState, "Coin: ", glm::vec2(0, 0));
-    // Text(const SDLState &sdlState, const std::string_view str, const glm::vec2& pos) : str(str), pos(pos) {
   }
   static inline void reset(const SDLState &sdlState,
                            const ResourceManager &resourceManager) {
@@ -178,4 +177,11 @@ struct Game {
     dynTiles.clear();
     init(sdlState, resourceManager);
   }
+  // NOTE: We are forced to define an explictit `free()`, because static `Text`
+  // instances may be created by `Game` class and they need to be freed manually
+  // before `main()` ends. `SDL_ttf` requires a strict order of
+  // deinitialization.
+  // TODO: Implement `TextManager`, so static `Text` instances do not need to be
+  // created.
+  static inline void free() { coinText.free(); }
 };
