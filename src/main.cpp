@@ -34,7 +34,7 @@ int main(int argc, char **argv) {
   }
   defer(SDL_Quit());
 
-  SDLState sdlState{"learn_sdl3", SDL_WINDOW_RESIZABLE, nullptr};
+  SDLState sdlState{"sdl3_basic_platformer", SDL_WINDOW_RESIZABLE, nullptr};
   ResourceManager resourceManager{sdlState};
   Game game;
   game.init(sdlState, resourceManager);
