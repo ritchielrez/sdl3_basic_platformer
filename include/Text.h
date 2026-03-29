@@ -1,10 +1,11 @@
 #pragma once
 
-#include "SDLState.h"
-#include <SDL3_ttf/SDL_ttf.h>
 #include <SDL3_ttf/SDL_textengine.h>
+#include <SDL3_ttf/SDL_ttf.h>
 
 #include <glm/glm.hpp>
+
+#include "SDLState.h"
 
 class Text {
   TTF_Text *ttfText;

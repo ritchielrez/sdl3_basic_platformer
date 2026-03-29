@@ -108,8 +108,9 @@ struct Game {
         switch (map[r][c]) {
           case Tiles::DIRT: {
             StaticTile staticTile{};
-            staticTile.pos = glm::vec2(
-                c * TILE_SIZE, sdlState.logicalHeight - (MAP_ROWS - r) * TILE_SIZE);
+            staticTile.pos =
+                glm::vec2(c * TILE_SIZE,
+                          sdlState.logicalHeight - (MAP_ROWS - r) * TILE_SIZE);
             staticTile.tex = resourceManager.getWorldTex();
             staticTile.w = TILE_SIZE;
             staticTile.h = TILE_SIZE;
@@ -124,8 +125,8 @@ struct Game {
           }
           case Tiles::COIN: {
             Coin coin{};
-            coin.pos = glm::vec2(
-                c * TILE_SIZE, sdlState.logicalHeight - (MAP_ROWS - r) * TILE_SIZE);
+            coin.pos = glm::vec2(c * TILE_SIZE, sdlState.logicalHeight -
+                                                    (MAP_ROWS - r) * TILE_SIZE);
             coin.tex = resourceManager.getCoinTex();
             coin.w = TILE_SIZE;
             coin.h = TILE_SIZE;
