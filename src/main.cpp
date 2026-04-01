@@ -23,7 +23,6 @@
 #include "ResourceManager.h"
 #include "SDLState.h"
 #include "StaticTile.h"
-#include "Text.h"
 #include "defer.h"
 
 int main(int argc, char **argv) {
@@ -108,8 +107,6 @@ int main(int argc, char **argv) {
     for (auto &coin : game.coins) {
       coin.draw(sdlState);
     }
-
-    Game::coinText.draw();
 
 #ifdef DEBUG
     debugUI.presentFrame(sdlState);
