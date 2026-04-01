@@ -57,6 +57,15 @@ struct SDLState {
       exit(1);
     }
   }
+
+  // Delete copy and move constructors
+  SDLState(const SDLState &) = delete;
+  SDLState(SDLState &&) noexcept = delete;
+
+  // Delete copy and move assignment operators
+  SDLState &operator=(const SDLState &) = delete;
+  SDLState &operator=(SDLState &&) = delete;
+
   ~SDLState() {
     TTF_DestroyRendererTextEngine(textEngine);
     TTF_CloseFont(font);
