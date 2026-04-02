@@ -58,6 +58,7 @@ dkms.conf
 # IDE files
 .zed/
 .vs/
+.idea/
 
 # Rad debugger files
 raddbg
