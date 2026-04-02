@@ -183,5 +183,5 @@ struct Game {
   // deinitialization.
   // TODO: Implement `TextManager`, so static `Text` instances do not need to be
   // created.
-  static inline void free() { coinText.free(); }
+  ~Game() { coinText.free(); }
 };

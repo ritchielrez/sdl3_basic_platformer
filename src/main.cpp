@@ -23,7 +23,6 @@
 #include "ResourceManager.h"
 #include "SDLState.h"
 #include "StaticTile.h"
-#include "Text.h"
 #include "defer.h"
 
 int main(int argc, char **argv) {
@@ -38,7 +37,6 @@ int main(int argc, char **argv) {
   ResourceManager resourceManager{sdlState};
   Game game;
   game.init(sdlState, resourceManager);
-  defer(game.free());
 
 #ifdef DEBUG
   DebugUI debugUI{sdlState, "assets/fonts/Roboto-Regular.ttf", 20.0f};
