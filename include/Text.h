@@ -36,9 +36,5 @@ class Text {
   // created.
   void free() const { TTF_DestroyText(ttfText); }
 
-  TTF_Text *getTtfText() const noexcept { return ttfText; }
-  std::string_view getStr() const noexcept { return str; }
-  glm::vec2 getPos() const noexcept { return pos; }
-
   void draw() const noexcept { TTF_DrawRendererText(ttfText, pos.x, pos.y); }
 };
