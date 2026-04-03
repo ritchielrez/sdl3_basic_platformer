@@ -84,31 +84,8 @@ int main(int argc, char **argv) {
     SDL_SetRenderDrawColor(sdlState.renderer, 20, 152, 220, 255);
     SDL_RenderClear(sdlState.renderer);
 
-    // Update
-
-    // Only animate the player if the current animation has multiple frames.
-    // If it has one frame, the timer length/duration is set to 0.
-    if (game.player.anims[game.player.currAnim].getLen() != 0) {
-      game.player.anims[game.player.currAnim].step(dt);
-    }
-    game.player.update(sdlState, dt);
-    for (auto &coin : game.coins) {
-      coin.anims[coin.currAnim].step(dt);
-    }
-
-    // Render
-    game.player.draw(sdlState);
-    for (auto &staticTile : game.staticTiles) {
-      staticTile.draw(sdlState);
-    }
-    for (auto &dynTile : game.dynTiles) {
-      dynTile.draw(sdlState);
-    }
-    for (auto &coin : game.coins) {
-      coin.draw(sdlState);
-    }
-
-    Game::coinText.draw();
+    Game::update(sdlState, dt);
+    Game::draw(sdlState);
 
 #ifdef DEBUG
     debugUI.presentFrame(sdlState);

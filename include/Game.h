@@ -184,4 +184,31 @@ struct Game {
   // TODO: Implement `TextManager`, so static `Text` instances do not need to be
   // created.
   ~Game() { coinText.free(); }
+  static inline void update(const SDLState &sdlState, float dt) {
+    // Only animate the player if the current animation has multiple frames.
+    // If it has one frame, the timer length/duration is set to 0.
+    if (player.anims[player.currAnim].getLen() != 0) {
+      player.anims[player.currAnim].step(dt);
+    }
+    player.update(sdlState, dt);
+    for (auto &coin : coins) {
+      coin.anims[coin.currAnim].step(dt);
+    }
+
+  }
+
+  static inline void draw(const SDLState &sdlState) {
+    player.draw(sdlState);
+    for (auto &staticTile : staticTiles) {
+      staticTile.draw(sdlState);
+    }
+    for (auto &dynTile : dynTiles) {
+      dynTile.draw(sdlState);
+    }
+    for (auto &coin : coins) {
+      coin.draw(sdlState);
+    }
+
+    coinText.draw();
+  }
 };
