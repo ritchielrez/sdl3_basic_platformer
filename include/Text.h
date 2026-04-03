@@ -9,26 +9,24 @@
 
 class Text {
   TTF_Text *ttfText;
-  std::string_view str;
   glm::vec2 pos;
 
  public:
-  Text() : ttfText(nullptr), str(""), pos(glm::vec2(0, 0)) {}
+  Text() : ttfText(nullptr), pos(glm::vec2(0, 0)) {}
   Text(const SDLState &sdlState, const std::string_view str,
        const glm::vec2 &pos)
-      : str(str), pos(pos) {
+      : pos(pos) {
     ttfText = TTF_CreateText(sdlState.textEngine, sdlState.font, str.data(),
                              str.size());
     TTF_SetTextColor(ttfText, 255, 255, 255, SDL_ALPHA_OPAQUE);
   }
   Text(const SDLState &sdlState, const std::string_view str,
        const glm::vec2 &&pos)
-      : str(str), pos(pos) {
+      : pos(pos) {
     ttfText = TTF_CreateText(sdlState.textEngine, sdlState.font, str.data(),
                              str.size());
     TTF_SetTextColor(ttfText, 255, 255, 255, SDL_ALPHA_OPAQUE);
   }
-  // NOTE: We are forced to define an explictit `free()`, because static `Text`
 
   // Delete copy constructor and copy assignment operator
   Text(const Text &) = delete;
@@ -37,6 +35,8 @@ class Text {
   // Use default move constructor and move assignment operator
   Text(Text &&) noexcept = default;
   Text &operator=(Text &&) noexcept = default;
+
+  // NOTE: We are forced to define an explicit `free()`, because static `Text`
   // instances may be created by `Game` class and they need to be freed manually
   // before `main()` ends. `SDL_ttf` requires a strict order of
   // deinitialization.
@@ -45,4 +45,6 @@ class Text {
   void free() const { TTF_DestroyText(ttfText); }
 
   void draw() const noexcept { TTF_DrawRendererText(ttfText, pos.x, pos.y); }
+
+  void draw() const { TTF_DrawRendererText(ttfText, pos.x, pos.y); }
 };
