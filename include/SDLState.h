@@ -58,13 +58,13 @@ struct SDLState {
     }
   }
 
-  // Delete copy and move constructors
+  // Delete copy constructor and copy assignment operator
   SDLState(const SDLState &) = delete;
-  SDLState(SDLState &&) noexcept = delete;
-
-  // Delete copy and move assignment operators
   SDLState &operator=(const SDLState &) = delete;
-  SDLState &operator=(SDLState &&) = delete;
+
+  // Use default move constructor and move assignment operator
+  SDLState(SDLState &&) noexcept = default;
+  SDLState &operator=(SDLState &&) noexcept = default;
 
   ~SDLState() {
     TTF_DestroyRendererTextEngine(textEngine);

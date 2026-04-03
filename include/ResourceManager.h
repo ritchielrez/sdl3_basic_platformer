@@ -49,13 +49,13 @@ class ResourceManager {
     }
   }
 
-  // Delete copy and move constructors
+  // Delete copy constructor and copy assignment operator
   ResourceManager(const ResourceManager &) = delete;
-  ResourceManager(ResourceManager &&) noexcept = delete;
-
-  // Delete copy and move assignment operators
   ResourceManager &operator=(const ResourceManager &) = delete;
-  ResourceManager &operator=(ResourceManager &&) = delete;
+
+  // Use default move constructor and move assignment operator
+  ResourceManager(ResourceManager &&) noexcept = default;
+  ResourceManager &operator=(ResourceManager &&) noexcept = default;
 
   SDL_Texture *loadTex(const SDLState &sdlState,
                        const std::string_view &filePath) {
