@@ -160,6 +160,7 @@ void Player::collision(float dt) {
       Game::coins[i] = Game::coins.back();
       Game::coins.pop_back();
       i--;
+      Game::collectedCoins++;
     }
   }
 

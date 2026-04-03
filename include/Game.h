@@ -1,5 +1,7 @@
 #pragma once
 
+#include <fmt/base.h>
+
 #include <array>
 #include <glm/glm.hpp>
 #include <vector>
@@ -39,6 +41,7 @@ struct Game {
   static inline std::vector<Coin> coins{};
   static inline SDL_FRect cam{};
   static inline Text coinText{};
+  static inline size_t collectedCoins = 0;
 
  private:
   static inline void createPlayer(const SDLState &sdlState,
@@ -168,13 +171,16 @@ struct Game {
     cam.x = 0;
     cam.y = 0;
 
-    coinText = Text(sdlState, "Coin: ", glm::vec2(0, 0));
+    coinText = Text(sdlState, fmt::format("Coin: {}", collectedCoins),
+                    glm::vec2(0, 0));
   }
   static inline void reset(const SDLState &sdlState,
                            const ResourceManager &resourceManager) {
     player = Player();
     staticTiles.clear();
     dynTiles.clear();
+    coins.clear();
+    collectedCoins = 0;
     init(sdlState, resourceManager);
   }
   // NOTE: We are forced to define an explictit `free()`, because static `Text`
@@ -184,6 +190,7 @@ struct Game {
   // TODO: Implement `TextManager`, so static `Text` instances do not need to be
   // created.
   ~Game() { coinText.free(); }
+
   static inline void update(const SDLState &sdlState, float dt) {
     // Only animate the player if the current animation has multiple frames.
     // If it has one frame, the timer length/duration is set to 0.
@@ -195,6 +202,7 @@ struct Game {
       coin.anims[coin.currAnim].step(dt);
     }
 
+    coinText.assign(fmt::format("Coin: {}", collectedCoins));
   }
 
   static inline void draw(const SDLState &sdlState) {
