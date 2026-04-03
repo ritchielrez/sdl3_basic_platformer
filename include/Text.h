@@ -44,7 +44,9 @@ class Text {
   // created.
   void free() const { TTF_DestroyText(ttfText); }
 
-  void draw() const noexcept { TTF_DrawRendererText(ttfText, pos.x, pos.y); }
+  void assign(const std::string_view str) {
+    TTF_SetTextString(ttfText, str.data(), str.size());
+  }
 
   void draw() const { TTF_DrawRendererText(ttfText, pos.x, pos.y); }
 };
