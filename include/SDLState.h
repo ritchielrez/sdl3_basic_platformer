@@ -1,8 +1,8 @@
 #pragma once
 
 #include <SDL3/SDL.h>
-#include <SDL3_ttf/SDL_ttf.h>
 #include <SDL3_ttf/SDL_textengine.h>
+#include <SDL3_ttf/SDL_ttf.h>
 
 struct SDLState {
   SDL_Window *win;
@@ -43,7 +43,7 @@ struct SDLState {
       exit(1);
     }
 
-    font = TTF_OpenFont("assets/fonts/PixelOperator8.ttf", 18.0f);
+    font = TTF_OpenFont("assets/fonts/PixelOperator8.ttf", 8.0f);
     if (!font) {
       SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error",
                                "Could not open font", nullptr);
