@@ -8,33 +8,16 @@
 
 #include "Coin.h"
 #include "DynTile.h"
+#include "Map.h"
 #include "Player.h"
 #include "ResourceManager.h"
 #include "SDLState.h"
 #include "StaticTile.h"
 #include "Text.h"
 
-namespace Tiles {
-enum {
-  NONE,
-  GRASS,
-  DIRT,
-  BRIDGE1,
-  BRIDGE2,
-  BRIDGE3,
-  TREE1,
-  TREE2,
-  TREE3,
-  COIN,
-};
-}
-
 struct Game {
-  static constexpr float TILE_SIZE = 16.0f;
-  static constexpr size_t MAP_ROWS = 5;
-  static constexpr size_t MAP_COLS = 200;
+  static inline Map map{};
   static inline bool debug = false;
-  static inline uint16_t map[MAP_ROWS][MAP_COLS]{Tiles::NONE};
   static inline Player player{};
   static inline std::vector<StaticTile> staticTiles{};
   static inline std::vector<DynTile> dynTiles{};
@@ -77,7 +60,7 @@ struct Game {
     playerAnims[PlayerAnim::slide] = Frames(
         glm::vec2(2 * PLAYER_SIZE, 2 * PLAYER_SIZE), PLAYER_SIZE, PLAYER_SIZE);
 
-    player.pos = glm::vec2(0, sdlState.logicalHeight - 64);
+    player.pos = glm::vec2(0, sdlState.logicalHeight - 3 * PLAYER_SIZE);
     player.tex = resourceManager.getPlayerTex();
     player.maxSpeedX = 100.0f;
     player.jumpVel = -300.0f;
@@ -94,45 +77,40 @@ struct Game {
 
   static inline void loadTileMap(const SDLState &sdlState,
                                  const ResourceManager &resourceManager) {
-    for (uint16_t r = 1; r <= 2; r++) {
-      for (uint16_t c = 0; c < MAP_COLS; c++) {
-        map[MAP_ROWS - r][c] = Tiles::DIRT;
-      }
-    }
-
-    map[2][5] = Tiles::COIN;
+    map.parse("./assets/map.csv");
 
     staticTiles.reserve(100);
     dynTiles.reserve(100);
     coins.reserve(100);
 
-    for (uint16_t r = 0; r < MAP_ROWS; r++) {
-      for (uint16_t c = 0; c < MAP_COLS; c++) {
-        switch (map[r][c]) {
+    for (uint16_t r = 0; r < Map::ROWS; r++) {
+      for (uint16_t c = 0; c < Map::COLS; c++) {
+        switch (map.getTiles()[r][c]) {
           case Tiles::DIRT: {
             StaticTile staticTile{};
-            staticTile.pos =
-                glm::vec2(c * TILE_SIZE,
-                          sdlState.logicalHeight - (MAP_ROWS - r) * TILE_SIZE);
+            staticTile.pos = glm::vec2(
+                c * Map::TILE_SIZE,
+                sdlState.logicalHeight - (Map::ROWS - r) * Map::TILE_SIZE);
             staticTile.tex = resourceManager.getWorldTex();
-            staticTile.w = TILE_SIZE;
-            staticTile.h = TILE_SIZE;
+            staticTile.w = Map::TILE_SIZE;
+            staticTile.h = Map::TILE_SIZE;
             staticTile.collider.x = 0;
             staticTile.collider.y = 0;
             staticTile.collider.w = staticTile.w;
             staticTile.collider.h = staticTile.h;
-            staticTile.anims = std::vector<Frames>{
-                Frames(glm::vec2(0, TILE_SIZE), TILE_SIZE, TILE_SIZE)};
+            staticTile.anims = std::vector<Frames>{Frames(
+                glm::vec2(0, Map::TILE_SIZE), Map::TILE_SIZE, Map::TILE_SIZE)};
             staticTiles.push_back(staticTile);
             break;
           }
           case Tiles::COIN: {
             Coin coin{};
-            coin.pos = glm::vec2(c * TILE_SIZE, sdlState.logicalHeight -
-                                                    (MAP_ROWS - r) * TILE_SIZE);
+            coin.pos = glm::vec2(
+                c * Map::TILE_SIZE,
+                sdlState.logicalHeight - (Map::ROWS - r) * Map::TILE_SIZE);
             coin.tex = resourceManager.getCoinTex();
-            coin.w = TILE_SIZE;
-            coin.h = TILE_SIZE;
+            coin.w = Map::TILE_SIZE;
+            coin.h = Map::TILE_SIZE;
             coin.collider.x = 5.0f;
             coin.collider.y = 5.0f;
             coin.collider.w = 6.0f;
@@ -142,11 +120,11 @@ struct Game {
 
             std::vector<glm::vec2> coinTexCoords{COIN_ANIM_FRAMES};
             for (size_t i = 0; i < COIN_ANIM_FRAMES; i++) {
-              coinTexCoords[i].x = i * TILE_SIZE;
+              coinTexCoords[i].x = i * Map::TILE_SIZE;
               coinTexCoords[i].y = 0;
             }
             coin.anims = {Frames(COIN_ANIM_FRAMES, 0.1f, coinTexCoords,
-                                 TILE_SIZE, TILE_SIZE)};
+                                 Map::TILE_SIZE, Map::TILE_SIZE)};
             coin.currAnim = 0;
             coins.push_back(coin);
             break;
