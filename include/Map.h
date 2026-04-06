@@ -21,6 +21,7 @@ enum {
   TREE2,
   TREE3,
   COIN,
+  ENEMY,
 };
 }
 

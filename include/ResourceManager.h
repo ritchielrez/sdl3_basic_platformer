@@ -11,13 +11,15 @@ class ResourceManager {
   SDL_Texture *playerTex;
   SDL_Texture *worldTex;
   SDL_Texture *platformsTex;
+  SDL_Texture *enemyTex;
 
  public:
   ResourceManager()
       : coinTex(nullptr),
         playerTex(nullptr),
         worldTex(nullptr),
-        platformsTex(nullptr) {}
+        platformsTex(nullptr),
+        enemyTex(nullptr) {}
   ResourceManager(SDLState &sdlState) {
     coinTex = loadTex(sdlState, "assets/sprites/coin.png");
     if (!coinTex) {
@@ -45,6 +47,13 @@ class ResourceManager {
       SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error",
                                "Platforms texture could not be loaded",
                                nullptr);
+      exit(1);
+    }
+
+    enemyTex = loadTex(sdlState, "assets/sprites/slime_green.png");
+    if (!enemyTex) {
+      SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error",
+                               "Enemy texture could not be loaded", nullptr);
       exit(1);
     }
   }
@@ -83,11 +92,13 @@ class ResourceManager {
   SDL_Texture *getPlayerTex() const { return playerTex; }
   SDL_Texture *getWorldTex() const { return worldTex; }
   SDL_Texture *getPlatformTex() const { return platformsTex; }
+  SDL_Texture *getEnemyTex() const { return enemyTex; }
 
   ~ResourceManager() {
     SDL_DestroyTexture(coinTex);
     SDL_DestroyTexture(playerTex);
     SDL_DestroyTexture(worldTex);
     SDL_DestroyTexture(platformsTex);
+    SDL_DestroyTexture(enemyTex);
   }
 };

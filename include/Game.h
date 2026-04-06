@@ -8,6 +8,7 @@
 
 #include "Coin.h"
 #include "DynTile.h"
+#include "Enemy.h"
 #include "Map.h"
 #include "Player.h"
 #include "ResourceManager.h"
@@ -19,6 +20,7 @@ struct Game {
   static inline Map map{};
   static inline bool debug = false;
   static inline Player player{};
+  static inline std::vector<Enemy> enemies{};
   static inline std::vector<StaticTile> staticTiles{};
   static inline std::vector<DynTile> dynTiles{};
   static inline std::vector<Coin> coins{};
@@ -117,7 +119,6 @@ struct Game {
             coin.collider.h = 6.0f;
 
             constexpr size_t COIN_ANIM_FRAMES = 12;
-
             std::vector<glm::vec2> coinTexCoords{COIN_ANIM_FRAMES};
             for (size_t i = 0; i < COIN_ANIM_FRAMES; i++) {
               coinTexCoords[i].x = i * Map::TILE_SIZE;
@@ -126,9 +127,38 @@ struct Game {
             coin.anims = {Frames(COIN_ANIM_FRAMES, 0.1f, coinTexCoords,
                                  Map::TILE_SIZE, Map::TILE_SIZE)};
             coin.currAnim = 0;
+
             coins.push_back(coin);
             break;
           }
+          case Tiles::ENEMY: {
+            const float ENEMY_SIZE = 24.0f;
+            Enemy enemy{};
+            enemy.pos = glm::vec2(c * Map::TILE_SIZE,
+                                  (sdlState.logicalHeight -
+                                   (Map::ROWS - r - 1) * Map::TILE_SIZE) -
+                                      ENEMY_SIZE);
+            enemy.tex = resourceManager.getEnemyTex();
+            enemy.w = ENEMY_SIZE;
+            enemy.h = ENEMY_SIZE;
+            enemy.collider.x = 0;
+            enemy.collider.y = 0;
+            enemy.collider.w = enemy.w;
+            enemy.collider.h = enemy.h;
+
+            constexpr size_t ENEMY_ANIM_FRAMES = 4;
+            std::vector<glm::vec2> enemyTexCoords{ENEMY_ANIM_FRAMES};
+            for (size_t i = 0; i < ENEMY_ANIM_FRAMES; i++) {
+              enemyTexCoords[i].x = i * ENEMY_SIZE;
+              enemyTexCoords[i].y = ENEMY_SIZE;
+            }
+            enemy.anims = {Frames(ENEMY_ANIM_FRAMES, 0.1f, enemyTexCoords,
+                                  ENEMY_SIZE, ENEMY_SIZE)};
+            enemy.currAnim = 0;
+
+            enemies.push_back(enemy);
+            break;
+          };
           case Tiles::NONE:
             break;
           default:
@@ -176,11 +206,15 @@ struct Game {
       player.anims[player.currAnim].step(dt);
     }
     player.update(sdlState, dt);
+
     for (auto &coin : coins) {
       coin.anims[coin.currAnim].step(dt);
     }
-
     coinText.assign(fmt::format("Coin: {}", collectedCoins));
+
+    for (auto &enemy : enemies) {
+      enemy.anims[enemy.currAnim].step(dt);
+    }
   }
 
   static inline void draw(const SDLState &sdlState) {
@@ -193,6 +227,9 @@ struct Game {
     }
     for (auto &coin : coins) {
       coin.draw(sdlState);
+    }
+    for (auto &enemy : enemies) {
+      enemy.draw(sdlState);
     }
 
     coinText.draw();
