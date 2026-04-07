@@ -84,8 +84,13 @@ int main(int argc, char **argv) {
     SDL_SetRenderDrawColor(sdlState.renderer, 20, 152, 220, 255);
     SDL_RenderClear(sdlState.renderer);
 
-    Game::update(sdlState, dt);
-    Game::draw(sdlState);
+    if(game.player.death) {
+      game.reset(sdlState, resourceManager);
+      fmt::println("You died.");
+    } else {
+      game.update(sdlState, dt);
+      game.draw(sdlState);
+    }
 
 #ifdef DEBUG
     debugUI.presentFrame(sdlState);
@@ -97,9 +102,7 @@ int main(int argc, char **argv) {
     prevTime = nowTime;
 
     if (Game::player.pos.y >= sdlState.logicalHeight + 150.0f) {
-      game.reset(sdlState, resourceManager);
-      fmt::print("You died.\n");
-      continue;
+      game.player.death = true;
     }
   }
 

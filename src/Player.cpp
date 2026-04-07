@@ -164,6 +164,19 @@ void Player::collision(float dt) {
     }
   }
 
+  for(auto &enemy: Game::enemies) {
+    collidedRect.x = enemy.pos.x;
+    collidedRect.y = enemy.pos.y;
+    collidedRect.w = enemy.w;
+    collidedRect.h = enemy.h;
+
+    if (SDL_GetRectIntersectionFloat(&playerCollider, &collidedRect,
+                                     &intersectionRect)) {
+      collided = true;
+      death = true;
+    }
+  }
+
   if (grounded != foundGround) {
     grounded = foundGround;
     if (foundGround) {

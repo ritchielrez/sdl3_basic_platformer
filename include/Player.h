@@ -15,13 +15,14 @@ struct Player : public Entity {
   glm::vec2 accel;
   float jumpVel, gravVel;
   float maxSpeedX;
-  bool collided, grounded, passedCamRuler;
+  bool collided, death, grounded, passedCamRuler;
 
   Player()
       : accel(glm::vec2(0)),
         jumpVel(0),
         maxSpeedX(0),
         collided(false),
+        death(false),
         grounded(false),
         passedCamRuler(false) {}
   void update(const SDLState& sdlState, float dt);

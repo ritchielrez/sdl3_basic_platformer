@@ -49,7 +49,7 @@ struct Map {
 
       std::string cell;
       for (size_t j = 0; std::getline(ss, cell, ',') && j <= COLS; j++) {
-        tiles[i][j] = std::stoul(std::move(cell));
+        tiles[i][j] = static_cast<uint16_t>(std::stoul(std::move(cell)));
       }
     }
   }
