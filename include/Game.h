@@ -179,7 +179,7 @@ struct Game {
     cam.x = 0;
     cam.y = 0;
 
-    coinText = Text(sdlState, fmt::format("Coin: {}", collectedCoins),
+    coinText = Text(sdlState, fmt::format("Coins: {}", collectedCoins),
                     glm::vec2(0, 0));
   }
   static inline void reset(const SDLState &sdlState,
@@ -210,7 +210,7 @@ struct Game {
     for (auto &coin : coins) {
       coin.anims[coin.currAnim].step(dt);
     }
-    coinText.assign(fmt::format("Coin: {}", collectedCoins));
+    coinText.assign(fmt::format("Coins: {}", collectedCoins));
 
     for (auto &enemy : enemies) {
       enemy.anims[enemy.currAnim].step(dt);
