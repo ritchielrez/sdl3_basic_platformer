@@ -141,10 +141,10 @@ struct Game {
             enemy.tex = resourceManager.getEnemyTex();
             enemy.w = ENEMY_SIZE;
             enemy.h = ENEMY_SIZE;
-            enemy.collider.x = 0;
-            enemy.collider.y = 0;
-            enemy.collider.w = enemy.w;
-            enemy.collider.h = enemy.h;
+            enemy.collider.x = 8;
+            enemy.collider.y = 13;
+            enemy.collider.w = enemy.w - 16;
+            enemy.collider.h = enemy.h - 14;
 
             constexpr size_t ENEMY_ANIM_FRAMES = 4;
             std::vector<glm::vec2> enemyTexCoords{ENEMY_ANIM_FRAMES};
