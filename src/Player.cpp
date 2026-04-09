@@ -95,10 +95,10 @@ void Player::collision(float dt) {
   collided = false;
   bool foundGround = false;
   for (auto& staticTile : Game::staticTiles) {
-    collidedRect.x = staticTile.pos.x;
-    collidedRect.y = staticTile.pos.y;
-    collidedRect.w = staticTile.w;
-    collidedRect.h = staticTile.h;
+    collidedRect.x = staticTile.pos.x + staticTile.collider.x;
+    collidedRect.y = staticTile.pos.y + staticTile.collider.y;
+    collidedRect.w = staticTile.collider.w;
+    collidedRect.h = staticTile.collider.h;
 
     if (SDL_GetRectIntersectionFloat(&playerCollider, &collidedRect,
                                      &intersectionRect)) {
@@ -136,10 +136,10 @@ void Player::collision(float dt) {
   }
 
   for (auto& dynTile : Game::dynTiles) {
-    collidedRect.x = dynTile.pos.x;
-    collidedRect.y = dynTile.pos.y;
-    collidedRect.w = dynTile.w;
-    collidedRect.h = dynTile.h;
+    collidedRect.x = dynTile.pos.x + dynTile.collider.x;
+    collidedRect.y = dynTile.pos.y + dynTile.collider.y;
+    collidedRect.w = dynTile.collider.w;
+    collidedRect.h = dynTile.collider.h;
 
     // TODO:Implement collision behaviour of player with moving platform tiles.
     if (SDL_GetRectIntersectionFloat(&playerCollider, &collidedRect,
@@ -149,10 +149,10 @@ void Player::collision(float dt) {
   }
 
   for (size_t i = 0; i < Game::coins.size(); i++) {
-    collidedRect.x = Game::coins[i].pos.x;
-    collidedRect.y = Game::coins[i].pos.y;
-    collidedRect.w = Game::coins[i].w;
-    collidedRect.h = Game::coins[i].h;
+    collidedRect.x = Game::coins[i].pos.x + Game::coins[i].collider.x;
+    collidedRect.y = Game::coins[i].pos.y + Game::coins[i].collider.y;
+    collidedRect.w = Game::coins[i].collider.w;
+    collidedRect.h = Game::coins[i].collider.h;
 
     if (SDL_GetRectIntersectionFloat(&playerCollider, &collidedRect,
                                      &intersectionRect)) {
@@ -165,10 +165,10 @@ void Player::collision(float dt) {
   }
 
   for(auto &enemy: Game::enemies) {
-    collidedRect.x = enemy.pos.x;
-    collidedRect.y = enemy.pos.y;
-    collidedRect.w = enemy.w;
-    collidedRect.h = enemy.h;
+    collidedRect.x = enemy.pos.x + enemy.collider.x;
+    collidedRect.y = enemy.pos.y + enemy.collider.y;
+    collidedRect.w = enemy.collider.w;
+    collidedRect.h = enemy.collider.h;
 
     if (SDL_GetRectIntersectionFloat(&playerCollider, &collidedRect,
                                      &intersectionRect)) {
