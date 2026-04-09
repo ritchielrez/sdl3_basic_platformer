@@ -85,6 +85,8 @@ struct Game {
     dynTiles.reserve(100);
     coins.reserve(100);
 
+    constexpr float ENEMY_SIZE = 24.0f;
+
     for (uint16_t r = 0; r < Map::ROWS; r++) {
       for (uint16_t c = 0; c < Map::COLS; c++) {
         switch (map.getTiles()[r][c]) {
@@ -132,7 +134,6 @@ struct Game {
             break;
           }
           case Tiles::ENEMY: {
-            const float ENEMY_SIZE = 24.0f;
             Enemy enemy{};
             enemy.pos = glm::vec2(c * Map::TILE_SIZE,
                                   (sdlState.logicalHeight -
