@@ -180,7 +180,7 @@ struct Game {
     cam.y = 0;
 
     coinText = Text(sdlState, fmt::format("Coins: {}", collectedCoins),
-                    glm::vec2(0, 0));
+                    glm::vec2(10, 10));
   }
   static inline void reset(const SDLState &sdlState,
                            const ResourceManager &resourceManager) {
@@ -218,7 +218,6 @@ struct Game {
   }
 
   static inline void draw(const SDLState &sdlState) {
-    player.draw(sdlState);
     for (auto &staticTile : staticTiles) {
       staticTile.draw(sdlState);
     }
@@ -233,5 +232,7 @@ struct Game {
     }
 
     coinText.draw();
+
+    player.draw(sdlState);
   }
 };
