@@ -27,11 +27,12 @@ enum {
 
 struct Map {
   static constexpr float TILE_SIZE = 16.0f;
-  static constexpr size_t ROWS = 5;
-  static constexpr size_t COLS = 200;
 
  private:
-  std::array<std::array<uint16_t, COLS>, ROWS> tiles{Tiles::NONE};
+  // std::array<std::array<uint16_t, COLS>, ROWS> tiles{Tiles::NONE};
+  std::vector<std::vector<uint16_t>> tiles;
+  size_t rows = 0;
+  size_t cols = 0;
 
  public:
   void parse(const std::string& filePath) {
@@ -43,18 +44,26 @@ struct Map {
       exit(1);
     }
 
-    std::string row;
-    for (size_t i = 0; std::getline(input, row) && i <= ROWS; i++) {
-      std::istringstream ss(std::move(row));
+    std::string line;
+    while (std::getline(input, line)) {
+      if (line.empty()) continue;
+      std::istringstream ss(std::move(line));
 
       std::string cell;
-      for (size_t j = 0; std::getline(ss, cell, ',') && j <= COLS; j++) {
-        tiles[i][j] = static_cast<uint16_t>(std::stoul(std::move(cell)));
+      std::vector<uint16_t> row;
+      while (std::getline(ss, cell, ',')) {
+        row.push_back(std::move(static_cast<uint16_t>(std::stoul(std::move(cell)))));
       }
+      tiles.push_back(std::move(row));
     }
+
+    rows = tiles.size();
+    cols = tiles[0].size();
   }
 
-  const std::array<std::array<uint16_t, COLS>, ROWS> getTiles() const {
+  const size_t getRows() const { return rows; }
+  const size_t getCols() const { return cols; }
+  const std::vector<std::vector<uint16_t>> getTiles() const {
     return tiles;
   }
 };

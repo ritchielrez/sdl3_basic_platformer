@@ -87,14 +87,14 @@ struct Game {
 
     constexpr float ENEMY_SIZE = 24.0f;
 
-    for (uint16_t r = 0; r < Map::ROWS; r++) {
-      for (uint16_t c = 0; c < Map::COLS; c++) {
+    for (uint16_t r = 0; r < map.getRows(); r++) {
+      for (uint16_t c = 0; c < map.getCols(); c++) {
         switch (map.getTiles()[r][c]) {
           case Tiles::DIRT: {
             StaticTile staticTile{};
             staticTile.pos = glm::vec2(
                 c * Map::TILE_SIZE,
-                sdlState.logicalHeight - (Map::ROWS - r) * Map::TILE_SIZE);
+                sdlState.logicalHeight - (map.getRows() - r) * Map::TILE_SIZE);
             staticTile.tex = resourceManager.getWorldTex();
             staticTile.w = Map::TILE_SIZE;
             staticTile.h = Map::TILE_SIZE;
@@ -111,7 +111,7 @@ struct Game {
             Coin coin{};
             coin.pos = glm::vec2(
                 c * Map::TILE_SIZE,
-                sdlState.logicalHeight - (Map::ROWS - r) * Map::TILE_SIZE);
+                sdlState.logicalHeight - (map.getRows() - r) * Map::TILE_SIZE);
             coin.tex = resourceManager.getCoinTex();
             coin.w = Map::TILE_SIZE;
             coin.h = Map::TILE_SIZE;
@@ -137,7 +137,7 @@ struct Game {
             Enemy enemy{};
             enemy.pos = glm::vec2(c * Map::TILE_SIZE,
                                   (sdlState.logicalHeight -
-                                   (Map::ROWS - r - 1) * Map::TILE_SIZE) -
+                                   (map.getRows() - r - 1) * Map::TILE_SIZE) -
                                       ENEMY_SIZE);
             enemy.tex = resourceManager.getEnemyTex();
             enemy.w = ENEMY_SIZE;
@@ -185,7 +185,9 @@ struct Game {
   }
   static inline void reset(const SDLState &sdlState,
                            const ResourceManager &resourceManager) {
+    map = Map();
     player = Player();
+    enemies.clear();
     staticTiles.clear();
     dynTiles.clear();
     coins.clear();
@@ -216,6 +218,7 @@ struct Game {
     for (auto &enemy : enemies) {
       enemy.anims[enemy.currAnim].step(dt);
     }
+    fmt::println("{}", enemies.size());
   }
 
   static inline void draw(const SDLState &sdlState) {
