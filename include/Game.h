@@ -79,7 +79,9 @@ struct Game {
 
   static inline void loadTileMap(const SDLState &sdlState,
                                  const ResourceManager &resourceManager) {
-    map.parse("./assets/map.csv");
+    if(!map.parse("./assets/map.csv")) {
+      exit(1);
+    }
 
     staticTiles.reserve(100);
     dynTiles.reserve(100);
@@ -89,7 +91,7 @@ struct Game {
 
     for (uint16_t r = 0; r < map.getRows(); r++) {
       for (uint16_t c = 0; c < map.getCols(); c++) {
-        switch (map.getTiles()[r][c]) {
+        switch (map.getTiles()[r * map.getCols() + c]) {
           case Tiles::DIRT: {
             StaticTile staticTile{};
             staticTile.pos = glm::vec2(
@@ -218,7 +220,6 @@ struct Game {
     for (auto &enemy : enemies) {
       enemy.anims[enemy.currAnim].step(dt);
     }
-    fmt::println("{}", enemies.size());
   }
 
   static inline void draw(const SDLState &sdlState) {
