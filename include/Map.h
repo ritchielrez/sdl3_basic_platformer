@@ -40,7 +40,7 @@ struct Map {
 
     if (!input.is_open()) {
       SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error",
-                               "Could not open tilemap", nullptr);
+                               "Could not open tilemap from disk", nullptr);
       exit(1);
     }
     std::string cell, line;
@@ -52,7 +52,7 @@ struct Map {
         if (rows == 0) cols = c;
         else if (c > cols) {
           SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error",
-                                   "Could not parse tilemap, the number of columns for all rows should be the same", nullptr);
+                                   "Could not parse tilemap from disk, the number of columns for all rows should be the same", nullptr);
           return false;
         }
         tiles.push_back(static_cast<uint16_t>(std::stoul(std::move(cell))));
