@@ -29,7 +29,7 @@ struct Map {
   static constexpr float TILE_SIZE = 16.0f;
 
  private:
-  std::vector<uint16_t> tiles{Tiles::NONE};
+  std::vector<uint16_t> tiles;
   size_t rows = 0;
   size_t cols = 0;
 
