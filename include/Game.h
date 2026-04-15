@@ -79,10 +79,6 @@ struct Game {
 
   static inline void loadTileMap(const SDLState &sdlState,
                                  const ResourceManager &resourceManager) {
-    if(!map.parse("./assets/map.csv")) {
-      exit(1);
-    }
-
     staticTiles.reserve(100);
     dynTiles.reserve(100);
     coins.reserve(100);
@@ -174,6 +170,9 @@ struct Game {
  public:
   static inline void init(const SDLState &sdlState,
                           const ResourceManager &resourceManager) {
+    if(!map.parse("./assets/map.csv")) {
+      exit(1);
+    }
     createPlayer(sdlState, resourceManager);
     loadTileMap(sdlState, resourceManager);
 
