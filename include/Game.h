@@ -77,7 +77,7 @@ struct Game {
     player.collider.h = 10.0f;
   }
 
-  static inline void loadTileMap(const SDLState &sdlState,
+  static inline void createTiles(const SDLState &sdlState,
                                  const ResourceManager &resourceManager) {
     staticTiles.reserve(100);
     dynTiles.reserve(100);
@@ -174,7 +174,7 @@ struct Game {
       exit(1);
     }
     createPlayer(sdlState, resourceManager);
-    loadTileMap(sdlState, resourceManager);
+    createTiles(sdlState, resourceManager);
 
     cam.w = sdlState.logicalWidth;
     cam.h = sdlState.logicalHeight;
