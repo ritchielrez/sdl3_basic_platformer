@@ -26,7 +26,7 @@ struct Player : public Entity {
         grounded(false),
         passedCamRuler(false) {}
   void update(const SDLState& sdlState, float dt);
-  void collision(float dt);
+  void collision();
 
   std::string inspect() {
     std::string playerState{8, 0};

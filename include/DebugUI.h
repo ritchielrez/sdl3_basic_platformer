@@ -11,9 +11,6 @@
 #include "SDLState.h"
 
 struct DebugUI {
-  ImGuiIO io;
-  ImGuiStyle style;
-
   float fontHeight;
 
   DebugUI() = delete;
@@ -28,7 +25,6 @@ struct DebugUI {
     io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
 
     ImGui::StyleColorsDark();
-    ImGuiStyle &style = ImGui::GetStyle();
 
     ImGui_ImplSDL3_InitForSDLRenderer(sdlState.win, sdlState.renderer);
     ImGui_ImplSDLRenderer3_Init(sdlState.renderer);
@@ -46,7 +42,6 @@ struct DebugUI {
     io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
 
     ImGui::StyleColorsDark();
-    ImGuiStyle &style = ImGui::GetStyle();
 
     ImGui_ImplSDL3_InitForSDLRenderer(sdlState.win, sdlState.renderer);
     ImGui_ImplSDLRenderer3_Init(sdlState.renderer);

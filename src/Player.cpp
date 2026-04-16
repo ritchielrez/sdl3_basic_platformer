@@ -73,7 +73,7 @@ void Player::update(const SDLState& sdlState, float dt) {
   if (!grounded) vel.y += gravity * dt;
 
   pos += vel * dt;
-  collision(dt);
+  collision();
 
   float camRuler = (sdlState.logicalWidth - w) / 2;
 
@@ -83,7 +83,7 @@ void Player::update(const SDLState& sdlState, float dt) {
   }
 }
 
-void Player::collision(float dt) {
+void Player::collision() {
   SDL_FRect playerCollider{.x = pos.x + collider.x,
                            .y = pos.y + collider.y,
                            .w = collider.w,

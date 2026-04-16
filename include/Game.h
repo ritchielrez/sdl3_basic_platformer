@@ -85,9 +85,26 @@ struct Game {
 
     constexpr float ENEMY_SIZE = 24.0f;
 
-    for (uint16_t r = 0; r < map.getRows(); r++) {
-      for (uint16_t c = 0; c < map.getCols(); c++) {
+    for (size_t r = 0; r < map.getRows(); r++) {
+      for (size_t c = 0; c < map.getCols(); c++) {
         switch (map.getTiles()[r * map.getCols() + c]) {
+          case Tiles::GRASS: {
+            StaticTile staticTile{};
+            staticTile.pos = glm::vec2(
+                c * Map::TILE_SIZE,
+                sdlState.logicalHeight - (map.getRows() - r) * Map::TILE_SIZE);
+            staticTile.tex = resourceManager.getWorldTex();
+            staticTile.w = Map::TILE_SIZE;
+            staticTile.h = Map::TILE_SIZE;
+            staticTile.collider.x = 0;
+            staticTile.collider.y = 0;
+            staticTile.collider.w = staticTile.w;
+            staticTile.collider.h = staticTile.h;
+            staticTile.anims = std::vector<Frames>{Frames(
+                glm::vec2(0, 0), Map::TILE_SIZE, Map::TILE_SIZE)};
+            staticTiles.push_back(staticTile);
+            break;
+          }
           case Tiles::DIRT: {
             StaticTile staticTile{};
             staticTile.pos = glm::vec2(
@@ -170,7 +187,7 @@ struct Game {
  public:
   static inline void init(const SDLState &sdlState,
                           const ResourceManager &resourceManager) {
-    if(!map.parse("./assets/map.csv")) {
+    if (!map.parse("./assets/map.csv")) {
       exit(1);
     }
     createPlayer(sdlState, resourceManager);
