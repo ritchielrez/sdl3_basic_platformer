@@ -17,7 +17,13 @@ if(MSVC)
 endif()
 
 add_executable(main src/main.cpp src/Entity.cpp src/Player.cpp)
+set_target_properties(main PROPERTIES COMPILE_WARNING_AS_ERROR ON)
 target_include_directories(main PRIVATE include)
+target_compile_options(main PRIVATE
+     $<$<OR:$<CXX_COMPILER_ID:Clang>,$<CXX_COMPILER_ID:AppleClang>,$<CXX_COMPILER_ID:GNU>>:
+          -Wall>
+     $<$<CXX_COMPILER_ID:MSVC>:
+          /W4>)
 
 if (CMAKE_BUILD_TYPE STREQUAL "Debug" OR CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo")
   target_compile_definitions(main PRIVATE DEBUG)
