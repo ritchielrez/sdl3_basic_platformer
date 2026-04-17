@@ -9,9 +9,9 @@ struct Entity {
   glm::vec2 pos, vel;
   float w, h;
   SDL_FRect collider;
-  SDL_Texture *tex;
-  std::vector<Frames> anims;
   int64_t currAnim;
+  std::vector<Frames> anims;
+  SDL_Texture *tex;
   float dir;
 
   Entity()

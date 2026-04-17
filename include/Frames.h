@@ -10,8 +10,8 @@
 class Frames {
   Timer timer;
   size_t frameCount;
-  std::vector<glm::vec2> texCoords;
   float frameWidth, frameHeight;
+  std::vector<glm::vec2> texCoords;
 
  public:
   Frames()
