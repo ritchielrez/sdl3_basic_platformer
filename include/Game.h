@@ -77,7 +77,7 @@ struct Game {
     player.collider.h = 10.0f;
   }
 
-  static inline void createTiles(const SDLState &sdlState,
+  static inline void createEntities(const SDLState &sdlState,
                                  const ResourceManager &resourceManager) {
     staticTiles.reserve(100);
     dynTiles.reserve(100);
@@ -191,7 +191,7 @@ struct Game {
       exit(1);
     }
     createPlayer(sdlState, resourceManager);
-    createTiles(sdlState, resourceManager);
+    createEntities(sdlState, resourceManager);
 
     cam.w = sdlState.logicalWidth;
     cam.h = sdlState.logicalHeight;
