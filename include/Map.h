@@ -22,6 +22,8 @@ enum {
   TREE3,
   COIN,
   ENEMY,
+  SKY_PEACH,
+  CLOUD_PEACH,
 };
 }
 
