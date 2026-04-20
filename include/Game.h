@@ -150,7 +150,8 @@ struct Game {
           }
           case Tiles::ENEMY: {
             Enemy enemy{};
-            enemy.pos = glm::vec2(c * Map::TILE_SIZE,
+            // NOTE: Subtracting by 4 pixels allows the enemy tile to be perfectly aligned with other tiles horizontally.
+            enemy.pos = glm::vec2(c * Map::TILE_SIZE - 4,
                                   (sdlState.logicalHeight -
                                    (map.getRows() - r - 1) * Map::TILE_SIZE) -
                                       ENEMY_SIZE);
