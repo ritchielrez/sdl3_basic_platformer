@@ -78,7 +78,7 @@ void Player::update(const SDLState& sdlState, float dt) {
   float camRuler = (sdlState.logicalWidth - w) / 2;
 
   if (!passedCamRuler && pos.x >= camRuler) passedCamRuler = true;
-  if (passedCamRuler) {
+  if (passedCamRuler && pos.x >= camRuler) {
     Game::cam.x = pos.x - camRuler;
   }
 }
