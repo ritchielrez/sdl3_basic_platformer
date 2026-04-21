@@ -88,11 +88,11 @@ class ResourceManager {
     return tex;
   }
 
-  SDL_Texture *getCoinTex() const { return coinTex; }
-  SDL_Texture *getPlayerTex() const { return playerTex; }
-  SDL_Texture *getWorldTex() const { return worldTex; }
-  SDL_Texture *getPlatformTex() const { return platformsTex; }
-  SDL_Texture *getEnemyTex() const { return enemyTex; }
+  [[nodiscard]] SDL_Texture *getCoinTex() const { return coinTex; }
+  [[nodiscard]] SDL_Texture *getPlayerTex() const { return playerTex; }
+  [[nodiscard]] SDL_Texture *getWorldTex() const { return worldTex; }
+  [[nodiscard]] SDL_Texture *getPlatformTex() const { return platformsTex; }
+  [[nodiscard]] SDL_Texture *getEnemyTex() const { return enemyTex; }
 
   ~ResourceManager() {
     SDL_DestroyTexture(coinTex);
