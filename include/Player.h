@@ -20,6 +20,7 @@ struct Player : public Entity {
   Player()
       : accel(glm::vec2(0)),
         jumpVel(0),
+        gravVel(0),
         maxSpeedX(0),
         collided(false),
         death(false),
