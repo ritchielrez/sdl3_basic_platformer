@@ -13,7 +13,12 @@ struct SDLState {
   int winWidth = 1280, winHeight = 720;
   static constexpr uint32_t logicalWidth = 320, logicalHeight = 180;
 
-  SDLState() : win(nullptr), renderer(nullptr), keys(nullptr) {}
+  SDLState()
+      : win(nullptr),
+        renderer(nullptr),
+        font(nullptr),
+        textEngine(nullptr),
+        keys(nullptr) {}
   SDLState(const char *winTitle, SDL_WindowFlags winFlags,
            const char *rendererName) {
     win = SDL_CreateWindow(winTitle, winWidth, winHeight, winFlags);
