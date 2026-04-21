@@ -10,19 +10,15 @@
 #include "DebugUI.h"
 #endif
 
-#include <array>
 #include <cassert>
 #include <glm/glm.hpp>
 #include <string_view>
-#include <vector>
 
-#include "DynTile.h"
 #include "Game.h"
 #include "Log.h"
 #include "Player.h"
 #include "ResourceManager.h"
 #include "SDLState.h"
-#include "StaticTile.h"
 #include "defer.h"
 
 int main([[maybe_unused]]int argc, [[maybe_unused]]char **argv) {
