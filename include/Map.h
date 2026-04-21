@@ -2,10 +2,9 @@
 
 #include <SDL3/SDL.h>
 
-#include <array>
 #include <cstdlib>
 #include <fstream>
-#include <iostream>
+#include <vector>
 #include <sstream>
 #include <string>
 
