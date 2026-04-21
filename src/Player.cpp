@@ -164,7 +164,7 @@ void Player::collision() {
     }
   }
 
-  for(auto &enemy: Game::enemies) {
+  for (auto& enemy : Game::enemies) {
     collidedRect.x = enemy.pos.x + enemy.collider.x;
     collidedRect.y = enemy.pos.y + enemy.collider.y;
     collidedRect.w = enemy.collider.w;

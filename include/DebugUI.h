@@ -74,7 +74,8 @@ struct DebugUI {
     if (!Game::debug) return;
 
     ImGui::Begin("Camera");
-    ImGui::Text("%s",
+    ImGui::Text(
+        "%s",
         fmt::format("Position: ({}, {})\n", Game::cam.x, Game::cam.y).c_str());
     ImGui::End();
   }

@@ -2,7 +2,6 @@
 
 #include <fmt/base.h>
 
-#include <array>
 #include <glm/glm.hpp>
 #include <vector>
 
@@ -78,7 +77,7 @@ struct Game {
   }
 
   static inline void createEntities(const SDLState &sdlState,
-                                 const ResourceManager &resourceManager) {
+                                    const ResourceManager &resourceManager) {
     staticTiles.reserve(100);
     dynTiles.reserve(100);
     coins.reserve(100);
@@ -100,8 +99,8 @@ struct Game {
             staticTile.collider.y = 0;
             staticTile.collider.w = staticTile.w;
             staticTile.collider.h = staticTile.h;
-            staticTile.anims = std::vector<Frames>{Frames(
-                glm::vec2(0, 0), Map::TILE_SIZE, Map::TILE_SIZE)};
+            staticTile.anims = std::vector<Frames>{
+                Frames(glm::vec2(0, 0), Map::TILE_SIZE, Map::TILE_SIZE)};
             staticTiles.push_back(staticTile);
             break;
           }
@@ -150,7 +149,8 @@ struct Game {
           }
           case Tiles::ENEMY: {
             Enemy enemy{};
-            // NOTE: Subtracting by 4 pixels allows the enemy tile to be perfectly aligned with other tiles horizontally.
+            // NOTE: Subtracting by 4 pixels allows the enemy tile to be
+            // perfectly aligned with other tiles horizontally.
             enemy.pos = glm::vec2(c * Map::TILE_SIZE - 4,
                                   (sdlState.logicalHeight -
                                    (map.getRows() - r - 1) * Map::TILE_SIZE) -

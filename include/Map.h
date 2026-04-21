@@ -4,9 +4,9 @@
 
 #include <cstdlib>
 #include <fstream>
-#include <vector>
 #include <sstream>
 #include <string>
+#include <vector>
 
 namespace Tiles {
 enum {
@@ -50,10 +50,14 @@ struct Map {
       std::istringstream ss(std::move(line));
 
       for (size_t c = 1; std::getline(ss, cell, ','); c++) {
-        if (rows == 0) cols = c;
+        if (rows == 0)
+          cols = c;
         else if (c > cols) {
-          SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error",
-                                   "Could not parse tilemap from disk, the number of columns for all rows should be the same", nullptr);
+          SDL_ShowSimpleMessageBox(
+              SDL_MESSAGEBOX_ERROR, "Error",
+              "Could not parse tilemap from disk, the number of columns for "
+              "all rows should be the same",
+              nullptr);
           return false;
         }
         tiles.push_back(static_cast<uint16_t>(std::stoul(cell)));
@@ -63,10 +67,7 @@ struct Map {
     return true;
   }
 
-
   [[nodiscard]] size_t getRows() const { return rows; }
   [[nodiscard]] size_t getCols() const { return cols; }
-  [[nodiscard]] std::vector<uint16_t> getTiles() const {
-    return tiles;
-  }
+  [[nodiscard]] std::vector<uint16_t> getTiles() const { return tiles; }
 };

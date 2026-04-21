@@ -80,7 +80,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char **argv) {
     SDL_SetRenderDrawColor(sdlState.renderer, 20, 152, 220, 255);
     SDL_RenderClear(sdlState.renderer);
 
-    if(game.player.death) {
+    if (game.player.death) {
       game.reset(sdlState, resourceManager);
       fmt::println("You died.");
     } else {
