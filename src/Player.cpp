@@ -17,7 +17,7 @@ void Player::update(const SDLState& sdlState, float dt) {
   if (sdlState.keys[SDL_SCANCODE_D]) {
     currDir += 1;
   }
-  if (currDir) {
+  if (currDir != 0) {
     dir = currDir;
   }
 
@@ -28,9 +28,9 @@ void Player::update(const SDLState& sdlState, float dt) {
 
   switch (currAnim) {
     case PlayerAnim::idle: {
-      if (currDir) {
+      if (currDir != 0) {
         currAnim = PlayerAnim::run;
-      } else if (vel.x) {
+      } else if (vel.x != 0) {
         const float deaccelFactor = vel.x > 0 ? -1.5f : 1.5f;
         float deaccelVel = deaccelFactor * accel.x * dt;
 
@@ -43,7 +43,7 @@ void Player::update(const SDLState& sdlState, float dt) {
       break;
     }
     case PlayerAnim::run: {
-      if (!currDir) {
+      if (currDir == 0) {
         currAnim = PlayerAnim::idle;
       }
 
