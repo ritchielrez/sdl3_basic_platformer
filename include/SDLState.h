@@ -10,7 +10,7 @@ struct SDLState {
   TTF_Font *font;
   TTF_TextEngine *textEngine;
   const bool *keys;
-  uint32_t winWidth = 1280, winHeight = 720;
+  int winWidth = 1280, winHeight = 720;
   static constexpr uint32_t logicalWidth = 320, logicalHeight = 180;
 
   SDLState() : win(nullptr), renderer(nullptr), keys(nullptr) {}
