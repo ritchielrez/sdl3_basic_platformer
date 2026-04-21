@@ -6,6 +6,10 @@
 #include <cstdlib>
 #include <string_view>
 
+#include "SDLState.h"
+
+#include "SDLState.h"
+
 class ResourceManager {
   SDL_Texture *coinTex;
   SDL_Texture *playerTex;
