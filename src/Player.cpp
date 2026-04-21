@@ -88,9 +88,9 @@ void Player::collision() {
                            .y = pos.y + collider.y,
                            .w = collider.w,
                            .h = collider.h};
-  SDL_FRect groundSensor{0};
-  SDL_FRect collidedRect{0};
-  SDL_FRect intersectionRect{0};
+  SDL_FRect groundSensor{0, 0, 0, 0};
+  SDL_FRect collidedRect{0, 0, 0, 0};
+  SDL_FRect intersectionRect{0, 0, 0, 0};
 
   collided = false;
   bool foundGround = false;
