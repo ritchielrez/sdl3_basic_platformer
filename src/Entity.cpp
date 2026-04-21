@@ -20,7 +20,7 @@ void Entity::draw(const SDLState &sdlState) {
                            flipMode);
 
   if (Game::debug) {
-    SDL_FRect colliderRect{0};
+    SDL_FRect colliderRect{0, 0, 0, 0};
     colliderRect.x = pos.x + collider.x - Game::cam.x;
     colliderRect.y = pos.y + collider.y - Game::cam.y;
     colliderRect.w = collider.w;
