@@ -5,6 +5,7 @@
 #include <glm/glm.hpp>
 #include <vector>
 
+#include "BgTile.h"
 #include "Coin.h"
 #include "DynTile.h"
 #include "Enemy.h"
@@ -20,6 +21,7 @@ struct Game {
   static inline bool debug = false;
   static inline Player player{};
   static inline std::vector<Enemy> enemies{};
+  static inline std::vector<BgTile> bgTiles{};
   static inline std::vector<StaticTile> staticTiles{};
   static inline std::vector<DynTile> dynTiles{};
   static inline std::vector<Coin> coins{};
@@ -78,8 +80,9 @@ struct Game {
 
   static inline void createEntities(const SDLState &sdlState,
                                     const ResourceManager &resourceManager) {
-    staticTiles.reserve(100);
-    dynTiles.reserve(100);
+    bgTiles.reserve(10000);
+    staticTiles.reserve(1000);
+    dynTiles.reserve(10);
     coins.reserve(100);
 
     constexpr float ENEMY_SIZE = 24.0f;
@@ -176,6 +179,42 @@ struct Game {
             enemies.push_back(enemy);
             break;
           };
+          case Tiles::SKY_PEACH: {
+            BgTile bgTile{};
+            bgTile.pos = glm::vec2(
+                c * Map::TILE_SIZE,
+                sdlState.logicalHeight - (map.getRows() - r) * Map::TILE_SIZE);
+            bgTile.tex = resourceManager.getWorldTex();
+            bgTile.w = Map::TILE_SIZE;
+            bgTile.h = Map::TILE_SIZE;
+            bgTile.collider.x = 0;
+            bgTile.collider.y = 0;
+            bgTile.collider.w = 0;
+            bgTile.collider.h = 0;
+            bgTile.anims = std::vector<Frames>{
+                Frames(glm::vec2(Map::TILE_SIZE, 11 * Map::TILE_SIZE),
+                       Map::TILE_SIZE, Map::TILE_SIZE)};
+            bgTiles.push_back(bgTile);
+            break;
+          }
+          case Tiles::CLOUD_PEACH: {
+            BgTile bgTile{};
+            bgTile.pos = glm::vec2(
+                c * Map::TILE_SIZE,
+                sdlState.logicalHeight - (map.getRows() - r) * Map::TILE_SIZE);
+            bgTile.tex = resourceManager.getWorldTex();
+            bgTile.w = Map::TILE_SIZE;
+            bgTile.h = Map::TILE_SIZE;
+            bgTile.collider.x = 0;
+            bgTile.collider.y = 0;
+            bgTile.collider.w = 0;
+            bgTile.collider.h = 0;
+            bgTile.anims = std::vector<Frames>{
+                Frames(glm::vec2(Map::TILE_SIZE, 12 * Map::TILE_SIZE),
+                       Map::TILE_SIZE, Map::TILE_SIZE)};
+            bgTiles.push_back(bgTile);
+            break;
+          }
           case Tiles::NONE:
             break;
           default:
@@ -240,6 +279,9 @@ struct Game {
   }
 
   static inline void draw(const SDLState &sdlState) {
+    for (auto &bgTile : bgTiles) {
+      bgTile.draw(sdlState);
+    }
     for (auto &staticTile : staticTiles) {
       staticTile.draw(sdlState);
     }
