@@ -21,7 +21,7 @@
 #include "SDLState.h"
 #include "defer.h"
 
-int main([[maybe_unused]]int argc, [[maybe_unused]]char **argv) {
+int main([[maybe_unused]] int argc, [[maybe_unused]] char **argv) {
   if (!SDL_Init(SDL_INIT_VIDEO)) {
     SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error",
                              "Could not initialize SDL3", nullptr);
