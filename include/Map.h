@@ -57,7 +57,7 @@ struct Map {
                                    "Could not parse tilemap from disk, the number of columns for all rows should be the same", nullptr);
           return false;
         }
-        tiles.push_back(static_cast<uint16_t>(std::stoul(std::move(cell))));
+        tiles.push_back(static_cast<uint16_t>(std::stoul(cell)));
       }
     }
 
