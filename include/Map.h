@@ -64,9 +64,9 @@ struct Map {
   }
 
 
-  const size_t getRows() const { return rows; }
-  const size_t getCols() const { return cols; }
-  const std::vector<uint16_t> getTiles() const {
+  size_t getRows() const { return rows; }
+  size_t getCols() const { return cols; }
+  std::vector<uint16_t> getTiles() const {
     return tiles;
   }
 };
