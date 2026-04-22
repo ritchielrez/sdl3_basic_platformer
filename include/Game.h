@@ -125,6 +125,86 @@ struct Game {
             bgTiles.push_back(bgTile);
             break;
           }
+          case Tiles::SKY_YELLOW: {
+            BgTile bgTile{};
+            bgTile.pos = glm::vec2(c * Map::TILE_SIZE, r * Map::TILE_SIZE);
+            bgTile.tex = resourceManager.getWorldTex();
+            bgTile.w = Map::TILE_SIZE;
+            bgTile.h = Map::TILE_SIZE;
+            bgTile.collider.x = 0;
+            bgTile.collider.y = 0;
+            bgTile.collider.w = 0;
+            bgTile.collider.h = 0;
+            bgTile.anims = std::vector<Frames>{
+                Frames(glm::vec2(Map::TILE_SIZE, 13 * Map::TILE_SIZE),
+                       Map::TILE_SIZE, Map::TILE_SIZE)};
+            bgTiles.push_back(bgTile);
+            break;
+          }
+          case Tiles::CLOUD_YELLOW: {
+            BgTile bgTile{};
+            bgTile.pos = glm::vec2(c * Map::TILE_SIZE, r * Map::TILE_SIZE);
+            bgTile.tex = resourceManager.getWorldTex();
+            bgTile.w = Map::TILE_SIZE;
+            bgTile.h = Map::TILE_SIZE;
+            bgTile.collider.x = 0;
+            bgTile.collider.y = 0;
+            bgTile.collider.w = 0;
+            bgTile.collider.h = 0;
+            bgTile.anims = std::vector<Frames>{
+                Frames(glm::vec2(Map::TILE_SIZE, 14 * Map::TILE_SIZE),
+                       Map::TILE_SIZE, Map::TILE_SIZE)};
+            bgTiles.push_back(bgTile);
+            break;
+          }
+          case Tiles::SKY_ORANGE: {
+            BgTile bgTile{};
+            bgTile.pos = glm::vec2(c * Map::TILE_SIZE, r * Map::TILE_SIZE);
+            bgTile.tex = resourceManager.getWorldTex();
+            bgTile.w = Map::TILE_SIZE;
+            bgTile.h = Map::TILE_SIZE;
+            bgTile.collider.x = 0;
+            bgTile.collider.y = 0;
+            bgTile.collider.w = 0;
+            bgTile.collider.h = 0;
+            bgTile.anims = std::vector<Frames>{
+                Frames(glm::vec2(Map::TILE_SIZE, 15 * Map::TILE_SIZE),
+                       Map::TILE_SIZE, Map::TILE_SIZE)};
+            bgTiles.push_back(bgTile);
+            break;
+          }
+          case Tiles::CLOUD_ORANGE: {
+            BgTile bgTile{};
+            bgTile.pos = glm::vec2(c * Map::TILE_SIZE, r * Map::TILE_SIZE);
+            bgTile.tex = resourceManager.getWorldTex();
+            bgTile.w = Map::TILE_SIZE;
+            bgTile.h = Map::TILE_SIZE;
+            bgTile.collider.x = 0;
+            bgTile.collider.y = 0;
+            bgTile.collider.w = 0;
+            bgTile.collider.h = 0;
+            bgTile.anims = std::vector<Frames>{
+                Frames(glm::vec2(Map::TILE_SIZE, 16 * Map::TILE_SIZE),
+                       Map::TILE_SIZE, Map::TILE_SIZE)};
+            bgTiles.push_back(bgTile);
+            break;
+          }
+          case Tiles::CLOUD_SKIN: {
+            BgTile bgTile{};
+            bgTile.pos = glm::vec2(c * Map::TILE_SIZE, r * Map::TILE_SIZE);
+            bgTile.tex = resourceManager.getWorldTex();
+            bgTile.w = Map::TILE_SIZE;
+            bgTile.h = Map::TILE_SIZE;
+            bgTile.collider.x = 0;
+            bgTile.collider.y = 0;
+            bgTile.collider.w = 0;
+            bgTile.collider.h = 0;
+            bgTile.anims = std::vector<Frames>{
+                Frames(glm::vec2(Map::TILE_SIZE, 10 * Map::TILE_SIZE),
+                       Map::TILE_SIZE, Map::TILE_SIZE)};
+            bgTiles.push_back(bgTile);
+            break;
+          }
           case Tiles::NONE:
             break;
           default:
