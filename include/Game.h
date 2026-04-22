@@ -17,7 +17,8 @@
 #include "Text.h"
 
 struct Game {
-  static inline Map map{};
+  static inline Map mapBgLayer{};
+  static inline Map mapMidLayer{};
   static inline bool debug = false;
   static inline Player player{};
   static inline std::vector<Enemy> enemies{};
@@ -87,14 +88,63 @@ struct Game {
 
     constexpr float ENEMY_SIZE = 24.0f;
 
-    for (size_t r = 0; r < map.getRows(); r++) {
-      for (size_t c = 0; c < map.getCols(); c++) {
-        switch (map.getTiles()[r * map.getCols() + c]) {
+    // `mapBgLayer` refers to the background layer of the level map that defines
+    // what the background should look like.
+    for (size_t r = 0; r < mapBgLayer.getRows(); r++) {
+      for (size_t c = 0; c < mapBgLayer.getCols(); c++) {
+        switch (mapBgLayer.getTiles()[r * mapBgLayer.getCols() + c]) {
+          case Tiles::SKY_PEACH: {
+            BgTile bgTile{};
+            bgTile.pos = glm::vec2(c * Map::TILE_SIZE, r * Map::TILE_SIZE);
+            bgTile.tex = resourceManager.getWorldTex();
+            bgTile.w = Map::TILE_SIZE;
+            bgTile.h = Map::TILE_SIZE;
+            bgTile.collider.x = 0;
+            bgTile.collider.y = 0;
+            bgTile.collider.w = 0;
+            bgTile.collider.h = 0;
+            bgTile.anims = std::vector<Frames>{
+                Frames(glm::vec2(Map::TILE_SIZE, 11 * Map::TILE_SIZE),
+                       Map::TILE_SIZE, Map::TILE_SIZE)};
+            bgTiles.push_back(bgTile);
+            break;
+          }
+          case Tiles::CLOUD_PEACH: {
+            BgTile bgTile{};
+            bgTile.pos = glm::vec2(c * Map::TILE_SIZE, r * Map::TILE_SIZE);
+            bgTile.tex = resourceManager.getWorldTex();
+            bgTile.w = Map::TILE_SIZE;
+            bgTile.h = Map::TILE_SIZE;
+            bgTile.collider.x = 0;
+            bgTile.collider.y = 0;
+            bgTile.collider.w = 0;
+            bgTile.collider.h = 0;
+            bgTile.anims = std::vector<Frames>{
+                Frames(glm::vec2(Map::TILE_SIZE, 12 * Map::TILE_SIZE),
+                       Map::TILE_SIZE, Map::TILE_SIZE)};
+            bgTiles.push_back(bgTile);
+            break;
+          }
+          case Tiles::NONE:
+            break;
+          default:
+            assert(false &&
+                   "Unreachable: invalid tile type for background layer");
+        }
+      }
+    }
+
+    // `mapMidLayer` refers to the layer of the level map that defines the
+    // player interactable tiles.
+    for (size_t r = 0; r < mapMidLayer.getRows(); r++) {
+      for (size_t c = 0; c < mapMidLayer.getCols(); c++) {
+        switch (mapMidLayer.getTiles()[r * mapMidLayer.getCols() + c]) {
           case Tiles::GRASS: {
             StaticTile staticTile{};
-            staticTile.pos = glm::vec2(
-                c * Map::TILE_SIZE,
-                sdlState.logicalHeight - (map.getRows() - r) * Map::TILE_SIZE);
+            staticTile.pos =
+                glm::vec2(c * Map::TILE_SIZE,
+                          sdlState.logicalHeight -
+                              (mapMidLayer.getRows() - r) * Map::TILE_SIZE);
             staticTile.tex = resourceManager.getWorldTex();
             staticTile.w = Map::TILE_SIZE;
             staticTile.h = Map::TILE_SIZE;
@@ -109,9 +159,10 @@ struct Game {
           }
           case Tiles::DIRT: {
             StaticTile staticTile{};
-            staticTile.pos = glm::vec2(
-                c * Map::TILE_SIZE,
-                sdlState.logicalHeight - (map.getRows() - r) * Map::TILE_SIZE);
+            staticTile.pos =
+                glm::vec2(c * Map::TILE_SIZE,
+                          sdlState.logicalHeight -
+                              (mapMidLayer.getRows() - r) * Map::TILE_SIZE);
             staticTile.tex = resourceManager.getWorldTex();
             staticTile.w = Map::TILE_SIZE;
             staticTile.h = Map::TILE_SIZE;
@@ -126,9 +177,10 @@ struct Game {
           }
           case Tiles::COIN: {
             Coin coin{};
-            coin.pos = glm::vec2(
-                c * Map::TILE_SIZE,
-                sdlState.logicalHeight - (map.getRows() - r) * Map::TILE_SIZE);
+            coin.pos =
+                glm::vec2(c * Map::TILE_SIZE,
+                          sdlState.logicalHeight -
+                              (mapMidLayer.getRows() - r) * Map::TILE_SIZE);
             coin.tex = resourceManager.getCoinTex();
             coin.w = Map::TILE_SIZE;
             coin.h = Map::TILE_SIZE;
@@ -154,10 +206,11 @@ struct Game {
             Enemy enemy{};
             // NOTE: Subtracting by 4 pixels allows the enemy tile to be
             // perfectly aligned with other tiles horizontally.
-            enemy.pos = glm::vec2(c * Map::TILE_SIZE - 4,
-                                  (sdlState.logicalHeight -
-                                   (map.getRows() - r - 1) * Map::TILE_SIZE) -
-                                      ENEMY_SIZE);
+            enemy.pos =
+                glm::vec2(c * Map::TILE_SIZE - 4,
+                          (sdlState.logicalHeight -
+                           (mapMidLayer.getRows() - r - 1) * Map::TILE_SIZE) -
+                              ENEMY_SIZE);
             enemy.tex = resourceManager.getEnemyTex();
             enemy.w = ENEMY_SIZE;
             enemy.h = ENEMY_SIZE;
@@ -179,46 +232,10 @@ struct Game {
             enemies.push_back(enemy);
             break;
           };
-          case Tiles::SKY_PEACH: {
-            BgTile bgTile{};
-            bgTile.pos = glm::vec2(
-                c * Map::TILE_SIZE,
-                sdlState.logicalHeight - (map.getRows() - r) * Map::TILE_SIZE);
-            bgTile.tex = resourceManager.getWorldTex();
-            bgTile.w = Map::TILE_SIZE;
-            bgTile.h = Map::TILE_SIZE;
-            bgTile.collider.x = 0;
-            bgTile.collider.y = 0;
-            bgTile.collider.w = 0;
-            bgTile.collider.h = 0;
-            bgTile.anims = std::vector<Frames>{
-                Frames(glm::vec2(Map::TILE_SIZE, 11 * Map::TILE_SIZE),
-                       Map::TILE_SIZE, Map::TILE_SIZE)};
-            bgTiles.push_back(bgTile);
-            break;
-          }
-          case Tiles::CLOUD_PEACH: {
-            BgTile bgTile{};
-            bgTile.pos = glm::vec2(
-                c * Map::TILE_SIZE,
-                sdlState.logicalHeight - (map.getRows() - r) * Map::TILE_SIZE);
-            bgTile.tex = resourceManager.getWorldTex();
-            bgTile.w = Map::TILE_SIZE;
-            bgTile.h = Map::TILE_SIZE;
-            bgTile.collider.x = 0;
-            bgTile.collider.y = 0;
-            bgTile.collider.w = 0;
-            bgTile.collider.h = 0;
-            bgTile.anims = std::vector<Frames>{
-                Frames(glm::vec2(Map::TILE_SIZE, 12 * Map::TILE_SIZE),
-                       Map::TILE_SIZE, Map::TILE_SIZE)};
-            bgTiles.push_back(bgTile);
-            break;
-          }
           case Tiles::NONE:
             break;
           default:
-            assert(false && "Unreachable");
+            assert(false && "Unreachable: invalid tile type for medium layer");
         }
       }
     }
@@ -227,7 +244,10 @@ struct Game {
  public:
   static inline void init(const SDLState &sdlState,
                           const ResourceManager &resourceManager) {
-    if (!map.parse("./assets/map.csv")) {
+    if (!mapBgLayer.parse("./assets/map_layer_bg.csv")) {
+      exit(1);
+    }
+    if (!mapMidLayer.parse("./assets/map_layer_mid.csv")) {
       exit(1);
     }
     createPlayer(sdlState, resourceManager);
@@ -243,9 +263,11 @@ struct Game {
   }
   static inline void reset(const SDLState &sdlState,
                            const ResourceManager &resourceManager) {
-    map = Map();
+    mapBgLayer = Map();
+    mapMidLayer = Map();
     player = Player();
     enemies.clear();
+    bgTiles.clear();
     staticTiles.clear();
     dynTiles.clear();
     coins.clear();

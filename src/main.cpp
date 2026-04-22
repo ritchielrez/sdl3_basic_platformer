@@ -77,7 +77,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char **argv) {
 #endif
 
     // Clear screen
-    SDL_SetRenderDrawColor(sdlState.renderer, 20, 152, 220, 255);
+    SDL_SetRenderDrawColor(sdlState.renderer, 0, 0, 0, 255);
     SDL_RenderClear(sdlState.renderer);
 
     if (game.player.death) {
