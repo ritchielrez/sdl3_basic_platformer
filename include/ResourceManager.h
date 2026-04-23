@@ -6,6 +6,7 @@
 #include <cstdlib>
 #include <string_view>
 
+#include "SDL3/SDL_surface.h"
 #include "SDLState.h"
 
 class ResourceManager {
@@ -82,7 +83,7 @@ class ResourceManager {
     SDL_Surface *surface = SDL_CreateSurfaceFrom(
         width, height, SDL_PIXELFORMAT_RGBA32, pixData, width * 4);
     SDL_Texture *tex = SDL_CreateTextureFromSurface(sdlState.renderer, surface);
-    SDL_SetTextureScaleMode(tex, SDL_SCALEMODE_NEAREST);
+    SDL_SetTextureScaleMode(tex, SDL_SCALEMODE_PIXELART);
 
     SDL_DestroySurface(surface);
     stbi_image_free(pixData);

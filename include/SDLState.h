@@ -36,7 +36,8 @@ struct SDLState {
     }
 
     SDL_SetRenderLogicalPresentation(renderer, logicalWidth, logicalHeight,
-                                     SDL_LOGICAL_PRESENTATION_LETTERBOX);
+                                     SDL_LOGICAL_PRESENTATION_INTEGER_SCALE);
+
     // Tell SDL how to use the alpha values.
     SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
 

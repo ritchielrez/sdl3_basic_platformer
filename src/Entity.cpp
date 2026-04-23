@@ -1,5 +1,7 @@
 #include "Entity.h"
 
+#include <glm/glm.hpp>
+
 #include "Game.h"
 #include "Log.h"
 
@@ -12,8 +14,10 @@ void Entity::draw(const SDLState &sdlState) {
                 .y = currFrame.getTexCoord().y,
                 .w = currFrame.getFrameWidth(),
                 .h = currFrame.getFrameHeight()};
-  SDL_FRect dst{
-      .x = pos.x - Game::cam.x, .y = pos.y - Game::cam.y, .w = w, .h = h};
+  SDL_FRect dst{.x = glm::round(pos.x - Game::cam.x),
+                .y = glm::round(pos.y - Game::cam.y),
+                .w = w,
+                .h = h};
 
   SDL_FlipMode flipMode = dir == -1 ? SDL_FLIP_HORIZONTAL : SDL_FLIP_NONE;
   SDL_RenderTextureRotated(sdlState.renderer, tex, &src, &dst, 0, nullptr,
@@ -21,8 +25,8 @@ void Entity::draw(const SDLState &sdlState) {
 
   if (Game::debug) {
     SDL_FRect colliderRect{0, 0, 0, 0};
-    colliderRect.x = pos.x + collider.x - Game::cam.x;
-    colliderRect.y = pos.y + collider.y - Game::cam.y;
+    colliderRect.x = glm::round(pos.x + collider.x - Game::cam.x);
+    colliderRect.y = glm::round(pos.y + collider.y - Game::cam.y);
     colliderRect.w = collider.w;
     colliderRect.h = collider.h;
     SDL_SetRenderDrawColor(sdlState.renderer, 255, 0, 0, 128);
