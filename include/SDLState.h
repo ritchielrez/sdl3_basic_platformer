@@ -4,6 +4,8 @@
 #include <SDL3_ttf/SDL_textengine.h>
 #include <SDL3_ttf/SDL_ttf.h>
 
+#include <cstdlib>
+
 struct SDLState {
   SDL_Window *win;
   SDL_Renderer *renderer;
