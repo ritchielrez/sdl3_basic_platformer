@@ -14,8 +14,8 @@ void Entity::draw(const SDLState &sdlState) {
                 .y = currFrame.getTexCoord().y,
                 .w = currFrame.getFrameWidth(),
                 .h = currFrame.getFrameHeight()};
-  SDL_FRect dst{.x = glm::round(pos.x - Game::cam.x),
-                .y = glm::round(pos.y - Game::cam.y),
+  SDL_FRect dst{.x = pos.x - Game::cam.x,
+                .y = pos.y - Game::cam.y,
                 .w = w,
                 .h = h};
 
@@ -25,8 +25,8 @@ void Entity::draw(const SDLState &sdlState) {
 
   if (Game::debug) {
     SDL_FRect colliderRect{0, 0, 0, 0};
-    colliderRect.x = glm::round(pos.x + collider.x - Game::cam.x);
-    colliderRect.y = glm::round(pos.y + collider.y - Game::cam.y);
+    colliderRect.x = pos.x + collider.x - Game::cam.x;
+    colliderRect.y = pos.y + collider.y - Game::cam.y;
     colliderRect.w = collider.w;
     colliderRect.h = collider.h;
     SDL_SetRenderDrawColor(sdlState.renderer, 255, 0, 0, 128);
