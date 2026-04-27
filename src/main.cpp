@@ -6,7 +6,7 @@
 // debugging information. Dear imgui is a bloat-free graphical user interface
 // library for C++. It is fast, portable, renderer agnostic, and self-contained
 // (no external dependencies). It has been used by various AAA companies to
-// render in game debug information.
+// build various in game proprietary tools.
 #ifdef DEBUG
 #include <backends/imgui_impl_sdl3.h>
 #include <imgui.h>
@@ -44,7 +44,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char **argv) {
   SDLState sdlState{"sdl3_basic_platformer", SDL_WINDOW_RESIZABLE, nullptr};
 
   // Create `ResourceManager` object which initializes textures needed to render
-  // game objects.
+  // game entities.
   ResourceManager resourceManager{sdlState};
 
   // Create `Game` object which initializes game entities.
@@ -56,31 +56,46 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char **argv) {
   DebugUI debugUI{sdlState, "assets/fonts/Roboto-Regular.ttf", 20.0f};
 #endif
 
+  // Keep track of the time when the previous frame started rendering.
   uint64_t prevTime = SDL_GetTicks();
   bool running = true;
   while (running) {
+    // Keep track of the time when the current frame starts processing.
     uint64_t nowTime = SDL_GetTicks();
+    // Find the delta time, which tells us how much time did it take to process
+    // the last frame in seconds.
     float dt = (nowTime - prevTime) / 1000.0f;
 
     SDL_Event event{0};
+    // Start looking through all the events that the operating system is trying
+    // to send us for processing. These events can be something as basic as
+    // mouse clicks, certains keys being pressed, window being resized etc.
     while (SDL_PollEvent(&event)) {
+      // Imgui needs to have some control over the event handling if it is being
+      // used. This is a requirment of the library.
 #ifdef DEBUG
       if (game.debug) ImGui_ImplSDL3_ProcessEvent(&event);
 #endif
       switch (event.type) {
+        // If the user clicked on the close button stop running the game.
         case SDL_EVENT_QUIT: {
           running = false;
           break;
         }
+        // Keep track of the window width and height internally when it has been
+        // resized.
         case SDL_EVENT_WINDOW_RESIZED: {
           sdlState.winWidth = event.window.data1;
           sdlState.winHeight = event.window.data2;
           break;
         }
+        // Handle when keys are being pressed down by the user.
         // NOTE: Keyboard events are better if you do not want multiple key
         // down events in a single frame. With events, there is a delay
         // between consecutive key down events.
         case SDL_EVENT_KEY_DOWN: {
+          // Toggle showing debug information when the
+          // user presses F1, only if a debug build is being run.
 #ifdef DEBUG
           if (event.key.scancode == SDL_SCANCODE_F1) game.debug = !game.debug;
 #endif
@@ -89,19 +104,24 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char **argv) {
       }
     }
 
+    // Render the debug information on to the screen.
 #ifdef DEBUG
     debugUI.newFrame();
     debugUI.drawFrame();
 #endif
 
-    // Clear screen
+    // Clear the screen with black color.
     SDL_SetRenderDrawColor(sdlState.renderer, 0, 0, 0, 255);
     SDL_RenderClear(sdlState.renderer);
 
+    // If the player dies, restart the game and print "You died." (for now).
+    // TODO: Implement game over screen.
     if (game.player.death) {
       game.reset(sdlState, resourceManager);
       fmt::println("You died.");
     } else {
+      // If the player did not die, keep updating the game state and rendering
+      // game entities on to the screen.
       game.update(sdlState, dt);
       game.draw(sdlState);
     }
@@ -110,11 +130,17 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char **argv) {
     debugUI.presentFrame(sdlState);
 #endif
 
-    // Swap buffers
+    // Swap buffers. GPU buffers are general-purpose blocks of memory allocated
+    // by the GPU, primarily used to store data for the pixels that are rendered
+    // onto the screen.
     SDL_RenderPresent(sdlState.renderer);
 
+    // The current frame has been fully rendered, so this frame's starting time
+    // is going to be the previous frame's time relative to the next frame.
     prevTime = nowTime;
 
+    // If the player fall 150 pixels below of the bottom of the screen, they
+    // die.
     if (Game::player.pos.y >= sdlState.logicalHeight + 150.0f) {
       game.player.death = true;
     }
