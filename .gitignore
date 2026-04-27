@@ -56,7 +56,6 @@ dkms.conf
 *.dwo
 
 # IDE files
-.zed/
 .vs/
 .idea/
 
