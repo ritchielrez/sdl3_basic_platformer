@@ -416,8 +416,7 @@ struct Game {
   }
 
  public:
-  static inline void init(const SDLState &sdlState,
-                          const ResourceManager &resourceManager) {
+  void init(const SDLState &sdlState, const ResourceManager &resourceManager) {
     if (!mapBgLayer.parse("./assets/levels/1/bg.csv")) {
       exit(1);
     }
@@ -437,8 +436,7 @@ struct Game {
     coinText = Text(sdlState, fmt::format("Coins: {}", collectedCoins),
                     glm::vec2(10, 10));
   }
-  static inline void reset(const SDLState &sdlState,
-                           const ResourceManager &resourceManager) {
+  void reset(const SDLState &sdlState, const ResourceManager &resourceManager) {
     mapBgLayer = Map();
     mapMidLayer = Map();
     player = Player();
@@ -460,7 +458,7 @@ struct Game {
     coinText.free();
   }
 
-  static inline void update(const SDLState &sdlState, float dt) {
+  void update(const SDLState &sdlState, float dt) {
     // Only animate the player if the current animation has multiple frames.
     // If it has one frame, the timer length/duration is set to 0.
     if (player.anims[player.currAnim].getLen() != 0) {
@@ -478,7 +476,7 @@ struct Game {
     }
   }
 
-  static inline void draw(const SDLState &sdlState) {
+  void draw(const SDLState &sdlState) {
     constexpr float parallaxFactor = -0.3f;
     const SDL_FRect bgTexDst = {.x = parallaxFactor * cam.x,
                                 .y = parallaxFactor * cam.y,
