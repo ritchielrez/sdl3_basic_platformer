@@ -6,6 +6,8 @@
 
 #include <cstdlib>
 
+// `SDLState` is a class holding internal data that are needed for SDL to
+// function.
 struct SDLState {
   SDL_Window *win;
   SDL_Renderer *renderer;
@@ -15,6 +17,8 @@ struct SDLState {
   int winWidth = 1280, winHeight = 720;
   static constexpr uint32_t logicalWidth = 320, logicalHeight = 180;
 
+  // No argument constructor setting everything to the default value of
+  // `nullptr`.
   SDLState()
       : win(nullptr),
         renderer(nullptr),
