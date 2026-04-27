@@ -3,7 +3,10 @@
 #include <fmt/base.h>
 
 // Only include imgui for debug builds because imgui is only used to show
-// debugging information.
+// debugging information. Dear imgui is a bloat-free graphical user interface
+// library for C++. It is fast, portable, renderer agnostic, and self-contained
+// (no external dependencies). It has been used by various AAA companies to
+// render in game debug information.
 #ifdef DEBUG
 #include <backends/imgui_impl_sdl3.h>
 #include <imgui.h>
@@ -14,7 +17,6 @@
 
 #include <cassert>
 #include <glm/glm.hpp>
-#include <string_view>
 
 #include "Game.h"
 #include "Player.h"
@@ -49,7 +51,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char **argv) {
   Game game;
   game.init(sdlState, resourceManager);
 
-  // Create `DebugUI` object to show debug information.
+  // Create `DebugUI` object to show debug information using imgui.
 #ifdef DEBUG
   DebugUI debugUI{sdlState, "assets/fonts/Roboto-Regular.ttf", 20.0f};
 #endif
