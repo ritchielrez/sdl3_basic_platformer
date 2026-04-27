@@ -2,6 +2,8 @@
 #include <SDL3/SDL_main.h>
 #include <fmt/base.h>
 
+// Only include imgui for debug builds because imgui is only used to show
+// debugging information.
 #ifdef DEBUG
 #include <backends/imgui_impl_sdl3.h>
 #include <imgui.h>
@@ -15,25 +17,39 @@
 #include <string_view>
 
 #include "Game.h"
-#include "Log.h"
 #include "Player.h"
 #include "ResourceManager.h"
 #include "SDLState.h"
 #include "defer.h"
 
 int main([[maybe_unused]] int argc, [[maybe_unused]] char **argv) {
+  // Initialize SDL3 for rendering graphics. If initialization fails exit early.
+  // SDL3 is a library that can handle audio, input and graphics accross various
+  // platforms. One of the biggest users of SDL is Valve, as many of their games
+  // such as Team Fortress 2 use SDL for some parts of the games.
   if (!SDL_Init(SDL_INIT_VIDEO)) {
     SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error",
                              "Could not initialize SDL3", nullptr);
     return 1;
   }
+  // Deinitialize SDL3 at the very end of the program. Important as SDL
+  // allocates bunch of stuff on the memory and they need to be freed in the end
+  // to ensure there are no memory leaks.
   defer(SDL_Quit());
 
+  // Create `SDLState` object which initializes a window and a renderer (allows
+  // the user to use GPU to render graphics).
   SDLState sdlState{"sdl3_basic_platformer", SDL_WINDOW_RESIZABLE, nullptr};
+
+  // Create `ResourceManager` object which initializes textures needed to render
+  // game objects.
   ResourceManager resourceManager{sdlState};
+
+  // Create `Game` object which initializes game entities.
   Game game;
   game.init(sdlState, resourceManager);
 
+  // Create `DebugUI` object to show debug information.
 #ifdef DEBUG
   DebugUI debugUI{sdlState, "assets/fonts/Roboto-Regular.ttf", 20.0f};
 #endif
