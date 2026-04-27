@@ -12,7 +12,9 @@ namespace Tiles {
 enum {
   NONE,
   GRASS,
-  DIRT,
+  DIRT1,
+  DIRT2,
+  DIRT3,
   BRIDGE1,
   BRIDGE2,
   BRIDGE3,
