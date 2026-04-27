@@ -312,6 +312,43 @@ struct Game {
             staticTiles.push_back(staticTile);
             break;
           }
+          case Tiles::DIRT2: {
+            StaticTile staticTile{};
+            staticTile.pos =
+                glm::vec2(c * Map::TILE_SIZE,
+                          sdlState.logicalHeight -
+                              (mapMidLayer.getRows() - r) * Map::TILE_SIZE);
+            staticTile.tex = resourceManager.getWorldTex();
+            staticTile.w = Map::TILE_SIZE;
+            staticTile.h = Map::TILE_SIZE;
+            staticTile.collider.x = 0;
+            staticTile.collider.y = 0;
+            staticTile.collider.w = staticTile.w;
+            staticTile.collider.h = staticTile.h;
+            staticTile.anims = std::vector<Frames>{Frames(
+                glm::vec2(Map::TILE_SIZE, 0), Map::TILE_SIZE, Map::TILE_SIZE)};
+            staticTiles.push_back(staticTile);
+            break;
+          }
+          case Tiles::DIRT3: {
+            StaticTile staticTile{};
+            staticTile.pos =
+                glm::vec2(c * Map::TILE_SIZE,
+                          sdlState.logicalHeight -
+                              (mapMidLayer.getRows() - r) * Map::TILE_SIZE);
+            staticTile.tex = resourceManager.getWorldTex();
+            staticTile.w = Map::TILE_SIZE;
+            staticTile.h = Map::TILE_SIZE;
+            staticTile.collider.x = 0;
+            staticTile.collider.y = 0;
+            staticTile.collider.w = staticTile.w;
+            staticTile.collider.h = staticTile.h;
+            staticTile.anims = std::vector<Frames>{
+                Frames(glm::vec2(Map::TILE_SIZE, Map::TILE_SIZE),
+                       Map::TILE_SIZE, Map::TILE_SIZE)};
+            staticTiles.push_back(staticTile);
+            break;
+          }
           case Tiles::COIN: {
             Coin coin{};
             coin.pos =
