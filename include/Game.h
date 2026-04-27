@@ -85,10 +85,10 @@ struct Game {
 
   static inline void createBg(const SDLState &sdlState,
                               const ResourceManager &resourceManager) {
-    bgTex = SDL_CreateTexture(sdlState.renderer, SDL_PIXELFORMAT_RGBA8888,
-                              SDL_TEXTUREACCESS_TARGET,
-                              mapBgLayer.getCols() * Map::TILE_SIZE,
-                              mapBgLayer.getRows() * Map::TILE_SIZE);
+    bgTex = SDL_CreateTexture(
+        sdlState.renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET,
+        static_cast<int>(mapBgLayer.getCols() * Map::TILE_SIZE),
+        static_cast<int>(mapBgLayer.getRows() * Map::TILE_SIZE));
     SDL_SetTextureScaleMode(bgTex, SDL_SCALEMODE_PIXELART);
     SDL_SetRenderTarget(sdlState.renderer, bgTex);
 
@@ -294,7 +294,7 @@ struct Game {
             staticTiles.push_back(staticTile);
             break;
           }
-          case Tiles::DIRT: {
+          case Tiles::DIRT1: {
             StaticTile staticTile{};
             staticTile.pos =
                 glm::vec2(c * Map::TILE_SIZE,
