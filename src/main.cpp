@@ -16,6 +16,8 @@
 #endif
 
 #include <cassert>
+// glm is a C++ math library offering important math objects such as vectors,
+// matrices etc.
 #include <glm/glm.hpp>
 
 #include "Game.h"
