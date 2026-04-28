@@ -10,10 +10,14 @@
 // function.
 struct SDLState {
   SDL_Window *win;
+  // `SDL_Renderer` is a simple 2D rendering API. This handles cross platform
+  // rendering of graphics.
   SDL_Renderer *renderer;
   TTF_Font *font;
   TTF_TextEngine *textEngine;
   const bool *keys;
+  // The difference between normal window width and height and the logical width
+  // and height is
   int winWidth = 1280, winHeight = 720;
   static constexpr uint32_t logicalWidth = 320, logicalHeight = 180;
 
@@ -70,14 +74,18 @@ struct SDLState {
     }
   }
 
-  // Delete copy constructor and copy assignment operator
+  // Delete copy constructor and copy assignment operator. This way, a
+  // `SDLState` object cannot be copied.
   SDLState(const SDLState &) = delete;
   SDLState &operator=(const SDLState &) = delete;
 
-  // Use default move constructor and move assignment operator
+  // Use default move constructor and move assignment operator. This way,
+  // `SDLState` object can only be moved, because I do not want to have any
+  // copies of internal SDL data. Having copies may lead to confusion.
   SDLState(SDLState &&) noexcept = default;
   SDLState &operator=(SDLState &&) noexcept = default;
 
+  // Destructor to deinitialize any SDL related data.
   ~SDLState() {
     TTF_DestroyRendererTextEngine(textEngine);
     TTF_CloseFont(font);
