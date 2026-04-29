@@ -71,7 +71,7 @@ struct Game {
     player.pos = glm::vec2(0, sdlState.logicalHeight - 3 * PLAYER_SIZE);
     player.tex = resourceManager.getPlayerTex();
     player.maxSpeedX = 100.0f;
-    player.jumpVel = -300.0f;
+    player.jumpVel = -350.0f;
     player.w = PLAYER_SIZE;
     player.h = PLAYER_SIZE;
     player.accel = glm::vec2(300, 0);
