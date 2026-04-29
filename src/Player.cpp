@@ -81,6 +81,17 @@ void Player::update(const SDLState& sdlState, float dt) {
   if (passedCamRuler && pos.x >= camRuler) {
     Game::cam.x = pos.x - camRuler;
   }
+
+  // If the player is close to the top of the screen, then move the camera up
+  // slightly so it does not look like the player is touching the ceiling or
+  // going beyond it.
+  constexpr float camYSmoothness = 5.0f;
+
+  if (pos.y <= 10) {
+    Game::cam.y = glm::lerp(Game::cam.y, -15.f, camYSmoothness * dt);
+  } else {
+    Game::cam.y = glm::lerp(Game::cam.y, 0.f, camYSmoothness * dt);
+  }
 }
 
 void Player::collision() {
