@@ -9,7 +9,11 @@
 #include "SDL3/SDL_surface.h"
 #include "SDLState.h"
 
+// `ResourceManager` is a class that, you guessed it right manages resources.
+// Here resources refer to textures, which are basically images that are loaded
+// onto the GPU VRAM.
 class ResourceManager {
+  // Here is a list of textures the game needs.
   SDL_Texture *coinTex;
   SDL_Texture *playerTex;
   SDL_Texture *worldTex;
@@ -17,13 +21,19 @@ class ResourceManager {
   SDL_Texture *enemyTex;
 
  public:
+  // No argument constructor setting everything to the default value of
+  // `nullptr`. This does not create any textures.
   ResourceManager()
       : coinTex(nullptr),
         playerTex(nullptr),
         worldTex(nullptr),
         platformsTex(nullptr),
         enemyTex(nullptr) {}
+  // Parameterized constructor to initialize everything properly. This does
+  // create the necessary textures.
   ResourceManager(SDLState &sdlState) {
+    // Create all of these textures from image files, if any of them failed to
+    // create then exit early.
     coinTex = loadTex(sdlState, "assets/sprites/coin.png");
     if (!coinTex) {
       SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error",
@@ -61,13 +71,13 @@ class ResourceManager {
     }
   }
 
-  // Delete copy constructor and copy assignment operator
+  // Delete copy and move constructors and copy and move assignment operators.
+  // This way, a `ResourceManager` object cannot be copied or moved into a new
+  // `ResourceManager` object.
   ResourceManager(const ResourceManager &) = delete;
   ResourceManager &operator=(const ResourceManager &) = delete;
-
-  // Use default move constructor and move assignment operator
-  ResourceManager(ResourceManager &&) noexcept = default;
-  ResourceManager &operator=(ResourceManager &&) noexcept = default;
+  ResourceManager(ResourceManager &&) noexcept = delete;
+  ResourceManager &operator=(ResourceManager &&) noexcept = delete;
 
   SDL_Texture *loadTex(const SDLState &sdlState,
                        const std::string_view &filePath) {
