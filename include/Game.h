@@ -479,7 +479,7 @@ struct Game {
   void draw(const SDLState &sdlState) {
     constexpr float parallaxFactor = -0.3f;
     const SDL_FRect bgTexDst = {.x = parallaxFactor * cam.x,
-                                .y = parallaxFactor * cam.y,
+                                .y = -Map::TILE_SIZE,
                                 .w = mapBgLayer.getCols() * Map::TILE_SIZE,
                                 .h = mapBgLayer.getRows() * Map::TILE_SIZE};
     SDL_RenderTexture(sdlState.renderer, bgTex, nullptr, &bgTexDst);
