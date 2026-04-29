@@ -79,34 +79,52 @@ class ResourceManager {
   ResourceManager(ResourceManager &&) noexcept = delete;
   ResourceManager &operator=(ResourceManager &&) noexcept = delete;
 
+  // This is a custom method that creates a texture from an image.
   SDL_Texture *loadTex(const SDLState &sdlState,
                        const std::string_view &filePath) {
-    int width = 0;
-    int height = 0;
-    int channels = 0;
+    // These values are needed by stb_image in order to load pixel data from any
+    // image.
+    int width = 0;     // width of the picture
+    int height = 0;    // height of the picture
+    int channels = 0;  // number of values used to represent one pixel (3 for
+                       // RGB, 4 for RGBA)
+    // Use stb_image to load the pixel color data of the image. stb_image is a
+    // very well-known imager loading library used by many games and game
+    // engines.
     stbi_uc *pixData =
         stbi_load(filePath.data(), &width, &height, &channels, 4);
 
-    // NOTE: SDL_Surface and SDL_Texture are pretty much the same, except
-    // SDL_Surface stores texture data in RAM whereas SDL_Texture stores texture
-    // data in GPU VRAM.
+    // Create a SDL_Surface from the pixel data of the image, because you cannot
+    // create a SDL_Texture directly from the pixel data. NOTE: SDL_Surface and
+    // SDL_Texture are pretty much the same, except SDL_Surface stores texture
+    // data in RAM whereas SDL_Texture stores texture data in GPU VRAM.
     SDL_Surface *surface = SDL_CreateSurfaceFrom(
         width, height, SDL_PIXELFORMAT_RGBA32, pixData, width * 4);
+    // Create a SDL_Texture from a SDL_Surface.
     SDL_Texture *tex = SDL_CreateTextureFromSurface(sdlState.renderer, surface);
+    // Set the texture scaling mode to pixel art so when the textures are
+    // upscaled they do not get blurry.
     SDL_SetTextureScaleMode(tex, SDL_SCALEMODE_PIXELART);
 
+    // The SDL_Surface is not needed anymore, it is an intermediate resource
+    // used to create a texture.
     SDL_DestroySurface(surface);
     stbi_image_free(pixData);
 
+    // Return the created texture.
     return tex;
   }
 
+  // Getter methods for the textures. [[nodiscard]] ensures that the return
+  // value of the getter cannot be unused by the caller.
   [[nodiscard]] SDL_Texture *getCoinTex() const { return coinTex; }
   [[nodiscard]] SDL_Texture *getPlayerTex() const { return playerTex; }
   [[nodiscard]] SDL_Texture *getWorldTex() const { return worldTex; }
   [[nodiscard]] SDL_Texture *getPlatformTex() const { return platformsTex; }
   [[nodiscard]] SDL_Texture *getEnemyTex() const { return enemyTex; }
 
+  // Destructor to deallocate all textures. This prevents any memory
+  // leaks.
   ~ResourceManager() {
     SDL_DestroyTexture(coinTex);
     SDL_DestroyTexture(playerTex);
