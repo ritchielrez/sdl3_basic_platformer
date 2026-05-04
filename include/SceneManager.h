@@ -3,16 +3,20 @@
 #include "DeathScene.h"
 #include "GameScene.h"
 #include "MainScene.h"
+#include "ResourceManager.h"
+#include "SDLState.h"
 
 enum class SceneType { MAIN, GAME, DEATH };
 
 class SceneManager {
   SceneType sceneType;
   union {
-    MainScene main;
-    GameScene game;
-    DeathScene death;
-  } scene;
+    MainScene mainScene;
+    GameScene gameScene;
+    DeathScene deathScene;
+  };
 
-  SceneManager() : sceneType(SceneType::GAME) { scene.game = GameScene(); }
+ public:
+  SceneManager(const SDLState &sdlState, const ResourceManager &resourceManager)
+      : sceneType(SceneType::GAME), gameScene(sdlState, resourceManager) {}
 };

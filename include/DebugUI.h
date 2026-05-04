@@ -1,4 +1,5 @@
 #pragma once
+#include "Player.h"
 #ifdef DEBUG
 #include <backends/imgui_impl_sdl3.h>
 #include <fmt/core.h>
@@ -62,11 +63,11 @@ struct DebugUI {
                                  ImGuiDockNodeFlags_PassthruCentralNode);
   }
 
-  void drawPlayerInfo() {
+  void drawPlayerInfo(const Player &player) {
     if (!Game::debug) return;
 
     ImGui::Begin("Player");
-    ImGui::Text("%s", Game::player.inspect().c_str());
+    ImGui::Text("%s", player.inspect().c_str());
     ImGui::End();
   }
 

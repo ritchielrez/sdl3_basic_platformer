@@ -4,6 +4,7 @@
 #include <SDL3_ttf/SDL_ttf.h>
 
 #include <glm/glm.hpp>
+#include <string_view>
 
 #include "SDLState.h"
 
