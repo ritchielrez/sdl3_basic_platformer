@@ -29,7 +29,7 @@ struct Player : public Entity {
   void update(const SDLState& sdlState, float dt);
   void collision();
 
-  std::string inspect() {
+  [[nodiscard]] std::string inspect() const {
     std::string playerState{8, 0};
     switch (currAnim) {
       case PlayerAnim::idle: {
