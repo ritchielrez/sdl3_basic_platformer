@@ -45,8 +45,8 @@ class GameScene {
     createEntities();
     createPlayer();
 
-    cam.w = sdlState.logicalWidth;
-    cam.h = sdlState.logicalHeight;
+    cam.w = SDLState::logicalWidth;
+    cam.h = SDLState::logicalHeight;
     cam.x = 0;
     cam.y = 0;
 
