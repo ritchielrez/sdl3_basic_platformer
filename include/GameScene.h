@@ -50,15 +50,15 @@ class GameScene {
     cam.x = 0;
     cam.y = 0;
 
-    collectedCoins = 0;
-
     coinText = Text(sdlState, fmt::format("Coins: {}", collectedCoins),
                     glm::vec2(10, 10));
   }
 
  public:
   GameScene(const SDLState &sdlState, const ResourceManager &resourceManager)
-      : sdlState(sdlState), resourceManager(resourceManager) {
+      : sdlState(sdlState),
+        resourceManager(resourceManager),
+        collectedCoins(0) {
     init();
   }
 
@@ -70,6 +70,7 @@ class GameScene {
     staticTiles.clear();
     dynTiles.clear();
     coins.clear();
+    collectedCoins = 0;
     init();
   }
 
