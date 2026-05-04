@@ -16,7 +16,7 @@ if(MSVC)
   endif()
 endif()
 
-add_executable(main src/main.cpp src/Entity.cpp src/Player.cpp)
+add_executable(main src/main.cpp src/Entity.cpp src/Player.cpp src/GameScene.cpp)
 set_target_properties(main PROPERTIES COMPILE_WARNING_AS_ERROR ON)
 target_include_directories(main PRIVATE include)
 target_compile_options(main PRIVATE
