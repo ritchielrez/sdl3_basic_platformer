@@ -37,17 +37,11 @@ class Text {
   Text(Text &&) noexcept = default;
   Text &operator=(Text &&) noexcept = default;
 
-  // NOTE: We are forced to define an explicit `free()`, because static `Text`
-  // instances may be created by `Game` class and they need to be freed manually
-  // before `main()` ends. `SDL_ttf` requires a strict order of
-  // deinitialization.
-  // TODO: Implement `TextManager`, so static `Text` instances do not need to be
-  // created.
-  void free() const { TTF_DestroyText(ttfText); }
-
   void assign(const std::string_view str) {
     TTF_SetTextString(ttfText, str.data(), str.size());
   }
 
   void draw() const { TTF_DrawRendererText(ttfText, pos.x, pos.y); }
+
+  ~Text() { TTF_DestroyText(ttfText); }
 };
