@@ -12,11 +12,13 @@
 #include "SDLState.h"
 
 struct DebugUI {
+  const SDLState &sdlState;
   float fontHeight;
 
   DebugUI() = delete;
 
-  DebugUI(const SDLState &sdlState, const std::string_view &fontPath) {
+  DebugUI(const SDLState &sdlState, const std::string_view &fontPath)
+      : sdlState(sdlState) {
     fontHeight = 18.0f;
 
     IMGUI_CHECKVERSION();
@@ -33,9 +35,8 @@ struct DebugUI {
     io.Fonts->AddFontFromFileTTF(fontPath.data(), fontHeight);
   }
   DebugUI(const SDLState &sdlState, const std::string_view &fontPath,
-          const float fontHeight) {
-    this->fontHeight = fontHeight;
-
+          const float fontHeight)
+      : sdlState(sdlState), fontHeight(fontHeight) {
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
     ImGuiIO &io = ImGui::GetIO();
@@ -81,23 +82,23 @@ struct DebugUI {
     ImGui::End();
   }
 
-  void drawFrame() {
+  void drawFrame(const Player &player) {
     if (!Game::debug) return;
 
-    drawPlayerInfo();
+    drawPlayerInfo(player);
     drawCameraInfo();
 
     ImGui::Render();
   }
 
-  void presentFrame(const SDLState &sdlState) {
+  void presentFrame() {
     if (!Game::debug) return;
     SDL_SetRenderLogicalPresentation(sdlState.renderer, 0, 0,
                                      SDL_LOGICAL_PRESENTATION_DISABLED);
     ImGui_ImplSDLRenderer3_RenderDrawData(ImGui::GetDrawData(),
                                           sdlState.renderer);
-    SDL_SetRenderLogicalPresentation(sdlState.renderer, sdlState.logicalWidth,
-                                     sdlState.logicalHeight,
+    SDL_SetRenderLogicalPresentation(sdlState.renderer, SDLState::logicalWidth,
+                                     SDLState::logicalHeight,
                                      SDL_LOGICAL_PRESENTATION_LETTERBOX);
   }
 

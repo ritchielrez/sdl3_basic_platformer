@@ -21,7 +21,6 @@
 #include <glm/glm.hpp>
 
 #include "Game.h"
-#include "Player.h"
 #include "ResourceManager.h"
 #include "SDLState.h"
 #include "defer.h"
@@ -41,21 +40,12 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char **argv) {
   // to ensure there are no memory leaks.
   defer(SDL_Quit());
 
-  // Create `SDLState` object which initializes a window and a renderer (allows
-  // the user to use GPU to render graphics).
-  SDLState sdlState{"sdl3_basic_platformer", SDL_WINDOW_RESIZABLE, nullptr};
-
-  // Create `ResourceManager` object which initializes textures needed to render
-  // game entities.
-  ResourceManager resourceManager{sdlState};
-
   // Create `Game` object which initializes game entities.
-  Game game;
-  game.init(sdlState, resourceManager);
+  Game game{"sdl3_basic_platformer", SDL_WINDOW_RESIZABLE, nullptr};
 
   // Create `DebugUI` object to show debug information using imgui.
 #ifdef DEBUG
-  DebugUI debugUI{sdlState, "assets/fonts/Roboto-Regular.ttf", 20.0f};
+  DebugUI debugUI{game.sdlState, "assets/fonts/Roboto-Regular.ttf", 20.0f};
 #endif
 
   // Keep track of the time when the previous frame started rendering.
@@ -76,7 +66,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char **argv) {
       // Imgui needs to have some control over the event handling if it is being
       // used. This is a requirment of the library.
 #ifdef DEBUG
-      if (game.debug) ImGui_ImplSDL3_ProcessEvent(&event);
+      if (Game::debug) ImGui_ImplSDL3_ProcessEvent(&event);
 #endif
       switch (event.type) {
         // If the user clicked on the close button stop running the game.
@@ -87,8 +77,8 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char **argv) {
         // Keep track of the window width and height internally when it has been
         // resized.
         case SDL_EVENT_WINDOW_RESIZED: {
-          sdlState.winWidth = event.window.data1;
-          sdlState.winHeight = event.window.data2;
+          game.sdlState.winWidth = event.window.data1;
+          game.sdlState.winHeight = event.window.data2;
           break;
         }
         // Handle when keys are being pressed down by the user.
@@ -99,7 +89,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char **argv) {
           // Toggle showing debug information when the
           // user presses F1, only if a debug build is being run.
 #ifdef DEBUG
-          if (event.key.scancode == SDL_SCANCODE_F1) game.debug = !game.debug;
+          if (event.key.scancode == SDL_SCANCODE_F1) Game::debug = !Game::debug;
 #endif
           break;
         }
@@ -113,13 +103,13 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char **argv) {
 #endif
 
     // Clear the screen with black color.
-    SDL_SetRenderDrawColor(sdlState.renderer, 0, 0, 0, 255);
-    SDL_RenderClear(sdlState.renderer);
+    SDL_SetRenderDrawColor(game.sdlState.renderer, 0, 0, 0, 255);
+    SDL_RenderClear(game.sdlState.renderer);
 
     // If the player dies, restart the game and print "You died." (for now).
     // TODO: Implement game over screen.
     if (game.player.death) {
-      game.reset(sdlState, resourceManager);
+      game.reset(game.sdlState, game.resourceManager);
       fmt::println("You died.");
     } else {
       // If the player did not die, keep updating the game state and rendering

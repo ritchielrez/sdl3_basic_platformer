@@ -15,17 +15,16 @@
 class GameScene {
   const SDLState &sdlState;
   const ResourceManager &resourceManager;
-  Map mapBgLayer{};
-  Map mapMidLayer{};
-  bool debug = false;
+  Map mapBgLayer;
+  Map mapMidLayer;
   Player player{};
-  SDL_Texture *bgTex{nullptr};
-  std::vector<Enemy> enemies{};
-  std::vector<StaticTile> staticTiles{};
-  std::vector<DynTile> dynTiles{};
-  std::vector<Coin> coins{};
-  SDL_FRect cam{};
-  Text coinText{};
+  SDL_Texture *bgTex;
+  std::vector<Enemy> enemies;
+  std::vector<StaticTile> staticTiles;
+  std::vector<DynTile> dynTiles;
+  std::vector<Coin> coins;
+  SDL_FRect cam;
+  Text coinText;
   size_t collectedCoins;
 
  private:
@@ -58,6 +57,8 @@ class GameScene {
   GameScene(const SDLState &sdlState, const ResourceManager &resourceManager)
       : sdlState(sdlState),
         resourceManager(resourceManager),
+        bgTex(nullptr),
+        cam(0.0f),
         collectedCoins(0) {
     init();
   }

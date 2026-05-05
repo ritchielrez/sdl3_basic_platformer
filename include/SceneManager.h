@@ -2,21 +2,57 @@
 
 #include "DeathScene.h"
 #include "GameScene.h"
-#include "MainScene.h"
 #include "ResourceManager.h"
 #include "SDLState.h"
+#include "StartScene.h"
 
-enum class SceneType { MAIN, GAME, DEATH };
+enum class SceneType {
+  start,
+  game,
+  death,
+};
 
 class SceneManager {
+  const SDLState &sdlState;
+  const ResourceManager &resourceManager;
   SceneType sceneType;
-  union {
-    MainScene mainScene;
-    GameScene gameScene;
-    DeathScene deathScene;
-  };
+  StartScene startScene;
+  GameScene gameScene;
+  DeathScene deathScene;
 
  public:
   SceneManager(const SDLState &sdlState, const ResourceManager &resourceManager)
-      : sceneType(SceneType::GAME), gameScene(sdlState, resourceManager) {}
+      : sdlState(sdlState),
+        resourceManager(resourceManager),
+        sceneType(SceneType::game),
+        startScene(),
+        gameScene(sdlState, resourceManager),
+        deathScene() {}
+
+  void update(float dt) {
+    switch (sceneType) {
+      case SceneType::start:
+        // startScene.update(dt);
+        break;
+      case SceneType::game:
+        gameScene.update(dt);
+        break;
+      case SceneType::death:
+        // deathScene.update(dt);
+        break;
+    }
+  }
+  void draw() {
+    switch (sceneType) {
+      case SceneType::start:
+        // startScene.draw();
+        break;
+      case SceneType::game:
+        gameScene.draw();
+        break;
+      case SceneType::death:
+        // deathScene.draw();
+        break;
+    }
+  }
 };
