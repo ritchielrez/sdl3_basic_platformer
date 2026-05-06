@@ -12,7 +12,7 @@
 #include "StaticTile.h"
 #include "Text.h"
 
-class GameScene {
+struct GameScene {
   const SDLState &sdlState;
   const ResourceManager &resourceManager;
   Map mapBgLayer;

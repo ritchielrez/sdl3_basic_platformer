@@ -16,11 +16,12 @@ class SceneManager {
   const SDLState &sdlState;
   const ResourceManager &resourceManager;
   SceneType sceneType;
+
+ public:
   StartScene startScene;
   GameScene gameScene;
   DeathScene deathScene;
 
- public:
   SceneManager(const SDLState &sdlState, const ResourceManager &resourceManager)
       : sdlState(sdlState),
         resourceManager(resourceManager),

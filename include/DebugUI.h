@@ -1,14 +1,17 @@
 #pragma once
-#include "Player.h"
+// Only include imgui for debug builds because imgui is only used to show
+// debugging information. Dear imgui is a bloat-free graphical user interface
+// library for C++. It is fast, portable, renderer agnostic, and self-contained
+// (no external dependencies). It has been used by various AAA companies to
+// build various in game proprietary tools.
 #ifdef DEBUG
+
 #include <backends/imgui_impl_sdl3.h>
 #include <fmt/core.h>
 #include <imgui.h>
 #include <imgui_impl_sdlrenderer3.h>
 
-#include <string>
-
-#include "Game.h"
+#include "Player.h"
 #include "SDLState.h"
 
 struct DebugUI {
@@ -51,8 +54,8 @@ struct DebugUI {
     io.Fonts->AddFontFromFileTTF(fontPath.data(), fontHeight);
   }
 
-  void newFrame() {
-    if (!Game::debug) return;
+  void newFrame(bool debug) {
+    if (!debug) return;
 
     ImGui_ImplSDLRenderer3_NewFrame();
     ImGui_ImplSDL3_NewFrame();
@@ -64,16 +67,16 @@ struct DebugUI {
                                  ImGuiDockNodeFlags_PassthruCentralNode);
   }
 
-  void drawPlayerInfo(const Player &player) {
-    if (!Game::debug) return;
+  void drawPlayerInfo(const Player &player, bool debug) {
+    if (!debug) return;
 
     ImGui::Begin("Player");
     ImGui::Text("%s", player.inspect().c_str());
     ImGui::End();
   }
 
-  void drawCameraInfo() {
-    if (!Game::debug) return;
+  void drawCameraInfo(bool debug) {
+    if (!debug) return;
 
     ImGui::Begin("Camera");
     ImGui::Text(
@@ -82,17 +85,17 @@ struct DebugUI {
     ImGui::End();
   }
 
-  void drawFrame(const Player &player) {
-    if (!Game::debug) return;
+  void drawFrame(const Player &player, bool debug) {
+    if (!debug) return;
 
-    drawPlayerInfo(player);
-    drawCameraInfo();
+    drawPlayerInfo(player, debug);
+    drawCameraInfo(debug);
 
     ImGui::Render();
   }
 
-  void presentFrame() {
-    if (!Game::debug) return;
+  void presentFrame(bool debug) const {
+    if (!debug) return;
     SDL_SetRenderLogicalPresentation(sdlState.renderer, 0, 0,
                                      SDL_LOGICAL_PRESENTATION_DISABLED);
     ImGui_ImplSDLRenderer3_RenderDrawData(ImGui::GetDrawData(),
