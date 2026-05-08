@@ -13,8 +13,6 @@ enum class SceneType {
 };
 
 class SceneManager {
-  const SDLState &sdlState;
-  const ResourceManager &resourceManager;
   SceneType sceneType;
 
  public:
@@ -23,9 +21,7 @@ class SceneManager {
   DeathScene deathScene;
 
   SceneManager(const SDLState &sdlState, const ResourceManager &resourceManager)
-      : sdlState(sdlState),
-        resourceManager(resourceManager),
-        sceneType(SceneType::game),
+      : sceneType(SceneType::game),
         startScene(),
         gameScene(sdlState, resourceManager),
         deathScene() {}

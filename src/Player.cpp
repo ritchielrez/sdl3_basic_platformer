@@ -2,14 +2,21 @@
 
 #include <SDL3/SDL.h>
 
+#include "Coin.h"
+#include "DynTile.h"
+#include "Enemy.h"
+#include "StaticTile.h"
+
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/compatibility.hpp>
 
-#include "Game.h"
-#include "Log.h"
 #include "SDLState.h"
 
-void Player::update(const SDLState& sdlState, float dt) {
+void Player::update(const SDLState& sdlState, SDL_FRect& cam,
+                    const std::vector<StaticTile>& staticTiles,
+                    const std::vector<DynTile>& dynTiles,
+                    std::vector<Coin>& coins, size_t& collectedCoins,
+                    const std::vector<Enemy>& enemies, float dt) {
   float currDir = 0;
   if (sdlState.keys[SDL_SCANCODE_A]) {
     currDir -= 1;
@@ -47,8 +54,8 @@ void Player::update(const SDLState& sdlState, float dt) {
         currAnim = PlayerAnim::idle;
       }
 
-      // NOTE: If `vel.x` and `dir` have different signs, their product is less
-      // than zero.
+      // NOTE: If `vel.x` and `dir` have different signs, their product is
+      // less than zero.
       if (vel.x * dir < 0 && grounded) {
         currAnim = PlayerAnim::slide;
       }
@@ -73,13 +80,13 @@ void Player::update(const SDLState& sdlState, float dt) {
   if (!grounded) vel.y += gravity * dt;
 
   pos += vel * dt;
-  collision();
+  collision(staticTiles, dynTiles, coins, collectedCoins, enemies);
 
-  float camRuler = (sdlState.logicalWidth - w) / 2;
+  float camRuler = (SDLState::logicalWidth - w) / 2;
 
   if (!passedCamRuler && pos.x >= camRuler) passedCamRuler = true;
   if (passedCamRuler && pos.x >= camRuler) {
-    Game::cam.x = pos.x - camRuler;
+    cam.x = pos.x - camRuler;
   }
 
   // If the player is close to the top of the screen, then move the camera up
@@ -88,13 +95,16 @@ void Player::update(const SDLState& sdlState, float dt) {
   constexpr float camYSmoothness = 5.0f;
 
   if (pos.y <= 10) {
-    Game::cam.y = glm::lerp(Game::cam.y, -15.f, camYSmoothness * dt);
+    cam.y = glm::lerp(cam.y, -15.f, camYSmoothness * dt);
   } else {
-    Game::cam.y = glm::lerp(Game::cam.y, 0.f, camYSmoothness * dt);
+    cam.y = glm::lerp(cam.y, 0.f, camYSmoothness * dt);
   }
 }
 
-void Player::collision() {
+void Player::collision(const std::vector<StaticTile>& staticTiles,
+                       const std::vector<DynTile>& dynTiles,
+                       std::vector<Coin>& coins, size_t& collectedCoins,
+                       const std::vector<Enemy>& enemies) {
   SDL_FRect playerCollider{.x = pos.x + collider.x,
                            .y = pos.y + collider.y,
                            .w = collider.w,
@@ -105,7 +115,7 @@ void Player::collision() {
 
   collided = false;
   bool foundGround = false;
-  for (auto& staticTile : Game::staticTiles) {
+  for (auto& staticTile : staticTiles) {
     collidedRect.x = staticTile.pos.x + staticTile.collider.x;
     collidedRect.y = staticTile.pos.y + staticTile.collider.y;
     collidedRect.w = staticTile.collider.w;
@@ -146,36 +156,37 @@ void Player::collision() {
     }
   }
 
-  for (auto& dynTile : Game::dynTiles) {
+  for (auto& dynTile : dynTiles) {
     collidedRect.x = dynTile.pos.x + dynTile.collider.x;
     collidedRect.y = dynTile.pos.y + dynTile.collider.y;
     collidedRect.w = dynTile.collider.w;
     collidedRect.h = dynTile.collider.h;
 
-    // TODO:Implement collision behaviour of player with moving platform tiles.
+    // TODO:Implement collision behaviour of player with moving platform
+    // tiles.
     if (SDL_GetRectIntersectionFloat(&playerCollider, &collidedRect,
                                      &intersectionRect)) {
       collided = true;
     }
   }
 
-  for (size_t i = 0; i < Game::coins.size(); i++) {
-    collidedRect.x = Game::coins[i].pos.x + Game::coins[i].collider.x;
-    collidedRect.y = Game::coins[i].pos.y + Game::coins[i].collider.y;
-    collidedRect.w = Game::coins[i].collider.w;
-    collidedRect.h = Game::coins[i].collider.h;
+  for (size_t i = 0; i < coins.size(); i++) {
+    collidedRect.x = coins[i].pos.x + coins[i].collider.x;
+    collidedRect.y = coins[i].pos.y + coins[i].collider.y;
+    collidedRect.w = coins[i].collider.w;
+    collidedRect.h = coins[i].collider.h;
 
     if (SDL_GetRectIntersectionFloat(&playerCollider, &collidedRect,
                                      &intersectionRect)) {
       collided = true;
-      Game::coins[i] = Game::coins.back();
-      Game::coins.pop_back();
+      coins[i] = coins.back();
+      coins.pop_back();
       i--;
-      Game::collectedCoins++;
+      collectedCoins++;
     }
   }
 
-  for (auto& enemy : Game::enemies) {
+  for (auto& enemy : enemies) {
     collidedRect.x = enemy.pos.x + enemy.collider.x;
     collidedRect.y = enemy.pos.y + enemy.collider.y;
     collidedRect.w = enemy.collider.w;

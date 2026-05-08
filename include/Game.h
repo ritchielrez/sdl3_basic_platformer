@@ -23,7 +23,7 @@ struct Game {
   DebugUI debugUI{sdlState, "assets/fonts/Roboto-Regular.ttf", 20.0f};
 #endif
 
-  bool debug = false;
+  static inline bool debug = false;
 
   Game(const char *winTitle, SDL_WindowFlags winFlags, const char *rendererName)
       : sdlState(winTitle, winFlags, rendererName),
@@ -37,10 +37,6 @@ struct Game {
       exit(1);
     }
   }
-
-  void update(float dt) { sceneManager.update(dt); }
-
-  void draw() { sceneManager.draw(); }
 
   void run() {
     // Keep track of the time when the previous frame started rendering.
@@ -96,8 +92,8 @@ struct Game {
 
       // Render the debug information on to the screen.
 #ifdef DEBUG
-      debugUI.newFrame(debug);
-      debugUI.drawFrame(player, debug);
+      debugUI.newFrame();
+      debugUI.drawFrame(player, sceneManager.gameScene.cam);
 #endif
 
       // Clear the screen with black color.
@@ -106,11 +102,11 @@ struct Game {
 
       // If the player did not die, keep updating the game state and rendering
       // game entities on to the screen.
-      update(dt);
-      draw();
+      sceneManager.update(dt);
+      sceneManager.draw();
 
 #ifdef DEBUG
-      debugUI.presentFrame(debug);
+      debugUI.presentFrame();
 #endif
 
       // Swap buffers. GPU buffers are general-purpose blocks of memory

@@ -54,56 +54,12 @@ struct DebugUI {
     io.Fonts->AddFontFromFileTTF(fontPath.data(), fontHeight);
   }
 
-  void newFrame(bool debug) {
-    if (!debug) return;
+  void drawPlayerInfo(const Player &player);
+  void drawCameraInfo(const SDL_FRect &cam);
 
-    ImGui_ImplSDLRenderer3_NewFrame();
-    ImGui_ImplSDL3_NewFrame();
-    ImGui::NewFrame();
-
-    // This ensures the dockspace does not cover the entire screen, so the
-    // actual game can seen behind the windows.
-    ImGui::DockSpaceOverViewport(0, nullptr,
-                                 ImGuiDockNodeFlags_PassthruCentralNode);
-  }
-
-  void drawPlayerInfo(const Player &player, bool debug) {
-    if (!debug) return;
-
-    ImGui::Begin("Player");
-    ImGui::Text("%s", player.inspect().c_str());
-    ImGui::End();
-  }
-
-  void drawCameraInfo(bool debug) {
-    if (!debug) return;
-
-    ImGui::Begin("Camera");
-    ImGui::Text(
-        "%s",
-        fmt::format("Position: ({}, {})\n", Game::cam.x, Game::cam.y).c_str());
-    ImGui::End();
-  }
-
-  void drawFrame(const Player &player, bool debug) {
-    if (!debug) return;
-
-    drawPlayerInfo(player, debug);
-    drawCameraInfo(debug);
-
-    ImGui::Render();
-  }
-
-  void presentFrame(bool debug) const {
-    if (!debug) return;
-    SDL_SetRenderLogicalPresentation(sdlState.renderer, 0, 0,
-                                     SDL_LOGICAL_PRESENTATION_DISABLED);
-    ImGui_ImplSDLRenderer3_RenderDrawData(ImGui::GetDrawData(),
-                                          sdlState.renderer);
-    SDL_SetRenderLogicalPresentation(sdlState.renderer, SDLState::logicalWidth,
-                                     SDLState::logicalHeight,
-                                     SDL_LOGICAL_PRESENTATION_LETTERBOX);
-  }
+  void newFrame();
+  void drawFrame(const Player &player, const SDL_FRect &cam);
+  void presentFrame() const;
 
   ~DebugUI() {
     ImGui_ImplSDLRenderer3_Shutdown();

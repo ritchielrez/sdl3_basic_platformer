@@ -4,8 +4,12 @@
 
 #include <string>
 
+#include "Coin.h"
+#include "DynTile.h"
+#include "Enemy.h"
 #include "Entity.h"
 #include "SDLState.h"
+#include "StaticTile.h"
 
 namespace PlayerAnim {
 enum { idle, run, jump, slide };
@@ -26,8 +30,14 @@ struct Player : public Entity {
         death(false),
         grounded(false),
         passedCamRuler(false) {}
-  void update(const SDLState& sdlState, float dt);
-  void collision();
+  void update(const SDLState& sdlState, SDL_FRect& cam,
+              const std::vector<StaticTile>& staticTiles,
+              const std::vector<DynTile>& dynTiles, std::vector<Coin>& coins,
+              size_t& collectedCoins, const std::vector<Enemy>& enemies,
+              float dt);
+  void collision(const std::vector<StaticTile>& staticTiles,
+                 const std::vector<DynTile>& dynTiles, std::vector<Coin>& coins,
+                 size_t& collectedCoins, const std::vector<Enemy>& enemies);
 
   [[nodiscard]] std::string inspect() const {
     std::string playerState{8, 0};

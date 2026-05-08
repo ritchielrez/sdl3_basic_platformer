@@ -24,5 +24,5 @@ struct Entity {
         tex(nullptr),
         dir(0) {}
 
-  void draw(const SDLState &sdlState);
+  void draw(const SDLState &sdlState, const SDL_FRect &cam);
 };

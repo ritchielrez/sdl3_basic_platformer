@@ -383,7 +383,8 @@ void GameScene::update(float dt) {
   if (player.anims[player.currAnim].getLen() != 0) {
     player.anims[player.currAnim].step(dt);
   }
-  player.update(sdlState, dt);
+  player.update(sdlState, cam, staticTiles, dynTiles, coins, collectedCoins,
+                enemies, dt);
 
   for (auto &coin : coins) {
     coin.anims[coin.currAnim].step(dt);
@@ -404,19 +405,19 @@ void GameScene::draw() {
   SDL_RenderTexture(sdlState.renderer, bgTex, nullptr, &bgTexDst);
 
   for (auto &staticTile : staticTiles) {
-    staticTile.draw(sdlState);
+    staticTile.draw(sdlState, cam);
   }
   for (auto &dynTile : dynTiles) {
-    dynTile.draw(sdlState);
+    dynTile.draw(sdlState, cam);
   }
   for (auto &coin : coins) {
-    coin.draw(sdlState);
+    coin.draw(sdlState, cam);
   }
   for (auto &enemy : enemies) {
-    enemy.draw(sdlState);
+    enemy.draw(sdlState, cam);
   }
 
   coinText.draw();
 
-  player.draw(sdlState);
+  player.draw(sdlState, cam);
 }
