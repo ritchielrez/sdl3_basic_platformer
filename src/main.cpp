@@ -9,13 +9,14 @@
 // build various in game proprietary tools.
 #ifdef DEBUG
 #include <backends/imgui_impl_sdl3.h>
-#include <imgui.h>
-#include <imgui_impl_sdlrenderer3.h>
 
 #include "DebugUI.h"
 #endif
 
+// cassert defines one macro function that can be used as a standard debugging
+// tool.
 #include <cassert>
+
 // glm is a C++ math library offering important math objects such as vectors,
 // matrices etc.
 #include <glm/glm.hpp>
@@ -63,20 +64,20 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char **argv) {
   bool running = true;
   while (running) {
     // Keep track of the time when the current frame starts processing.
-    uint64_t nowTime = SDL_GetTicks();
+    const uint64_t nowTime = SDL_GetTicks();
     // Find the delta time, which tells us how much time did it take to process
     // the last frame in seconds.
-    float dt = (nowTime - prevTime) / 1000.0f;
+    const float dt = static_cast<float>(nowTime - prevTime) / 1000.0f;
 
     SDL_Event event{0};
     // Start looking through all the events that the operating system is trying
     // to send us for processing. These events can be something as basic as
-    // mouse clicks, certains keys being pressed, window being resized etc.
+    // mouse clicks, certain keys being pressed, window being resized etc.
     while (SDL_PollEvent(&event)) {
       // Imgui needs to have some control over the event handling if it is being
-      // used. This is a requirment of the library.
+      // used. This is a requirement of the library.
 #ifdef DEBUG
-      if (game.debug) ImGui_ImplSDL3_ProcessEvent(&event);
+      if (Game::debug) ImGui_ImplSDL3_ProcessEvent(&event);
 #endif
       switch (event.type) {
         // If the user clicked on the close button stop running the game.
@@ -103,6 +104,8 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char **argv) {
 #endif
           break;
         }
+        default:
+          break;
       }
     }
 
@@ -143,8 +146,8 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char **argv) {
 
     // If the player fall 150 pixels below of the bottom of the screen, they
     // die.
-    if (Game::player.pos.y >= sdlState.logicalHeight + 150.0f) {
-      game.player.death = true;
+    if (Game::player.pos.y >= SDLState::logicalHeight + 150.0f) {
+      Game::player.death = true;
     }
   }
 
