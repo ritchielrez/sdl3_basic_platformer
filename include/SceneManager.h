@@ -33,9 +33,10 @@ class SceneManager {
         break;
       case SceneType::game:
         gameScene.update(dt);
+        if (gameScene.player.death) sceneType = SceneType::death;
         break;
       case SceneType::death:
-        // deathScene.update(dt);
+        deathScene.update(dt);
         break;
     }
   }

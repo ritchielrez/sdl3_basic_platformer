@@ -394,6 +394,12 @@ void GameScene::update(float dt) {
   for (auto &enemy : enemies) {
     enemy.anims[enemy.currAnim].step(dt);
   }
+
+  // If the player fall 150 pixels below of the bottom of the screen, they
+  // die.
+  if (player.pos.y >= SDLState::logicalHeight + 150.0f) {
+    player.death = true;
+  }
 }
 
 void GameScene::draw() {
