@@ -24,7 +24,7 @@ class SceneManager {
       : sceneType(SceneType::game),
         startScene(),
         gameScene(sdlState, resourceManager),
-        deathScene() {}
+        deathScene(sdlState) {}
 
   void update(float dt) {
     switch (sceneType) {
