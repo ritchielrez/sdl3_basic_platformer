@@ -1,6 +1,7 @@
 #pragma once
 
 #include <SDL3/SDL.h>
+#include <fmt/base.h>
 
 #include "Coin.h"
 #include "DynTile.h"
@@ -24,8 +25,8 @@ struct GameScene {
   std::vector<DynTile> dynTiles;
   std::vector<Coin> coins;
   SDL_FRect cam;
-  Text coinText;
   size_t collectedCoins;
+  Text coinText;
 
  private:
   void createPlayer();
@@ -48,9 +49,6 @@ struct GameScene {
     cam.h = SDLState::logicalHeight;
     cam.x = 0;
     cam.y = 0;
-
-    coinText = Text(sdlState, fmt::format("Coins: {}", collectedCoins),
-                    glm::vec2(10, 10));
   }
 
  public:
@@ -59,7 +57,9 @@ struct GameScene {
         resourceManager(resourceManager),
         bgTex(nullptr),
         cam(0.0f),
-        collectedCoins(0) {
+        collectedCoins(0),
+        coinText(sdlState, fmt::format("Coins: {}", collectedCoins),
+                 glm::vec2(10, 10)) {
     init();
   }
 

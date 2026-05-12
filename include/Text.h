@@ -2,6 +2,7 @@
 
 #include <SDL3_ttf/SDL_textengine.h>
 #include <SDL3_ttf/SDL_ttf.h>
+#include <fmt/core.h>
 
 #include <glm/glm.hpp>
 #include <string_view>
@@ -33,9 +34,9 @@ class Text {
   Text(const Text &) = delete;
   Text &operator=(const Text &) = delete;
 
-  // Use default move constructor and move assignment operator
-  Text(Text &&) noexcept = default;
-  Text &operator=(Text &&) noexcept = default;
+  // Delete move constructor and move assignment operator
+  Text(Text &&) noexcept = delete;
+  Text &operator=(Text &&) noexcept = delete;
 
   void assign(const std::string_view str) {
     TTF_SetTextString(ttfText, str.data(), str.size());
