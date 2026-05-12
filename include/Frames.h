@@ -37,16 +37,18 @@ class Frames {
         frameHeight(frameHeight),
         texCoords(texCoords) {}
 
-  int frameIdx() const {
+  [[nodiscard]] int frameIdx() const {
     assert(frameCount != 0);
     return frameCount != 1
                ? static_cast<int>(timer.getTime() / timer.getLen() * frameCount)
                : 0;
   }
-  float getLen() const { return timer.getLen(); }
-  float getFrameWidth() const { return frameWidth; }
-  float getFrameHeight() const { return frameHeight; }
-  glm::vec2 getTexCoord() const { return texCoords.at(frameIdx()); }
+  [[nodiscard]] float getLen() const { return timer.getLen(); }
+  [[nodiscard]] float getFrameWidth() const { return frameWidth; }
+  [[nodiscard]] float getFrameHeight() const { return frameHeight; }
+  [[nodiscard]] glm::vec2 getTexCoord() const {
+    return texCoords.at(frameIdx());
+  }
 
   void step(float dt) { timer.step(dt); }
 };
