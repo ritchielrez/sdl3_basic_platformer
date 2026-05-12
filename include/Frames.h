@@ -45,7 +45,7 @@ class Frames {
   }
   float getLen() const { return timer.getLen(); }
   float getFrameWidth() const { return frameWidth; }
-  float getFrameHeight() const { return frameWidth; }
+  float getFrameHeight() const { return frameHeight; }
   glm::vec2 getTexCoord() const { return texCoords.at(frameIdx()); }
 
   void step(float dt) { timer.step(dt); }
