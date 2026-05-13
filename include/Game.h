@@ -23,6 +23,7 @@ struct Game {
   DebugUI debugUI{sdlState, "assets/fonts/Roboto-Regular.ttf", 20.0f};
 #endif
 
+// Declare `debug` as static, so any part of the prograqm toggle debug mode.
   static inline bool debug = false;
 
   Game(const char *winTitle, SDL_WindowFlags winFlags, const char *rendererName)
@@ -88,6 +89,7 @@ struct Game {
         }
       }
 
+      // Create a shorthand alias for player.
       Player &player = sceneManager.gameScene.player;
 
       // Render the debug information on to the screen.
@@ -100,29 +102,21 @@ struct Game {
       SDL_SetRenderDrawColor(sdlState.renderer, 0, 0, 0, 255);
       SDL_RenderClear(sdlState.renderer);
 
-      constexpr int NOISE_W = 640;
-      constexpr int NOISE_H = 480;
-
       SDL_Texture *noiseTex =
           SDL_CreateTexture(sdlState.renderer, SDL_PIXELFORMAT_RGBA8888,
-                            SDL_TEXTUREACCESS_STREAMING, NOISE_W, NOISE_H);
+                            SDL_TEXTUREACCESS_STREAMING, SDLState::logicalWidth, SDLState::logicalHeight);
 
       void *pixelsPtr;
-      int pitch, rows;
+      int pitch;
 
       SDL_LockTexture(noiseTex, nullptr, &pixelsPtr, &pitch);
       uint32_t *pixels = (uint32_t *)pixelsPtr;
-      rows = pitch / 4;
 
-      for (int y = 0; y < NOISE_H; y++) {
-        for (int x = 0; x < NOISE_W; x++) {
+      for (uint32_t i = 0; i < SDLState::logicalWidth * SDLState::logicalHeight; i++) {
           uint8_t v = rand() % 256;
-
           uint32_t pixel = (255 << 24) |  // alpha
                            (v << 16) | (v << 8) | v;
-
-          pixels[y * rows + x] = pixel;
-        }
+          pixels[i] = pixel;
       }
 
       SDL_UnlockTexture(noiseTex);
