@@ -127,6 +127,12 @@ struct Game {
       SDL_RenderTexture(sdlState.renderer, resourceManager.getNoiseTex(),
                         nullptr, nullptr);
 
+      // SDL_SetRenderDrawColor(sdlState.renderer, 255, 255, 255, 40);
+      // for (uint32_t y = 0; y < SDLState::logicalHeight; y += 4) {
+      //   SDL_RenderLine(sdlState.renderer, 0, static_cast<float>(y),
+      //                  SDLState::logicalWidth, static_cast<float>(y));
+      // }
+
       // Swap buffers. GPU buffers are general-purpose blocks of memory
       // allocated by the GPU, primarily used to store data for the pixels that
       // are rendered onto the screen.
