@@ -100,6 +100,36 @@ struct Game {
       SDL_SetRenderDrawColor(sdlState.renderer, 0, 0, 0, 255);
       SDL_RenderClear(sdlState.renderer);
 
+      constexpr int NOISE_W = 640;
+      constexpr int NOISE_H = 480;
+
+      SDL_Texture *noiseTex =
+          SDL_CreateTexture(sdlState.renderer, SDL_PIXELFORMAT_RGBA8888,
+                            SDL_TEXTUREACCESS_STREAMING, NOISE_W, NOISE_H);
+
+      void *pixelsPtr;
+      int pitch, rows;
+
+      SDL_LockTexture(noiseTex, nullptr, &pixelsPtr, &pitch);
+      uint32_t *pixels = (uint32_t *)pixelsPtr;
+      rows = pitch / 4;
+
+      for (int y = 0; y < NOISE_H; y++) {
+        for (int x = 0; x < NOISE_W; x++) {
+          uint8_t v = rand() % 256;
+
+          uint32_t pixel = (255 << 24) |  // alpha
+                           (v << 16) | (v << 8) | v;
+
+          pixels[y * rows + x] = pixel;
+        }
+      }
+
+      SDL_UnlockTexture(noiseTex);
+
+      SDL_SetTextureBlendMode(noiseTex, SDL_BLENDMODE_BLEND);
+      SDL_SetTextureAlphaMod(noiseTex, 35);
+
       // If the player did not die, keep updating the game state and rendering
       // game entities on to the screen.
       sceneManager.update(dt);
@@ -108,6 +138,8 @@ struct Game {
 #ifdef DEBUG
       debugUI.presentFrame();
 #endif
+
+      SDL_RenderTexture(sdlState.renderer, noiseTex, NULL, NULL);
 
       // Swap buffers. GPU buffers are general-purpose blocks of memory
       // allocated by the GPU, primarily used to store data for the pixels that
