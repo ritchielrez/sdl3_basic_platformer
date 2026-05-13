@@ -13,6 +13,6 @@ class DeathScene {
   DeathScene(const SDLState &sdlState)
       : sdlState(sdlState), deathText(sdlState, "You died!!!", glm::vec2(0)) {}
 
-  void update([[maybe_unused]] float dt) { deathText.draw(); }
-  void draw();
+  void update(float dt);
+  void draw() { deathText.draw(); };
 };

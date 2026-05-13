@@ -5,7 +5,7 @@
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_main.h>
 
-// 	A builtin error handing library which provided `assert()`. This function
+// A builtin error handing library which provided `assert()`. This function
 // aborts the program if the user-specified condition is not true. May be
 // disabled for release builds
 #include <cassert>
