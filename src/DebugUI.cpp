@@ -1,5 +1,3 @@
-#pragma once
-
 #include "DebugUI.h"
 
 #include "Game.h"
