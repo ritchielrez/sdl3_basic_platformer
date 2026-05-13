@@ -1,9 +1,16 @@
 #pragma once
 
+#include <cstdint>
+#include <cstdlib>
+
 #include "ResourceManager.h"
+#include "SDL3/SDL_render.h"
 #include "SDLState.h"
 #include "SceneManager.h"
 
+// Includes `DebugUI` object to show debug information using imgui. Only created
+// in debug build. Any methods of `DebugUI` should be only called if the game is
+// compiled as a debug build.
 #ifdef DEBUG
 #include "DebugUI.h"
 #endif
@@ -18,12 +25,13 @@ struct Game {
   // `SceneManager` object which manages the current scene (main menu, game,
   // death screen).
   SceneManager sceneManager;
-// `DebugUI` object to show debug information using imgui.
+  // `DebugUI` object to show debug information using imgui. Only created in
+  // debug build.
 #ifdef DEBUG
   DebugUI debugUI{sdlState, "assets/fonts/Roboto-Regular.ttf", 20.0f};
 #endif
 
-// Declare `debug` as static, so any part of the prograqm toggle debug mode.
+  // Declare `debug` as static, so any part of the prograqm toggle debug mode.
   static inline bool debug = false;
 
   Game(const char *winTitle, SDL_WindowFlags winFlags, const char *rendererName)
@@ -102,38 +110,22 @@ struct Game {
       SDL_SetRenderDrawColor(sdlState.renderer, 0, 0, 0, 255);
       SDL_RenderClear(sdlState.renderer);
 
-      SDL_Texture *noiseTex =
-          SDL_CreateTexture(sdlState.renderer, SDL_PIXELFORMAT_RGBA8888,
-                            SDL_TEXTUREACCESS_STREAMING, SDLState::logicalWidth, SDLState::logicalHeight);
-
-      void *pixelsPtr;
-      int pitch;
-
-      SDL_LockTexture(noiseTex, nullptr, &pixelsPtr, &pitch);
-      uint32_t *pixels = (uint32_t *)pixelsPtr;
-
-      for (uint32_t i = 0; i < SDLState::logicalWidth * SDLState::logicalHeight; i++) {
-          uint8_t v = rand() % 256;
-          uint32_t pixel = (255 << 24) |  // alpha
-                           (v << 16) | (v << 8) | v;
-          pixels[i] = pixel;
-      }
-
-      SDL_UnlockTexture(noiseTex);
-
-      SDL_SetTextureBlendMode(noiseTex, SDL_BLENDMODE_BLEND);
-      SDL_SetTextureAlphaMod(noiseTex, 35);
-
       // If the player did not die, keep updating the game state and rendering
       // game entities on to the screen.
       sceneManager.update(dt);
       sceneManager.draw();
 
+      // Show the debug UI on to the screen.
 #ifdef DEBUG
       debugUI.presentFrame();
 #endif
 
-      SDL_RenderTexture(sdlState.renderer, noiseTex, NULL, NULL);
+      // Generate noise and render it on to the screen. This is done after the
+      // game entities are rendered so that the noise affects the lighting of
+      // the game world. This creates a VHS-style look.
+      resourceManager.generateNoise();
+      SDL_RenderTexture(sdlState.renderer, resourceManager.getNoiseTex(),
+                        nullptr, nullptr);
 
       // Swap buffers. GPU buffers are general-purpose blocks of memory
       // allocated by the GPU, primarily used to store data for the pixels that

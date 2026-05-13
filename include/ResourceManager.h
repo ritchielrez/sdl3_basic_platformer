@@ -19,6 +19,7 @@ class ResourceManager {
   SDL_Texture *worldTex;
   SDL_Texture *platformsTex;
   SDL_Texture *enemyTex;
+  SDL_Texture *noiseTex;
 
  public:
   // No argument constructor setting everything to the default value of
@@ -28,7 +29,8 @@ class ResourceManager {
         playerTex(nullptr),
         worldTex(nullptr),
         platformsTex(nullptr),
-        enemyTex(nullptr) {}
+        enemyTex(nullptr),
+        noiseTex(nullptr) {}
   // Parameterized constructor to initialize everything properly. This does
   // create the necessary textures.
   ResourceManager(SDLState &sdlState) {
@@ -69,6 +71,18 @@ class ResourceManager {
                                "Enemy texture could not be loaded", nullptr);
       exit(1);
     }
+
+    noiseTex =
+        SDL_CreateTexture(sdlState.renderer, SDL_PIXELFORMAT_RGBA8888,
+                          SDL_TEXTUREACCESS_STREAMING, SDLState::logicalWidth,
+                          SDLState::logicalHeight);
+    if (!noiseTex) {
+      SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error",
+                               "Noise texture could not be created", nullptr);
+      exit(1);
+    }
+    SDL_SetTextureBlendMode(noiseTex, SDL_BLENDMODE_BLEND);
+    SDL_SetTextureAlphaMod(noiseTex, 35);
   }
 
   // Delete copy and move constructors and copy and move assignment operators.
@@ -115,6 +129,24 @@ class ResourceManager {
     return tex;
   }
 
+  void generateNoise() {
+    void *pixelsPtr;
+    int pitch;
+
+    SDL_LockTexture(noiseTex, nullptr, &pixelsPtr, &pitch);
+    auto pixels = (uint32_t *)pixelsPtr;
+
+    for (uint32_t i = 0; i < SDLState::logicalWidth * SDLState::logicalHeight;
+         i++) {
+      uint8_t v = rand() % 256;
+      uint32_t pixel = (255 << 24) |  // alpha
+                       (v << 16) | (v << 8) | v;
+      pixels[i] = pixel;
+    }
+
+    SDL_UnlockTexture(noiseTex);
+  }
+
   // Getter methods for the textures. [[nodiscard]] ensures that the return
   // value of the getter cannot be unused by the caller.
   [[nodiscard]] SDL_Texture *getCoinTex() const { return coinTex; }
@@ -122,6 +154,7 @@ class ResourceManager {
   [[nodiscard]] SDL_Texture *getWorldTex() const { return worldTex; }
   [[nodiscard]] SDL_Texture *getPlatformTex() const { return platformsTex; }
   [[nodiscard]] SDL_Texture *getEnemyTex() const { return enemyTex; }
+  [[nodiscard]] SDL_Texture *getNoiseTex() const { return noiseTex; }
 
   // Destructor to deallocate all textures. This prevents any memory
   // leaks.
@@ -131,5 +164,6 @@ class ResourceManager {
     SDL_DestroyTexture(worldTex);
     SDL_DestroyTexture(platformsTex);
     SDL_DestroyTexture(enemyTex);
+    SDL_DestroyTexture(noiseTex);
   }
 };
