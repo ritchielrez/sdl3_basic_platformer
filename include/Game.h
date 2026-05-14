@@ -4,6 +4,7 @@
 #include <cstdlib>
 
 #include "ResourceManager.h"
+#include "SDL3/SDL_rect.h"
 #include "SDL3/SDL_render.h"
 #include "SDLState.h"
 #include "SceneManager.h"
@@ -31,13 +32,16 @@ struct Game {
   DebugUI debugUI{sdlState, "assets/fonts/Roboto-Regular.ttf", 20.0f};
 #endif
 
+  SDL_FRect noiseRect;
+
   // Declare `debug` as static, so any part of the prograqm toggle debug mode.
   static inline bool debug = false;
 
   Game(const char *winTitle, SDL_WindowFlags winFlags, const char *rendererName)
       : sdlState(winTitle, winFlags, rendererName),
         resourceManager(sdlState),
-        sceneManager(sdlState, resourceManager) {
+        sceneManager(sdlState, resourceManager),
+        noiseRect{0.0f, 0.0f, SDLState::logicalWidth, SDLState::logicalHeight} {
     // Initialize SDL3 for rendering graphics. If initialization fails exit
     // early.
     if (!SDL_Init(SDL_INIT_VIDEO)) {
@@ -120,19 +124,6 @@ struct Game {
       debugUI.presentFrame();
 #endif
 
-      // Generate noise and render it on to the screen. This is done after the
-      // game entities are rendered so that the noise affects the lighting of
-      // the game world. This creates a VHS-style look.
-      resourceManager.generateNoise();
-      SDL_RenderTexture(sdlState.renderer, resourceManager.getNoiseTex(),
-                        nullptr, nullptr);
-
-      // SDL_SetRenderDrawColor(sdlState.renderer, 255, 255, 255, 40);
-      // for (uint32_t y = 0; y < SDLState::logicalHeight; y += 4) {
-      //   SDL_RenderLine(sdlState.renderer, 0, static_cast<float>(y),
-      //                  SDLState::logicalWidth, static_cast<float>(y));
-      // }
-
       // Swap buffers. GPU buffers are general-purpose blocks of memory
       // allocated by the GPU, primarily used to store data for the pixels that
       // are rendered onto the screen.
@@ -142,12 +133,6 @@ struct Game {
       // time is going to be the previous frame's time relative to the next
       // frame.
       prevTime = nowTime;
-
-      // If the player fall 150 pixels below of the bottom of the screen, they
-      // die.
-      if (player.pos.y >= SDLState::logicalHeight + 150.0f) {
-        player.death = true;
-      }
     }
   }
 

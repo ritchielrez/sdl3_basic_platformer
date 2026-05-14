@@ -6,6 +6,8 @@
 
 #include <cstdlib>
 
+#include "SDL3/SDL_render.h"
+
 // `SDLState` is a class holding internal data that are needed for SDL to
 // function.
 struct SDLState {
@@ -56,6 +58,10 @@ struct SDLState {
                                "Could not create renderer", nullptr);
       exit(1);
     }
+
+    // Enable adaptive VSync, so the renderer will automatically adjust to the
+    // monitor's refresh rate.
+    SDL_SetRenderVSync(renderer, SDL_RENDERER_VSYNC_ADAPTIVE);
 
     // Set the logical resolution of the window. Ensure that the game only
     // upscaled by integer multiples.
