@@ -15,6 +15,7 @@ enum {
   DIRT1,
   DIRT2,
   DIRT3,
+  PLATFORM_GRASS,
   BRIDGE1,
   BRIDGE2,
   BRIDGE3,
