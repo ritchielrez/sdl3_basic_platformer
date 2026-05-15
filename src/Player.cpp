@@ -95,9 +95,9 @@ void Player::update(const SDLState& sdlState, SDL_FRect& cam,
   constexpr float camYSmoothness = 5.0f;
 
   if (pos.y <= 10) {
-    cam.y = glm::lerp(cam.y, -15.f, camYSmoothness * dt);
+    cam.y = glm::lerp(cam.y, -30.0f, camYSmoothness * dt);
   } else {
-    cam.y = glm::lerp(cam.y, 0.f, camYSmoothness * dt);
+    cam.y = glm::lerp(cam.y, 0.0f, camYSmoothness * dt);
   }
 }
 

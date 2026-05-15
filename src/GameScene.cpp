@@ -414,6 +414,7 @@ void GameScene::update(float dt) {
 
   for (auto &enemy : enemies) {
     enemy.anims[enemy.currAnim].step(dt);
+    enemy.update(staticTiles, dt, cam);
   }
 
   // If the player fall 150 pixels below of the bottom of the screen, they
