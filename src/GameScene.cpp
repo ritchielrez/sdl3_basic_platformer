@@ -367,11 +367,12 @@ void GameScene::createEntities() {
                         (sdlState.logicalHeight -
                          (mapMidLayer.getRows() - r - 1) * Map::TILE_SIZE) -
                             ENEMY_SIZE);
+          enemy.vel = glm::vec2(10.0f, 0.0f);
           enemy.tex = resourceManager.getEnemyTex();
           enemy.w = ENEMY_SIZE;
           enemy.h = ENEMY_SIZE;
-          enemy.collider.x = 8;
-          enemy.collider.y = 13;
+          enemy.collider.x = 8.0f;
+          enemy.collider.y = 13.0f;
           enemy.collider.w = enemy.w - 16;
           enemy.collider.h = enemy.h - 14;
 
