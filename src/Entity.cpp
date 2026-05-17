@@ -10,10 +10,10 @@ void Entity::draw(const SDLState &sdlState, const SDL_FRect &cam) {
   // However it still has an initialized `anims` object, so we can access
   // texture coordinates for that
   Frames currFrame = anims[currAnim != -1 ? currAnim : 0];
-  SDL_FRect src{.x = currFrame.getTexCoord().x,
-                .y = currFrame.getTexCoord().y,
-                .w = currFrame.getFrameWidth(),
-                .h = currFrame.getFrameHeight()};
+  SDL_FRect src{.x = glm::round(currFrame.getTexCoord().x),
+                .y = glm::round(currFrame.getTexCoord().y),
+                .w = static_cast<float>(currFrame.getFrameWidth()),
+                .h = static_cast<float>(currFrame.getFrameHeight())};
   SDL_FRect dst{.x = pos.x - cam.x, .y = pos.y - cam.y, .w = w, .h = h};
 
   SDL_FlipMode flipMode = dir == -1 ? SDL_FLIP_HORIZONTAL : SDL_FLIP_NONE;
