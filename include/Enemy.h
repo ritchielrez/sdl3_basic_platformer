@@ -14,8 +14,7 @@ struct Enemy : public Entity {
               const SDL_FRect& cam) {
     if (pos.x > cam.x && pos.x < cam.x + cam.w && pos.y > cam.y &&
         pos.y < cam.y + cam.h) {
-      (void)dt;
-      // pos += vel * dt;
+      pos += vel * dt;
       collision(staticTiles);
     }
   }
@@ -44,15 +43,12 @@ struct Enemy : public Entity {
           } else if (vel.x < 0) {
             pos.x += intersectionRect.w;
           }
-          vel.x = 0;
-        } else {
-          if (vel.y > 0) {
-            pos.y -= intersectionRect.h;
-          } else if (vel.y < 0) {
-            pos.y += intersectionRect.h;
-          }
-          vel.y = 0;
+          vel.x *= -1.0f;
+          dir *= -1.0f;
         }
+
+        // Recalculate enemyCollider after the enemy has moved due to collision.
+        enemyCollider.x = pos.x + collider.x;
       }
     }
   }
