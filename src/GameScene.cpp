@@ -216,8 +216,14 @@ void GameScene::createBg() {
         case Tiles::NONE:
           continue;
         default:
-          assert(false &&
-                 "Unreachable: invalid tile type for background layer");
+          SDL_ShowSimpleMessageBox(
+              SDL_MESSAGEBOX_ERROR, "Error",
+              fmt::format(
+                  "Unreachable: unhandled tile type of {} for background layer",
+                  mapMidLayer.getTiles()[r * mapMidLayer.getCols() + c])
+                  .data(),
+              nullptr);
+          exit(1);
       }
 
       SDL_RenderTexture(sdlState.renderer, resourceManager.getWorldTex(), &src,
@@ -392,7 +398,14 @@ void GameScene::createEntities() {
         case Tiles::NONE:
           break;
         default:
-          assert(false && "Unreachable: invalid tile type for medium layer");
+          SDL_ShowSimpleMessageBox(
+              SDL_MESSAGEBOX_ERROR, "Error",
+              fmt::format(
+                  "Unreachable: unhandled tile type of {} for middle layer",
+                  mapMidLayer.getTiles()[r * mapMidLayer.getCols() + c])
+                  .data(),
+              nullptr);
+          exit(1);
       }
     }
   }
