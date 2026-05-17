@@ -29,7 +29,7 @@ struct SDLState {
   // Because this is a pixel art game though the upscaling is not going to cause
   // any blurriness, so many pixel art games actually render at low resolutions
   // like 180p.
-  static constexpr uint32_t logicalWidth = 320, logicalHeight = 180;
+  static constexpr uint16_t logicalWidth = 320, logicalHeight = 180;
 
   // No argument constructor setting everything to the default value of
   // `nullptr`. This does not construct any SDL related objects.
