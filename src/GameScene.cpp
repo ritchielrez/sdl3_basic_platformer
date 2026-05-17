@@ -36,7 +36,7 @@ void GameScene::createPlayer() {
 
   player.pos = glm::vec2(0, sdlState.logicalHeight - 3 * PLAYER_SIZE);
   player.tex = resourceManager.getPlayerTex();
-  player.maxSpeedX = 100.0f;
+  player.maxSpeedX = 130.0f;
   player.jumpVel = -350.0f;
   player.w = PLAYER_SIZE;
   player.h = PLAYER_SIZE;
@@ -373,7 +373,8 @@ void GameScene::createEntities() {
                         (sdlState.logicalHeight -
                          (mapMidLayer.getRows() - r - 1) * Map::TILE_SIZE) -
                             ENEMY_SIZE);
-          enemy.vel = glm::vec2(10.0f, 0.0f);
+          enemy.vel = glm::vec2(60.0f, 0.0f);
+          enemy.dir = 1;
           enemy.tex = resourceManager.getEnemyTex();
           enemy.w = ENEMY_SIZE;
           enemy.h = ENEMY_SIZE;
