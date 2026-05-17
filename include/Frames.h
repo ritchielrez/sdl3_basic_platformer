@@ -10,27 +10,27 @@
 class Frames {
   Timer timer;
   size_t frameCount;
-  float frameWidth, frameHeight;
+  uint16_t frameWidth, frameHeight;
   std::vector<glm::vec2> texCoords;
 
  public:
   Frames()
       : timer(0), frameCount(0), frameWidth(0), frameHeight(0), texCoords() {}
-  Frames(glm::vec2 &&texCoord, float frameWidth, float frameHeight)
+  Frames(glm::vec2 &&texCoord, uint16_t frameWidth, uint16_t frameHeight)
       : timer(0),
         frameCount(1),
         frameWidth(frameWidth),
         frameHeight(frameHeight),
         texCoords(1, texCoord) {}
   Frames(int frameCount, float len, std::vector<glm::vec2> &&texCoords,
-         float frameWidth, float frameHeight)
+         uint16_t frameWidth, uint16_t frameHeight)
       : timer(len * frameCount),
         frameCount(frameCount),
         frameWidth(frameWidth),
         frameHeight(frameHeight),
         texCoords(texCoords) {}
   Frames(int frameCount, float len, std::vector<glm::vec2> &texCoords,
-         float frameWidth, float frameHeight)
+         uint16_t frameWidth, uint16_t frameHeight)
       : timer(len * frameCount),
         frameCount(frameCount),
         frameWidth(frameWidth),
@@ -44,8 +44,8 @@ class Frames {
                : 0;
   }
   [[nodiscard]] float getLen() const { return timer.getLen(); }
-  [[nodiscard]] float getFrameWidth() const { return frameWidth; }
-  [[nodiscard]] float getFrameHeight() const { return frameHeight; }
+  [[nodiscard]] uint16_t getFrameWidth() const { return frameWidth; }
+  [[nodiscard]] uint16_t getFrameHeight() const { return frameHeight; }
   [[nodiscard]] glm::vec2 getTexCoord() const {
     return texCoords.at(frameIdx());
   }
