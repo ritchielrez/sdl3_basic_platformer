@@ -12,7 +12,7 @@ struct Entity {
   int64_t currAnim;
   std::vector<Frames> anims;
   SDL_Texture *tex;
-  float dir;
+  int16_t dir;
 
   Entity()
       : pos(glm::vec2(0)),
