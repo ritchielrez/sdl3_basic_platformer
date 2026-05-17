@@ -103,9 +103,9 @@ class ResourceManager {
         width, height, SDL_PIXELFORMAT_RGBA32, pixData, width * 4);
     // Create a SDL_Texture from a SDL_Surface.
     SDL_Texture *tex = SDL_CreateTextureFromSurface(sdlState.renderer, surface);
-    // Set the texture scaling mode to pixel art so when the textures are
-    // upscaled they do not get blurry.
-    SDL_SetTextureScaleMode(tex, SDL_SCALEMODE_PIXELART);
+    // Set the texture scaling mode to nearest so when the textures are
+    // upscaled they do not get blurry and do not bleed.
+    SDL_SetTextureScaleMode(tex, SDL_SCALEMODE_NEAREST);
 
     // The SDL_Surface is not needed anymore, it is an intermediate resource
     // used to create a texture.
