@@ -107,7 +107,8 @@ struct Game {
       // Render the debug information on to the screen.
 #ifdef DEBUG
       debugUI.newFrame();
-      debugUI.drawFrame(player, sceneManager.gameScene.cam);
+      debugUI.drawFrame(player, sceneManager.gameScene.enemies,
+                        sceneManager.gameScene.cam);
 #endif
 
       // Clear the screen with black color.

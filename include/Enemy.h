@@ -1,9 +1,11 @@
 #pragma once
 
 #include <glm/glm.hpp>
+#include <string>
 
 #include "Entity.h"
 #include "StaticTile.h"
+#include "fmt/format.h"
 
 struct Enemy : public Entity {
   bool collided;
@@ -51,5 +53,12 @@ struct Enemy : public Entity {
         enemyCollider.x = pos.x + collider.x;
       }
     }
+  }
+
+  [[nodiscard]] std::string inspect() const {
+    return fmt::format(
+        "Position: ({}, {})\nVelocity: ({}, {})\nCollision: "
+        "{}\n",
+        pos.x, pos.y, vel.x, vel.y, collided);
   }
 };

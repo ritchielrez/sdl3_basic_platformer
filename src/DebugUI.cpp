@@ -14,7 +14,21 @@ void DebugUI::drawCameraInfo(const SDL_FRect &cam) {
   if (!Game::debug) return;
 
   ImGui::Begin("Camera");
-  ImGui::Text("%s", fmt::format("Position: ({}, {})\n", cam.x, cam.y).c_str());
+  ImGui::Text("Position: (%f, %f)", cam.x, cam.y);
+  ImGui::End();
+}
+
+void DebugUI::drawEnemiesInfo(const std::vector<Enemy> &enemies) {
+  if (!Game::debug) return;
+
+  ImGui::Begin("Enemies");
+  ImGui::Text("Total enemies: %zu\n", enemies.size());
+  for (size_t i = 0; i < enemies.size(); ++i) {
+    std::string label = fmt::format("Enemy {}", i);
+    if (ImGui::CollapsingHeader(label.c_str())) {
+      ImGui::Text("%s", enemies[i].inspect().c_str());
+    }
+  }
   ImGui::End();
 }
 
@@ -31,10 +45,12 @@ void DebugUI::newFrame() {
                                ImGuiDockNodeFlags_PassthruCentralNode);
 }
 
-void DebugUI::drawFrame(const Player &player, const SDL_FRect &cam) {
+void DebugUI::drawFrame(const Player &player, const std::vector<Enemy> &enemies,
+                        const SDL_FRect &cam) {
   if (!Game::debug) return;
 
   drawPlayerInfo(player);
+  drawEnemiesInfo(enemies);
   drawCameraInfo(cam);
 
   ImGui::Render();

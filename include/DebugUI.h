@@ -11,6 +11,7 @@
 #include <imgui.h>
 #include <imgui_impl_sdlrenderer3.h>
 
+#include "Enemy.h"
 #include "Player.h"
 #include "SDLState.h"
 
@@ -56,9 +57,11 @@ struct DebugUI {
 
   void drawPlayerInfo(const Player &player);
   void drawCameraInfo(const SDL_FRect &cam);
+  void drawEnemiesInfo(const std::vector<Enemy> &enemies);
 
   void newFrame();
-  void drawFrame(const Player &player, const SDL_FRect &cam);
+  void drawFrame(const Player &player, const std::vector<Enemy> &enemies,
+                 const SDL_FRect &cam);
   void presentFrame() const;
 
   ~DebugUI() {
