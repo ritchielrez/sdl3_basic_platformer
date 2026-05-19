@@ -4,6 +4,7 @@
 
 #include <cstdint>
 
+#include "DynTile.h"
 #include "Map.h"
 
 void GameScene::createPlayer() {
@@ -326,22 +327,22 @@ void GameScene::createEntities() {
           staticTiles.push_back(staticTile);
           break;
         }
-        case Tiles::PLATFORM_GRASS: {
-          StaticTile staticTile{};
-          staticTile.pos =
+        case Tiles::MOVING_PLATFORM_GRASS: {
+          DynTile dynTile{};
+          dynTile.pos =
               glm::vec2(c * Map::TILE_SIZE,
                         SDLState::logicalHeight -
                             (mapMidLayer.getRows() - r) * Map::TILE_SIZE);
-          staticTile.tex = resourceManager.getPlatformTex();
-          staticTile.w = static_cast<float>(Map::TILE_SIZE);
-          staticTile.h = static_cast<float>(Map::TILE_SIZE);
-          staticTile.collider.x = 0;
-          staticTile.collider.y = 0;
-          staticTile.collider.w = staticTile.w;
-          staticTile.collider.h = staticTile.h;
-          staticTile.anims = std::vector<Frames>{
+          dynTile.tex = resourceManager.getPlatformTex();
+          dynTile.w = static_cast<float>(Map::TILE_SIZE);
+          dynTile.h = static_cast<float>(Map::TILE_SIZE);
+          dynTile.collider.x = 0;
+          dynTile.collider.y = 0;
+          dynTile.collider.w = dynTile.w;
+          dynTile.collider.h = dynTile.h;
+          dynTile.anims = std::vector<Frames>{
               Frames(glm::vec2(0, 0), Map::TILE_SIZE, Map::TILE_SIZE)};
-          staticTiles.push_back(staticTile);
+          dynTiles.push_back(dynTile);
           break;
         }
         case Tiles::COIN: {
@@ -428,6 +429,10 @@ void GameScene::update(float dt) {
   }
   player.update(sdlState, cam, staticTiles, dynTiles, coins, collectedCoins,
                 enemies, dt);
+
+  for (auto &dynTile : dynTiles) {
+    dynTile.update(staticTiles, dt, cam);
+  }
 
   for (auto &coin : coins) {
     coin.anims[coin.currAnim].step(dt);
