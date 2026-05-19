@@ -46,7 +46,7 @@ struct Enemy : public Entity {
             pos.x += intersectionRect.w;
           }
           vel.x *= -1.0f;
-          dir *= -1.0f;
+          dir *= -1;
         }
 
         // Recalculate enemyCollider after the enemy has moved due to collision.

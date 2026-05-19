@@ -51,7 +51,7 @@ enum {
 }
 
 struct Map {
-  static constexpr float TILE_SIZE = 16.0f;
+  static constexpr uint16_t TILE_SIZE = 16;
 
  private:
   std::vector<uint16_t> tiles;

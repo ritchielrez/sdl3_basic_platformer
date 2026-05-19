@@ -5,7 +5,7 @@
 void GameScene::createPlayer() {
   constexpr size_t PLAYER_IDLE_FRAMES = 4;
   constexpr size_t PLAYER_RUN_FRAMES = 16;
-  constexpr float PLAYER_SIZE = 32.0f;
+  constexpr uint16_t PLAYER_SIZE = 32;
 
   std::vector<Frames> playerAnims;
   playerAnims.resize(5);
@@ -20,10 +20,10 @@ void GameScene::createPlayer() {
   std::vector<glm::vec2> playerRunTexCoords{PLAYER_RUN_FRAMES};
   for (size_t i = 0; i < PLAYER_RUN_FRAMES; i++) {
     if (i <= 7) {
-      playerRunTexCoords[i].x = i * PLAYER_SIZE;
+      playerRunTexCoords[i].x = static_cast<float>(i) * PLAYER_SIZE;
       playerRunTexCoords[i].y = 2 * PLAYER_SIZE;
     } else {
-      playerRunTexCoords[i].x = (i - 8) * PLAYER_SIZE;
+      playerRunTexCoords[i].x = static_cast<float>(i - 8) * PLAYER_SIZE;
       playerRunTexCoords[i].y = 3 * PLAYER_SIZE;
     }
   }
@@ -39,7 +39,7 @@ void GameScene::createPlayer() {
   player.maxSpeedX = 130.0f;
   player.jumpVel = -350.0f;
   player.w = PLAYER_SIZE;
-  player.h = PLAYER_SIZE;
+  player.h = static_cast<float>(PLAYER_SIZE);
   player.accel = glm::vec2(300, 0);
   player.anims = playerAnims;
   player.currAnim = PlayerAnim::idle;
@@ -61,11 +61,14 @@ void GameScene::createBg() {
   // what the background should look like.
   for (size_t r = 0; r < mapBgLayer.getRows(); r++) {
     for (size_t c = 0; c < mapBgLayer.getCols(); c++) {
-      SDL_FRect src{.x = 0, .y = 0, .w = Map::TILE_SIZE, .h = Map::TILE_SIZE};
-      const SDL_FRect dst{.x = c * Map::TILE_SIZE,
-                          .y = r * Map::TILE_SIZE,
-                          .w = Map::TILE_SIZE,
-                          .h = Map::TILE_SIZE};
+      SDL_FRect src{.x = 0,
+                    .y = 0,
+                    .w = static_cast<float>(Map::TILE_SIZE),
+                    .h = static_cast<float>(Map::TILE_SIZE)};
+      const SDL_FRect dst{.x = static_cast<float>(c * Map::TILE_SIZE),
+                          .y = static_cast<float>(r * Map::TILE_SIZE),
+                          .w = static_cast<float>(Map::TILE_SIZE),
+                          .h = static_cast<float>(Map::TILE_SIZE)};
 
       switch (mapBgLayer.getTiles()[r * mapBgLayer.getCols() + c]) {
         case Tiles::SKY_PEACH: {
@@ -239,7 +242,7 @@ void GameScene::createEntities() {
   dynTiles.reserve(10);
   coins.reserve(100);
 
-  constexpr float ENEMY_SIZE = 24.0f;
+  constexpr uint16_t ENEMY_SIZE = 24;
 
   // `mapMidLayer` refers to the layer of the level map that defines the
   // player interactable tiles.
@@ -253,8 +256,8 @@ void GameScene::createEntities() {
                         sdlState.logicalHeight -
                             (mapMidLayer.getRows() - r) * Map::TILE_SIZE);
           staticTile.tex = resourceManager.getWorldTex();
-          staticTile.w = Map::TILE_SIZE;
-          staticTile.h = Map::TILE_SIZE;
+          staticTile.w = static_cast<float>(Map::TILE_SIZE);
+          staticTile.h = static_cast<float>(Map::TILE_SIZE);
           staticTile.collider.x = 0;
           staticTile.collider.y = 0;
           staticTile.collider.w = staticTile.w;
@@ -271,8 +274,8 @@ void GameScene::createEntities() {
                         sdlState.logicalHeight -
                             (mapMidLayer.getRows() - r) * Map::TILE_SIZE);
           staticTile.tex = resourceManager.getWorldTex();
-          staticTile.w = Map::TILE_SIZE;
-          staticTile.h = Map::TILE_SIZE;
+          staticTile.w = static_cast<float>(Map::TILE_SIZE);
+          staticTile.h = static_cast<float>(Map::TILE_SIZE);
           staticTile.collider.x = 0;
           staticTile.collider.y = 0;
           staticTile.collider.w = staticTile.w;
@@ -289,8 +292,8 @@ void GameScene::createEntities() {
                         sdlState.logicalHeight -
                             (mapMidLayer.getRows() - r) * Map::TILE_SIZE);
           staticTile.tex = resourceManager.getWorldTex();
-          staticTile.w = Map::TILE_SIZE;
-          staticTile.h = Map::TILE_SIZE;
+          staticTile.w = static_cast<float>(Map::TILE_SIZE);
+          staticTile.h = static_cast<float>(Map::TILE_SIZE);
           staticTile.collider.x = 0;
           staticTile.collider.y = 0;
           staticTile.collider.w = staticTile.w;
@@ -307,8 +310,8 @@ void GameScene::createEntities() {
                         sdlState.logicalHeight -
                             (mapMidLayer.getRows() - r) * Map::TILE_SIZE);
           staticTile.tex = resourceManager.getWorldTex();
-          staticTile.w = Map::TILE_SIZE;
-          staticTile.h = Map::TILE_SIZE;
+          staticTile.w = static_cast<float>(Map::TILE_SIZE);
+          staticTile.h = static_cast<float>(Map::TILE_SIZE);
           staticTile.collider.x = 0;
           staticTile.collider.y = 0;
           staticTile.collider.w = staticTile.w;
@@ -326,8 +329,8 @@ void GameScene::createEntities() {
                         sdlState.logicalHeight -
                             (mapMidLayer.getRows() - r) * Map::TILE_SIZE);
           staticTile.tex = resourceManager.getPlatformTex();
-          staticTile.w = Map::TILE_SIZE;
-          staticTile.h = Map::TILE_SIZE;
+          staticTile.w = static_cast<float>(Map::TILE_SIZE);
+          staticTile.h = static_cast<float>(Map::TILE_SIZE);
           staticTile.collider.x = 0;
           staticTile.collider.y = 0;
           staticTile.collider.w = staticTile.w;
@@ -344,8 +347,8 @@ void GameScene::createEntities() {
                         sdlState.logicalHeight -
                             (mapMidLayer.getRows() - r) * Map::TILE_SIZE);
           coin.tex = resourceManager.getCoinTex();
-          coin.w = Map::TILE_SIZE;
-          coin.h = Map::TILE_SIZE;
+          coin.w = static_cast<float>(Map::TILE_SIZE);
+          coin.h = static_cast<float>(Map::TILE_SIZE);
           coin.collider.x = 5.0f;
           coin.collider.y = 5.0f;
           coin.collider.w = 6.0f;
@@ -354,7 +357,7 @@ void GameScene::createEntities() {
           constexpr size_t COIN_ANIM_FRAMES = 12;
           std::vector<glm::vec2> coinTexCoords{COIN_ANIM_FRAMES};
           for (size_t i = 0; i < COIN_ANIM_FRAMES; i++) {
-            coinTexCoords[i].x = i * Map::TILE_SIZE;
+            coinTexCoords[i].x = static_cast<float>(i) * Map::TILE_SIZE;
             coinTexCoords[i].y = 0;
           }
           coin.anims = {Frames(COIN_ANIM_FRAMES, 0.1f, coinTexCoords,
@@ -376,8 +379,8 @@ void GameScene::createEntities() {
           enemy.vel = glm::vec2(60.0f, 0.0f);
           enemy.dir = 1;
           enemy.tex = resourceManager.getEnemyTex();
-          enemy.w = ENEMY_SIZE;
-          enemy.h = ENEMY_SIZE;
+          enemy.w = static_cast<float>(ENEMY_SIZE);
+          enemy.h = static_cast<float>(ENEMY_SIZE);
           enemy.collider.x = 8.0f;
           enemy.collider.y = 13.0f;
           enemy.collider.w = enemy.w - 16;
@@ -386,7 +389,7 @@ void GameScene::createEntities() {
           constexpr size_t ENEMY_ANIM_FRAMES = 4;
           std::vector<glm::vec2> enemyTexCoords{ENEMY_ANIM_FRAMES};
           for (size_t i = 0; i < ENEMY_ANIM_FRAMES; i++) {
-            enemyTexCoords[i].x = i * ENEMY_SIZE;
+            enemyTexCoords[i].x = static_cast<float>(i * ENEMY_SIZE);
             enemyTexCoords[i].y = ENEMY_SIZE;
           }
           enemy.anims = {Frames(ENEMY_ANIM_FRAMES, 0.1f, enemyTexCoords,
@@ -440,10 +443,11 @@ void GameScene::update(float dt) {
 
 void GameScene::draw() {
   constexpr float parallaxFactor = -0.3f;
-  const SDL_FRect bgTexDst = {.x = parallaxFactor * cam.x,
-                              .y = -Map::TILE_SIZE,
-                              .w = mapBgLayer.getCols() * Map::TILE_SIZE,
-                              .h = mapBgLayer.getRows() * Map::TILE_SIZE};
+  const SDL_FRect bgTexDst = {
+      .x = parallaxFactor * cam.x,
+      .y = -Map::TILE_SIZE,
+      .w = static_cast<float>(mapBgLayer.getCols() * Map::TILE_SIZE),
+      .h = static_cast<float>(mapBgLayer.getRows() * Map::TILE_SIZE)};
   SDL_RenderTexture(sdlState.renderer, bgTex, nullptr, &bgTexDst);
 
   for (auto &staticTile : staticTiles) {

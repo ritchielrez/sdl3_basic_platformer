@@ -17,7 +17,7 @@ void Player::update(const SDLState& sdlState, SDL_FRect& cam,
                     const std::vector<DynTile>& dynTiles,
                     std::vector<Coin>& coins, size_t& collectedCoins,
                     const std::vector<Enemy>& enemies, float dt) {
-  float currDir = 0;
+  int16_t currDir = 0;
   if (sdlState.keys[SDL_SCANCODE_A]) {
     currDir -= 1;
   }
@@ -56,7 +56,7 @@ void Player::update(const SDLState& sdlState, SDL_FRect& cam,
 
       // NOTE: If `vel.x` and `dir` have different signs, their product is
       // less than zero.
-      if (vel.x * dir < 0 && grounded) {
+      if (vel.x * static_cast<float>(dir) < 0 && grounded) {
         currAnim = PlayerAnim::slide;
       }
       break;
@@ -64,16 +64,16 @@ void Player::update(const SDLState& sdlState, SDL_FRect& cam,
     case PlayerAnim::slide: {
       // NOTE: If `vel.x` and `currDir` have the same signs, their product is
       // greater than zero.
-      if (vel.x * currDir > 0 && grounded) {
+      if (vel.x * static_cast<float>(currDir) > 0 && grounded) {
         currAnim = PlayerAnim::run;
-      } else if (vel.x * currDir == 0 && grounded) {
+      } else if (vel.x * static_cast<float>(currDir) == 0 && grounded) {
         currAnim = PlayerAnim::idle;
       }
       break;
     }
   }
 
-  vel += currDir * accel * dt;
+  vel += static_cast<float>(currDir) * accel * dt;
   vel.x = glm::clamp(vel.x, -maxSpeedX, maxSpeedX);
 
   constexpr float gravity = 980.0f;
