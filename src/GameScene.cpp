@@ -1,5 +1,9 @@
 #include "GameScene.h"
 
+#include <sys/stat.h>
+
+#include <cstdint>
+
 #include "Map.h"
 
 void GameScene::createPlayer() {
@@ -34,7 +38,7 @@ void GameScene::createPlayer() {
   playerAnims[PlayerAnim::slide] = Frames(
       glm::vec2(2 * PLAYER_SIZE, 2 * PLAYER_SIZE), PLAYER_SIZE, PLAYER_SIZE);
 
-  player.pos = glm::vec2(0, sdlState.logicalHeight - 3 * PLAYER_SIZE);
+  player.pos = glm::vec2(0, SDLState::logicalHeight - 3 * PLAYER_SIZE);
   player.tex = resourceManager.getPlayerTex();
   player.maxSpeedX = 130.0f;
   player.jumpVel = -350.0f;
@@ -253,7 +257,7 @@ void GameScene::createEntities() {
           StaticTile staticTile{};
           staticTile.pos =
               glm::vec2(c * Map::TILE_SIZE,
-                        sdlState.logicalHeight -
+                        SDLState::logicalHeight -
                             (mapMidLayer.getRows() - r) * Map::TILE_SIZE);
           staticTile.tex = resourceManager.getWorldTex();
           staticTile.w = static_cast<float>(Map::TILE_SIZE);
@@ -271,7 +275,7 @@ void GameScene::createEntities() {
           StaticTile staticTile{};
           staticTile.pos =
               glm::vec2(c * Map::TILE_SIZE,
-                        sdlState.logicalHeight -
+                        SDLState::logicalHeight -
                             (mapMidLayer.getRows() - r) * Map::TILE_SIZE);
           staticTile.tex = resourceManager.getWorldTex();
           staticTile.w = static_cast<float>(Map::TILE_SIZE);
@@ -289,7 +293,7 @@ void GameScene::createEntities() {
           StaticTile staticTile{};
           staticTile.pos =
               glm::vec2(c * Map::TILE_SIZE,
-                        sdlState.logicalHeight -
+                        SDLState::logicalHeight -
                             (mapMidLayer.getRows() - r) * Map::TILE_SIZE);
           staticTile.tex = resourceManager.getWorldTex();
           staticTile.w = static_cast<float>(Map::TILE_SIZE);
@@ -307,7 +311,7 @@ void GameScene::createEntities() {
           StaticTile staticTile{};
           staticTile.pos =
               glm::vec2(c * Map::TILE_SIZE,
-                        sdlState.logicalHeight -
+                        SDLState::logicalHeight -
                             (mapMidLayer.getRows() - r) * Map::TILE_SIZE);
           staticTile.tex = resourceManager.getWorldTex();
           staticTile.w = static_cast<float>(Map::TILE_SIZE);
@@ -326,7 +330,7 @@ void GameScene::createEntities() {
           StaticTile staticTile{};
           staticTile.pos =
               glm::vec2(c * Map::TILE_SIZE,
-                        sdlState.logicalHeight -
+                        SDLState::logicalHeight -
                             (mapMidLayer.getRows() - r) * Map::TILE_SIZE);
           staticTile.tex = resourceManager.getPlatformTex();
           staticTile.w = static_cast<float>(Map::TILE_SIZE);
@@ -344,7 +348,7 @@ void GameScene::createEntities() {
           Coin coin{};
           coin.pos =
               glm::vec2(c * Map::TILE_SIZE,
-                        sdlState.logicalHeight -
+                        SDLState::logicalHeight -
                             (mapMidLayer.getRows() - r) * Map::TILE_SIZE);
           coin.tex = resourceManager.getCoinTex();
           coin.w = static_cast<float>(Map::TILE_SIZE);
@@ -373,8 +377,9 @@ void GameScene::createEntities() {
           // perfectly aligned with other tiles horizontally.
           enemy.pos =
               glm::vec2(c * Map::TILE_SIZE - 4,
-                        (sdlState.logicalHeight -
-                         (mapMidLayer.getRows() - r - 1) * Map::TILE_SIZE) -
+                        static_cast<float>(SDLState::logicalHeight -
+                                           (mapMidLayer.getRows() - r - 1) *
+                                               Map::TILE_SIZE) -
                             ENEMY_SIZE);
           enemy.vel = glm::vec2(60.0f, 0.0f);
           enemy.dir = 1;
