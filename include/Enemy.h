@@ -1,5 +1,7 @@
 #pragma once
 
+#include <SDL3/SDL.h>
+
 #include <glm/glm.hpp>
 #include <string>
 
@@ -14,8 +16,8 @@ struct Enemy : public Entity {
 
   void update(const std::vector<StaticTile>& staticTiles, float dt,
               const SDL_FRect& cam) {
-    if (pos.x > cam.x && pos.x < cam.x + cam.w && pos.y > cam.y &&
-        pos.y < cam.y + cam.h) {
+    const SDL_FRect enemyRect{.x = pos.x, .y = pos.y, .w = w, .h = h};
+    if (SDL_HasRectIntersectionFloat(&enemyRect, &cam)) {
       pos += vel * dt;
       collision(staticTiles);
     }
