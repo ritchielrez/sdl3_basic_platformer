@@ -41,8 +41,8 @@ void GameScene::createPlayer() {
 
   player.pos = glm::vec2(0, SDLState::logicalHeight - 3 * PLAYER_SIZE);
   player.tex = resourceManager.getPlayerTex();
-  player.maxSpeed.x= 130.0f;
-  player.maxSpeed.y= 500.0f;
+  player.maxSpeed.x = 130.0f;
+  player.maxSpeed.y = 500.0f;
   player.jumpVel = -350.0f;
   player.w = PLAYER_SIZE;
   player.h = static_cast<float>(PLAYER_SIZE);
@@ -398,7 +398,8 @@ void GameScene::createEntities() {
             enemyTexCoords[i].y = 32.0f;
           }
           enemy.anims = {Frames(ENEMY_ANIM_FRAMES, 0.1f, enemyTexCoords,
-                                enemy.w, enemy.h)};
+                                static_cast<uint16_t>(enemy.w),
+                                static_cast<uint16_t>(enemy.h))};
           enemy.currAnim = 0;
 
           enemies.push_back(enemy);
