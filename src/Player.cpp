@@ -137,7 +137,7 @@ void Player::collision(const std::vector<StaticTile>& staticTiles,
       if (SDL_GetRectIntersectionFloat(&playerCollider, &collidedRect,
                                        &intersectionRect)) {
         collided = true;
-        if (intersectionRect.w < intersectionRect.h) {
+        if (intersectionRect.w + 1.0f < intersectionRect.h) {
           if (step.x > 0) {
             pos.x -= intersectionRect.w;
           } else if (step.x < 0) {
