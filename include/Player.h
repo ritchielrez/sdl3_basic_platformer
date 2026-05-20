@@ -37,7 +37,8 @@ struct Player : public Entity {
               float dt);
   void collision(const std::vector<StaticTile>& staticTiles,
                  const std::vector<DynTile>& dynTiles, std::vector<Coin>& coins,
-                 size_t& collectedCoins, const std::vector<Enemy>& enemies);
+                 size_t& collectedCoins, const std::vector<Enemy>& enemies,
+                 float dt);
 
   [[nodiscard]] std::string inspect() const {
     std::string playerState{8, 0};
