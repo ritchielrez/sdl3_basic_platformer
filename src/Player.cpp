@@ -74,10 +74,11 @@ void Player::update(const SDLState& sdlState, SDL_FRect& cam,
   }
 
   vel += static_cast<float>(currDir) * accel * dt;
-  vel.x = glm::clamp(vel.x, -maxSpeedX, maxSpeedX);
+  vel.x = glm::clamp(vel.x, -maxSpeed.x, maxSpeed.x);
 
   constexpr float gravity = 980.0f;
   if (!grounded) vel.y += gravity * dt;
+  vel.y = glm::clamp(vel.y, -maxSpeed.y, maxSpeed.y);
 
   pos += vel * dt;
   collision(staticTiles, dynTiles, coins, collectedCoins, enemies);

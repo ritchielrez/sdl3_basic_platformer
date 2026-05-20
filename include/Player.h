@@ -18,14 +18,14 @@ enum { idle, run, jump, slide };
 struct Player : public Entity {
   glm::vec2 accel;
   float jumpVel, gravVel;
-  float maxSpeedX;
+  glm::vec2 maxSpeed;
   bool collided, death, grounded, passedCamRuler;
 
   Player()
       : accel(glm::vec2(0)),
         jumpVel(0),
         gravVel(0),
-        maxSpeedX(0),
+        maxSpeed(glm::vec2(0, 0)),
         collided(false),
         death(false),
         grounded(false),
