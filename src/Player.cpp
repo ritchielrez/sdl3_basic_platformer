@@ -151,7 +151,7 @@ void Player::collision(const std::vector<StaticTile>& staticTiles,
     groundSensor.h = 1;
 
     if (SDL_GetRectIntersectionFloat(&groundSensor, &collidedRect,
-                                     &intersectionRect)) {
+                                     &intersectionRect) && intersectionRect.w > intersectionRect.h) {
       foundGround = true;
     }
   }
