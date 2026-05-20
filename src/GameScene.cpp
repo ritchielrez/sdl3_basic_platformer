@@ -420,6 +420,8 @@ void GameScene::createEntities() {
 }
 
 void GameScene::update(float dt) {
+  dt = glm::min(dt, maxPhysicsDt);
+
   // Only animate the player if the current animation has multiple frames.
   // If it has one frame, the timer length/duration is set to 0.
   if (player.anims[player.currAnim].getLen() != 0) {
