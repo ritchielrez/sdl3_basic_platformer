@@ -247,8 +247,6 @@ void GameScene::createEntities() {
   dynTiles.reserve(10);
   coins.reserve(100);
 
-  constexpr uint16_t ENEMY_SIZE = 24;
-
   // `mapMidLayer` refers to the layer of the level map that defines the
   // player interactable tiles.
   for (size_t r = 0; r < mapMidLayer.getRows(); r++) {
@@ -376,17 +374,17 @@ void GameScene::createEntities() {
           Enemy enemy{};
           // NOTE: Subtracting by 4 pixels allows the enemy tile to be
           // perfectly aligned with other tiles horizontally.
+          enemy.w = 24.0f;
+          enemy.h = 16.0f;
           enemy.pos =
               glm::vec2(c * Map::TILE_SIZE - 4,
                         static_cast<float>(SDLState::logicalHeight -
                                            (mapMidLayer.getRows() - r - 1) *
                                                Map::TILE_SIZE) -
-                            ENEMY_SIZE);
+                            enemy.h);
           enemy.vel = glm::vec2(60.0f, 0.0f);
           enemy.dir = 1;
           enemy.tex = resourceManager.getEnemyTex();
-          enemy.w = static_cast<float>(ENEMY_SIZE);
-          enemy.h = static_cast<float>(ENEMY_SIZE);
           enemy.collider.x = 8.0f;
           enemy.collider.y = 13.0f;
           enemy.collider.w = enemy.w - 16;
@@ -395,11 +393,11 @@ void GameScene::createEntities() {
           constexpr size_t ENEMY_ANIM_FRAMES = 4;
           std::vector<glm::vec2> enemyTexCoords{ENEMY_ANIM_FRAMES};
           for (size_t i = 0; i < ENEMY_ANIM_FRAMES; i++) {
-            enemyTexCoords[i].x = static_cast<float>(i * ENEMY_SIZE);
-            enemyTexCoords[i].y = ENEMY_SIZE;
+            enemyTexCoords[i].x = static_cast<float>(i * enemy.w);
+            enemyTexCoords[i].y = 32.0f;
           }
           enemy.anims = {Frames(ENEMY_ANIM_FRAMES, 0.1f, enemyTexCoords,
-                                ENEMY_SIZE, ENEMY_SIZE)};
+                                enemy.w, enemy.h)};
           enemy.currAnim = 0;
 
           enemies.push_back(enemy);
