@@ -11,9 +11,10 @@
 
 class Text {
   TTF_Text *ttfText;
-  glm::vec2 pos;
 
  public:
+  glm::vec2 pos;
+
   Text() : ttfText(nullptr), pos(glm::vec2(0, 0)) {}
   Text(const SDLState &sdlState, const std::string_view str,
        const glm::vec2 &pos)
@@ -40,6 +41,12 @@ class Text {
 
   void assign(const std::string_view str) {
     TTF_SetTextString(ttfText, str.data(), str.size());
+  }
+
+  void getSize(int *w, int *h) const { TTF_GetTextSize(ttfText, w, h); }
+
+  void setColor(uint8_t r, uint8_t g, uint8_t b, uint8_t a = 255) {
+    TTF_SetTextColor(ttfText, r, g, b, a);
   }
 
   void draw() const { TTF_DrawRendererText(ttfText, pos.x, pos.y); }
