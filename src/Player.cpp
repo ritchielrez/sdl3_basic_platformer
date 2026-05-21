@@ -7,6 +7,7 @@
 #include "Coin.h"
 #include "DynTile.h"
 #include "Enemy.h"
+#include "Map.h"
 #include "StaticTile.h"
 
 #define GLM_ENABLE_EXPERIMENTAL
@@ -81,7 +82,16 @@ void Player::update(const SDLState& sdlState, SDL_FRect& cam,
   constexpr float gravity = 980.0f;
   if (!grounded) vel.y += gravity * dt;
 
-  pos += vel * dt;
+  glm::vec2 velFrame = vel * dt;
+
+  if (velFrame.x >= Map::TILE_SIZE) {
+    velFrame.x = Map::TILE_SIZE - 1;
+  }
+  if (velFrame.y >= Map::TILE_SIZE) {
+    velFrame.y = Map::TILE_SIZE - 1;
+  }
+
+  pos += velFrame;
   collision(staticTiles, dynTiles, coins, collectedCoins, enemies);
 
   float camRuler = (SDLState::logicalWidth - w) / 2;
