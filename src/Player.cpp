@@ -76,13 +76,13 @@ void Player::update(const SDLState& sdlState, SDL_FRect& cam,
   }
 
   vel += static_cast<float>(currDir) * accel * dt;
-  vel.x = glm::clamp(vel.x, -maxSpeed.x, maxSpeed.x);
+  vel.x = glm::clamp(vel.x, -maxSpeedX, maxSpeedX);
 
   constexpr float gravity = 980.0f;
   if (!grounded) vel.y += gravity * dt;
-  vel.y = glm::clamp(vel.y, -maxSpeed.y, maxSpeed.y);
 
-  collision(staticTiles, dynTiles, coins, collectedCoins, enemies, dt);
+  pos += vel * dt;
+  collision(staticTiles, dynTiles, coins, collectedCoins, enemies);
 
   float camRuler = (SDLState::logicalWidth - w) / 2;
 
@@ -106,7 +106,7 @@ void Player::update(const SDLState& sdlState, SDL_FRect& cam,
 void Player::collision(const std::vector<StaticTile>& staticTiles,
                        const std::vector<DynTile>& dynTiles,
                        std::vector<Coin>& coins, size_t& collectedCoins,
-                       const std::vector<Enemy>& enemies, float dt) {
+                       const std::vector<Enemy>& enemies) {
   SDL_FRect playerCollider{.x = pos.x + collider.x,
                            .y = pos.y + collider.y,
                            .w = collider.w,
@@ -118,106 +118,90 @@ void Player::collision(const std::vector<StaticTile>& staticTiles,
   collided = false;
   bool foundGround = false;
 
-  glm::vec2 step{0.0f};
-  constexpr uint16_t ITERATIONS = 100;
-  step.x = (vel.x * dt) / static_cast<float>(ITERATIONS);
-  step.y = (vel.y * dt) / static_cast<float>(ITERATIONS);
+  for (auto& staticTile : staticTiles) {
+    collidedRect.x = staticTile.pos.x + staticTile.collider.x;
+    collidedRect.y = staticTile.pos.y + staticTile.collider.y;
+    collidedRect.w = staticTile.collider.w;
+    collidedRect.h = staticTile.collider.h;
 
-  for (size_t i = 0; i < ITERATIONS; ++i) {
-    pos += step;
+    if (SDL_GetRectIntersectionFloat(&playerCollider, &collidedRect,
+                                     &intersectionRect)) {
+      collided = true;
+
+      if (intersectionRect.w > intersectionRect.h) {
+        if (vel.y > 0) {
+          pos.y -= intersectionRect.h;
+        } else if (vel.y < 0) {
+          pos.y += intersectionRect.h;
+        }
+        vel.y = 0;
+      } else {
+        if (vel.x > 0) {
+          pos.x -= intersectionRect.w;
+        } else if (vel.x < 0) {
+          pos.x += intersectionRect.w;
+        }
+        vel.x = 0;
+      }
+    }
+
+    // Recalculate playerCollider after the player has moved due to collision.
     playerCollider.x = pos.x + collider.x;
     playerCollider.y = pos.y + collider.y;
 
-    for (auto& staticTile : staticTiles) {
-      collidedRect.x = staticTile.pos.x + staticTile.collider.x;
-      collidedRect.y = staticTile.pos.y + staticTile.collider.y;
-      collidedRect.w = staticTile.collider.w;
-      collidedRect.h = staticTile.collider.h;
+    groundSensor.x = playerCollider.x;
+    groundSensor.y = playerCollider.y + playerCollider.h;
+    groundSensor.w = playerCollider.w;
+    groundSensor.h = 1;
 
-      if (SDL_GetRectIntersectionFloat(&playerCollider, &collidedRect,
-                                       &intersectionRect)) {
-        collided = true;
-
-        float dx = (collidedRect.x + collidedRect.w / 2.0f) - (playerCollider.x + playerCollider.w / 2.0f);
-        float dy = (collidedRect.y + collidedRect.h / 2.0f) - (playerCollider.y + playerCollider.h / 2.0f);
-
-        if (glm::abs(dx) < glm::abs(dy)) {
-          if (step.y > 0) {
-            pos.y -= intersectionRect.h;
-          } else if (step.y < 0) {
-            pos.y += intersectionRect.h;
-          }
-          step.y = 0;
-          vel.y = 0;
-        } else {
-          if (step.x > 0) {
-            pos.x -= intersectionRect.w;
-          } else if (step.x < 0) {
-            pos.x += intersectionRect.w;
-          }
-          step.x = 0;
-          vel.x = 0;
-        }
-      }
-
-      // Recalculate playerCollider after the player has moved due to collision.
-      playerCollider.x = pos.x + collider.x;
-      playerCollider.y = pos.y + collider.y;
-
-      groundSensor.x = playerCollider.x;
-      groundSensor.y = playerCollider.y + playerCollider.h;
-      groundSensor.w = playerCollider.w;
-      groundSensor.h = 1;
-
-      if (SDL_GetRectIntersectionFloat(&groundSensor, &collidedRect,
-                                       &intersectionRect) &&
-          intersectionRect.w > intersectionRect.h) {
-        foundGround = true;
-      }
+    if (SDL_GetRectIntersectionFloat(&groundSensor, &collidedRect,
+                                     &intersectionRect) &&
+        intersectionRect.w > intersectionRect.h) {
+      foundGround = true;
     }
+  }
 
-    for (auto& dynTile : dynTiles) {
-      collidedRect.x = dynTile.pos.x + dynTile.collider.x;
-      collidedRect.y = dynTile.pos.y + dynTile.collider.y;
-      collidedRect.w = dynTile.collider.w;
-      collidedRect.h = dynTile.collider.h;
+  for (auto& dynTile : dynTiles) {
+    collidedRect.x = dynTile.pos.x + dynTile.collider.x;
+    collidedRect.y = dynTile.pos.y + dynTile.collider.y;
+    collidedRect.w = dynTile.collider.w;
+    collidedRect.h = dynTile.collider.h;
 
-      // TODO: Implement collision behaviour of player with moving platform
-      // tiles.
-      if (SDL_GetRectIntersectionFloat(&playerCollider, &collidedRect,
-                                       &intersectionRect)) {
-        collided = true;
-      }
+    // TODO: Implement collision behaviour of player with moving platform
+    // tiles.
+    if (SDL_GetRectIntersectionFloat(&playerCollider, &collidedRect,
+                                     &intersectionRect)) {
+      collided = true;
     }
+  }
 
-    for (size_t j = 0; j < coins.size();) {
-      collidedRect.x = coins[j].pos.x + coins[j].collider.x;
-      collidedRect.y = coins[j].pos.y + coins[j].collider.y;
-      collidedRect.w = coins[j].collider.w;
-      collidedRect.h = coins[j].collider.h;
+  for (size_t j = 0; j < coins.size();) {
+    collidedRect.x = coins[j].pos.x + coins[j].collider.x;
+    collidedRect.y = coins[j].pos.y + coins[j].collider.y;
+    collidedRect.w = coins[j].collider.w;
+    collidedRect.h = coins[j].collider.h;
 
-      if (SDL_GetRectIntersectionFloat(&playerCollider, &collidedRect,
-                                       &intersectionRect)) {
-        collided = true;
-        coins[j] = coins.back();
-        coins.pop_back();
-        collectedCoins++;
-      } else {
-        j++;
-      }
+    if (SDL_GetRectIntersectionFloat(&playerCollider, &collidedRect,
+                                     &intersectionRect)) {
+      collided = true;
+      coins[j] = coins.back();
+      coins.pop_back();
+      collectedCoins++;
+    } else {
+      j++;
     }
+  }
 
-    for (auto& enemy : enemies) {
-      collidedRect.x = enemy.pos.x + enemy.collider.x;
-      collidedRect.y = enemy.pos.y + enemy.collider.y;
-      collidedRect.w = enemy.collider.w;
-      collidedRect.h = enemy.collider.h;
+  for (auto& enemy : enemies) {
+    collidedRect.x = enemy.pos.x + enemy.collider.x;
+    collidedRect.y = enemy.pos.y + enemy.collider.y;
+    collidedRect.w = enemy.collider.w;
+    collidedRect.h = enemy.collider.h;
 
-      if (SDL_GetRectIntersectionFloat(&playerCollider, &collidedRect,
-                                       &intersectionRect)) {
-        collided = true;
-        death = true;
-      }
+    if (SDL_GetRectIntersectionFloat(&playerCollider, &collidedRect,
+                                     &intersectionRect)) {
+      collided = true;
+      death = true;
     }
   }
 

@@ -18,14 +18,14 @@ enum { idle, run, jump, slide };
 struct Player : public Entity {
   glm::vec2 accel;
   float jumpVel, gravVel;
-  glm::vec2 maxSpeed;
+  float maxSpeedX;
   bool collided, death, grounded, passedCamRuler;
 
   Player()
       : accel(glm::vec2(0)),
         jumpVel(0),
         gravVel(0),
-        maxSpeed(glm::vec2(0, 0)),
+        maxSpeedX(0),
         collided(false),
         death(false),
         grounded(false),
@@ -37,8 +37,7 @@ struct Player : public Entity {
               float dt);
   void collision(const std::vector<StaticTile>& staticTiles,
                  const std::vector<DynTile>& dynTiles, std::vector<Coin>& coins,
-                 size_t& collectedCoins, const std::vector<Enemy>& enemies,
-                 float dt);
+                 size_t& collectedCoins, const std::vector<Enemy>& enemies);
 
   [[nodiscard]] std::string inspect() const {
     std::string playerState{8, 0};

@@ -16,7 +16,7 @@
 struct GameScene {
   const SDLState &sdlState;
   const ResourceManager &resourceManager;
-  static constexpr float maxPhysicsDt = 0.1f;
+  static constexpr float maxPhysicsDt = 0.017f;
   Map mapBgLayer;
   Map mapMidLayer;
   Player player{};
