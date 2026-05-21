@@ -119,7 +119,7 @@ void Player::collision(const std::vector<StaticTile>& staticTiles,
   bool foundGround = false;
 
   glm::vec2 step{0.0f};
-  constexpr uint16_t ITERATIONS = 32;
+  constexpr uint16_t ITERATIONS = 100;
   step.x = (vel.x * dt) / static_cast<float>(ITERATIONS);
   step.y = (vel.y * dt) / static_cast<float>(ITERATIONS);
 
