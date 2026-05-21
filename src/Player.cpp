@@ -137,20 +137,26 @@ void Player::collision(const std::vector<StaticTile>& staticTiles,
       if (SDL_GetRectIntersectionFloat(&playerCollider, &collidedRect,
                                        &intersectionRect)) {
         collided = true;
-        if (intersectionRect.w + 1.0f < intersectionRect.h) {
-          if (step.x > 0) {
-            pos.x -= intersectionRect.w;
-          } else if (step.x < 0) {
-            pos.x += intersectionRect.w;
-          }
-          step.x = 0;
-        } else {
+
+        float dx = (collidedRect.x + collidedRect.w / 2.0f) - (playerCollider.x + playerCollider.w / 2.0f);
+        float dy = (collidedRect.y + collidedRect.h / 2.0f) - (playerCollider.y + playerCollider.h / 2.0f);
+
+        if (glm::abs(dx) < glm::abs(dy)) {
           if (step.y > 0) {
             pos.y -= intersectionRect.h;
           } else if (step.y < 0) {
             pos.y += intersectionRect.h;
           }
           step.y = 0;
+          vel.y = 0;
+        } else {
+          if (step.x > 0) {
+            pos.x -= intersectionRect.w;
+          } else if (step.x < 0) {
+            pos.x += intersectionRect.w;
+          }
+          step.x = 0;
+          vel.x = 0;
         }
       }
 
