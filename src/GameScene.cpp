@@ -42,6 +42,7 @@ void GameScene::createPlayer() {
   player.pos = glm::vec2(0, SDLState::logicalHeight - 3 * PLAYER_SIZE);
   player.tex = resourceManager.getPlayerTex();
   player.maxSpeedX = 130.0f;
+  player.dashSpeed = 100.0f;
   player.jumpVel = -350.0f;
   player.w = PLAYER_SIZE;
   player.h = static_cast<float>(PLAYER_SIZE);

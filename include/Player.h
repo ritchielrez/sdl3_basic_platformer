@@ -17,19 +17,22 @@ enum { idle, run, jump, slide };
 
 struct Player : public Entity {
   glm::vec2 accel;
-  float jumpVel, gravVel;
-  float maxSpeedX;
-  bool collided, death, grounded, passedCamRuler;
+  float jumpVel, gravVel, maxSpeedX, dashSpeed;
+  bool collided, death, grounded, passedCamRuler, canDash;
+  Timer dashDuration, dashCooldown;
 
   Player()
       : accel(glm::vec2(0)),
         jumpVel(0),
         gravVel(0),
         maxSpeedX(0),
+        dashSpeed(0),
         collided(false),
         death(false),
         grounded(false),
-        passedCamRuler(false) {}
+        passedCamRuler(false),
+        dashDuration(0.5f),
+        dashCooldown(0.2f) {}
   void update(const SDLState& sdlState, SDL_FRect& cam,
               const std::vector<StaticTile>& staticTiles,
               const std::vector<DynTile>& dynTiles, std::vector<Coin>& coins,
@@ -61,7 +64,10 @@ struct Player : public Entity {
     }
     return fmt::format(
         "Position: ({}, {})\nVelocity: ({}, {})\nState: {}\nCollision: "
-        "{}\nGrounded: {}\n",
-        pos.x, pos.y, vel.x, vel.y, playerState, collided, grounded);
+        "{}\nGrounded: {}\nDash duration active: {}\nDash cooldown active: "
+        "{}\n",
+        pos.x, pos.y, vel.x, vel.y, playerState, collided, grounded,
+        dashDuration.isStarted() && !dashDuration.isTimeOut(),
+        dashCooldown.isStarted() && !dashCooldown.isTimeOut());
   }
 };

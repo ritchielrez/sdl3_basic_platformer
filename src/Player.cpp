@@ -36,6 +36,24 @@ void Player::update(const SDLState& sdlState, SDL_FRect& cam,
     currAnim = PlayerAnim::jump;
   }
 
+  if (dashCooldown.isStarted() && !dashCooldown.isTimeOut()) {
+    dashCooldown.step(dt);
+  }
+
+  if (currAnim == PlayerAnim::run &&
+      (!dashCooldown.isStarted() || dashCooldown.isTimeOut()) &&
+      sdlState.keys[SDL_SCANCODE_LSHIFT]) {
+    dashDuration.reset();
+    dashCooldown.reset();
+    dashDuration.step(dt);
+    dashCooldown.step(dt);
+  }
+
+  if (dashDuration.isStarted() && !dashDuration.isTimeOut()) {
+    vel.x += dir * dashSpeed * dt;
+    dashDuration.step(dt);
+  }
+
   switch (currAnim) {
     case PlayerAnim::idle: {
       if (currDir != 0) {
@@ -77,16 +95,18 @@ void Player::update(const SDLState& sdlState, SDL_FRect& cam,
   }
 
   vel += static_cast<float>(currDir) * accel * dt;
-  vel.x = glm::clamp(vel.x, -maxSpeedX, maxSpeedX);
+
+  if (!dashDuration.isStarted() || dashDuration.isTimeOut()) {
+    vel.x = glm::clamp(vel.x, -maxSpeedX, maxSpeedX);
+  } else {
+    vel.x = glm::clamp(vel.x, -maxSpeedX - dashSpeed, maxSpeedX + dashSpeed);
+  }
 
   constexpr float gravity = 980.0f;
   if (!grounded) vel.y += gravity * dt;
 
   glm::vec2 velFrame = vel * dt;
 
-  if (velFrame.x >= Map::TILE_SIZE) {
-    velFrame.x = Map::TILE_SIZE - 1;
-  }
   if (velFrame.y >= Map::TILE_SIZE) {
     velFrame.y = Map::TILE_SIZE - 1;
   }
@@ -94,13 +114,29 @@ void Player::update(const SDLState& sdlState, SDL_FRect& cam,
   pos += velFrame;
   collision(staticTiles, dynTiles, coins, collectedCoins, enemies);
 
+  // --- Horizontal Camera System ---
+  // The 'camRuler' is the point where the player is exactly in the center of
+  // the screen.
   float camRuler = (SDLState::logicalWidth - w) / 2;
+  constexpr float camXSmoothness = 4.0f;
+  float targetX = pos.x - camRuler;
 
+  // Velocity Look-Ahead:
+  // Standard lerp smoothing causes a steady-state lag where the camera trails
+  // the player. We offset the target by a fraction of the velocity to
+  // compensate. Using 0.12f allows the player to "lead" the camera slightly
+  // during high-speed bursts (like dashing), making the speed visible, while
+  // still centering them at normal speeds.
+  targetX += vel.x * 0.12f;
+
+  // Threshold Logic: The camera stays at 0 until the player first reaches the
+  // center of the screen, after which it begins smooth tracking.
   if (!passedCamRuler && pos.x >= camRuler) passedCamRuler = true;
-  if (passedCamRuler && pos.x >= camRuler) {
-    cam.x = pos.x - camRuler;
+  if (passedCamRuler) {
+    cam.x = glm::lerp(cam.x, targetX, camXSmoothness * dt);
   }
 
+  // --- Vertical Camera System ---
   // If the player is close to the top of the screen, then move the camera up
   // slightly so it does not look like the player is touching the ceiling or
   // going beyond it.
