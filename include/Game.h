@@ -73,6 +73,8 @@ struct Game {
 #ifdef DEBUG
         if (debug) ImGui_ImplSDL3_ProcessEvent(&event);
 #endif
+        sceneManager.handleEvent(event);
+
         switch (event.type) {
           // If the user clicked on the close button stop running the game.
           case SDL_EVENT_QUIT: {
@@ -99,6 +101,10 @@ struct Game {
             break;
           }
         }
+      }
+
+      if (sceneManager.startScene.shouldQuit) {
+        running = false;
       }
 
       // Create a shorthand alias for player.

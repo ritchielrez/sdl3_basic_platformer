@@ -7,18 +7,18 @@
 #include "SDLState.h"
 #include "Text.h"
 
-namespace StartSceneButtons {
+namespace StartSceneBtns {
 enum {
   PLAY,
   EXIT,
 };
-}  // namespace StartSceneButtons
+}  // namespace StartSceneBtns
 
 class StartScene {
   const SDLState &sdlState;
   Text playText;
   Text exitText;
-  uint8_t selectedButton = StartSceneButtons::PLAY;
+  uint8_t selectedBtn;
 
  public:
   bool shouldStartGame = false;
@@ -27,47 +27,51 @@ class StartScene {
   StartScene(const SDLState &sdlState)
       : sdlState(sdlState),
         playText(sdlState, "Play", glm::vec2(0)),
-        exitText(sdlState, "Exit", glm::vec2(0)) {
-    int pw, ph, ew, eh;
-    playText.getSize(&pw, &ph);
-    exitText.getSize(&ew, &eh);
+        exitText(sdlState, "Exit", glm::vec2(0)),
+        selectedBtn(StartSceneBtns::PLAY) {
+    int playTextWidth, playTextHeight, exitTextWidth, exitTextHeight;
+    playText.getSize(&playTextWidth, &playTextHeight);
+    exitText.getSize(&exitTextWidth, &exitTextHeight);
 
     // Center horizontally, space vertically in the middle
-    playText.pos = {(SDLState::logicalWidth - pw) / 2.0f,
-                    (SDLState::logicalHeight / 2.0f) - ph};
-    exitText.pos = {(SDLState::logicalWidth - ew) / 2.0f,
-                    (SDLState::logicalHeight / 2.0f) + 10.0f};
+    playText.pos = {
+        (SDLState::logicalWidth - static_cast<float>(playTextWidth)) / 2.0f,
+        (SDLState::logicalHeight / 2.0f) - static_cast<float>(playTextHeight)};
+    exitText.pos = {
+        (SDLState::logicalWidth - static_cast<float>(exitTextWidth)) / 2.0f,
+        (SDLState::logicalHeight / 2.0f) + 10.0f};
   }
 
-  void update(float dt) {
-    float mx, my;
-    SDL_GetMouseState(&mx, &my);
-
-    // Convert screen coordinates to logical coordinates for hit testing
-    // However, SDL3's logical presentation usually handles this if we use the
-    // right event values. For manual GetMouseState, we might need to scale, but
-    // SDL_GetMouseState in SDL3 often returns values in the logical coordinate
-    // space if configured. Let's assume logical coordinates for now as SDLState
-    // sets up logical presentation.
+  void update([[maybe_unused]] float dt) {
+    float windowMouseX, windowMouseY;
+    SDL_GetMouseState(&windowMouseX, &windowMouseY);
+    float mouseX = windowMouseX;
+    float mouseY = windowMouseY;
+    SDL_RenderCoordinatesFromWindow(sdlState.renderer, windowMouseX,
+                                    windowMouseY, &mouseX, &mouseY);
 
     // Check hover for Play
-    int pw, ph;
-    playText.getSize(&pw, &ph);
-    if (mx >= playText.pos.x && mx <= playText.pos.x + pw &&
-        my >= playText.pos.y && my <= playText.pos.y + ph) {
-      selectedButton = 0;
+    int playTextWidth, playTextHeight;
+    playText.getSize(&playTextWidth, &playTextHeight);
+    if (mouseX >= playText.pos.x &&
+        mouseX <= playText.pos.x + static_cast<float>(playTextWidth) &&
+        mouseY >= playText.pos.y &&
+        mouseY <= playText.pos.y + static_cast<float>(playTextHeight)) {
+      selectedBtn = 0;
     }
 
     // Check hover for Exit
-    int ew, eh;
-    exitText.getSize(&ew, &eh);
-    if (mx >= exitText.pos.x && mx <= exitText.pos.x + ew &&
-        my >= exitText.pos.y && my <= exitText.pos.y + eh) {
-      selectedButton = 1;
+    int exitTextWidth, exitTextHeight;
+    exitText.getSize(&exitTextWidth, &exitTextHeight);
+    if (mouseX >= exitText.pos.x &&
+        mouseX <= exitText.pos.x + static_cast<float>(exitTextWidth) &&
+        mouseY >= exitText.pos.y &&
+        mouseY <= exitText.pos.y + static_cast<float>(exitTextHeight)) {
+      selectedBtn = 1;
     }
 
     // Update colors based on selection
-    if (selectedButton == 0) {
+    if (selectedBtn == 0) {
       playText.setColor(255, 255, 0);    // Yellow
       exitText.setColor(255, 255, 255);  // White
     } else {
@@ -81,15 +85,15 @@ class StartScene {
       switch (event.key.scancode) {
         case SDL_SCANCODE_UP:
         case SDL_SCANCODE_W:
-          selectedButton = 0;
+          selectedBtn = 0;
           break;
         case SDL_SCANCODE_DOWN:
         case SDL_SCANCODE_S:
-          selectedButton = 1;
+          selectedBtn = 1;
           break;
         case SDL_SCANCODE_RETURN:
         case SDL_SCANCODE_SPACE:
-          if (selectedButton == 0)
+          if (selectedBtn == 0)
             shouldStartGame = true;
           else
             shouldQuit = true;
@@ -99,18 +103,28 @@ class StartScene {
       }
     } else if (event.type == SDL_EVENT_MOUSE_BUTTON_DOWN) {
       if (event.button.button == SDL_BUTTON_LEFT) {
-        float mx = event.button.x;
-        float my = event.button.y;
+        float windowMouseX = event.button.x;
+        float windowMouseY = event.button.y;
+        float mouseX = windowMouseX;
+        float mouseY = windowMouseY;
+        SDL_RenderCoordinatesFromWindow(sdlState.renderer, windowMouseX,
+                                        windowMouseY, &mouseX, &mouseY);
 
-        int pw, ph, ew, eh;
-        playText.getSize(&pw, &ph);
-        exitText.getSize(&ew, &eh);
+        int playTextWidth, playTextHeight, exitTextWidth, exitTextHeight;
+        playText.getSize(&playTextWidth, &playTextHeight);
+        exitText.getSize(&exitTextWidth, &exitTextHeight);
 
-        if (mx >= playText.pos.x && mx <= playText.pos.x + pw &&
-            my >= playText.pos.y && my <= playText.pos.y + ph) {
+        if (mouseX >= playText.pos.x &&
+            mouseX <= playText.pos.x + static_cast<float>(playTextWidth) &&
+            mouseY >= playText.pos.y &&
+            mouseY <= playText.pos.y + static_cast<float>(playTextHeight)) {
           shouldStartGame = true;
-        } else if (mx >= exitText.pos.x && mx <= exitText.pos.x + ew &&
-                   my >= exitText.pos.y && my <= exitText.pos.y + eh) {
+        } else if (mouseX >= exitText.pos.x &&
+                   mouseX <=
+                       exitText.pos.x + static_cast<float>(exitTextWidth) &&
+                   mouseY >= exitText.pos.y &&
+                   mouseY <=
+                       exitText.pos.y + static_cast<float>(exitTextHeight)) {
           shouldQuit = true;
         }
       }

@@ -21,29 +21,48 @@ class SceneManager {
   DeathScene deathScene;
 
   SceneManager(const SDLState &sdlState, const ResourceManager &resourceManager)
-      : sceneType(SceneType::game),
-        startScene(),
+      : sceneType(SceneType::start),
+        startScene(sdlState),
         gameScene(sdlState, resourceManager),
         deathScene(sdlState) {}
 
   void update(float dt) {
     switch (sceneType) {
-      case SceneType::start:
-        // startScene.update(dt);
+      case SceneType::start: {
+        startScene.update(dt);
+        if (startScene.shouldStartGame) {
+          gameScene.reset();
+          sceneType = SceneType::game;
+          startScene.shouldStartGame = false;
+        }
         break;
-      case SceneType::game:
+      }
+      case SceneType::game: {
         gameScene.update(dt);
         if (gameScene.player.death) sceneType = SceneType::death;
         break;
-      case SceneType::death:
-        // deathScene.update(dt);
+      }
+      case SceneType::death: {
+        deathScene.update(dt);
+        break;
+      }
+    }
+  }
+
+  void handleEvent(const SDL_Event &event) {
+    switch (sceneType) {
+      case SceneType::start:
+        startScene.handleEvent(event);
+        break;
+      default:
         break;
     }
   }
+
   void draw() {
     switch (sceneType) {
       case SceneType::start:
-        // startScene.draw();
+        startScene.draw();
         break;
       case SceneType::game:
         gameScene.draw();
