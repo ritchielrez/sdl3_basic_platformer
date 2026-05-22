@@ -133,7 +133,11 @@ void Player::update(const SDLState& sdlState, SDL_FRect& cam,
   // center of the screen, after which it begins smooth tracking.
   if (!passedCamRuler && pos.x >= camRuler) passedCamRuler = true;
   if (passedCamRuler) {
-    cam.x = glm::lerp(cam.x, targetX, camXSmoothness * dt);
+    if (pos.x >= camRuler) {
+      cam.x = glm::lerp(cam.x, targetX, camXSmoothness * dt);
+    } else {
+      cam.x = glm::lerp(cam.x, 0.0f, camXSmoothness * dt);
+    }
   }
 
   // --- Vertical Camera System ---
