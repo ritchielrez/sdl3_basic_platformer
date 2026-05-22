@@ -394,7 +394,7 @@ void GameScene::createEntities() {
           constexpr size_t ENEMY_ANIM_FRAMES = 4;
           std::vector<glm::vec2> enemyTexCoords{ENEMY_ANIM_FRAMES};
           for (size_t i = 0; i < ENEMY_ANIM_FRAMES; i++) {
-            enemyTexCoords[i].x = static_cast<float>(i * enemy.w);
+            enemyTexCoords[i].x = static_cast<float>(i) * enemy.w;
             enemyTexCoords[i].y = 32.0f;
           }
           enemy.anims = {Frames(ENEMY_ANIM_FRAMES, 0.1f, enemyTexCoords,

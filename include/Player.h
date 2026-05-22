@@ -18,7 +18,7 @@ enum { idle, run, jump, slide };
 struct Player : public Entity {
   glm::vec2 accel;
   float jumpVel, gravVel, maxSpeedX, dashSpeed;
-  bool collided, death, grounded, passedCamRuler, canDash;
+  bool collided, death, grounded, passedCamRuler;
   Timer dashDuration, dashCooldown;
 
   Player()

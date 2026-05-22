@@ -50,7 +50,7 @@ void Player::update(const SDLState& sdlState, SDL_FRect& cam,
   }
 
   if (dashDuration.isStarted() && !dashDuration.isTimeOut()) {
-    vel.x += dir * dashSpeed * dt;
+    vel.x += static_cast<float>(dir) * dashSpeed * dt;
     dashDuration.step(dt);
   }
 
