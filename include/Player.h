@@ -31,7 +31,7 @@ struct Player : public Entity {
         death(false),
         grounded(false),
         passedCamRuler(false),
-        dashDuration(0.5f),
+        dashDuration(0.25f),
         dashCooldown(0.2f) {}
   void update(const SDLState& sdlState, SDL_FRect& cam,
               const std::vector<StaticTile>& staticTiles,

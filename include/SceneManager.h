@@ -31,7 +31,6 @@ class SceneManager {
       case SceneType::start: {
         startScene.update(dt);
         if (startScene.shouldStartGame) {
-          gameScene.reset();
           sceneType = SceneType::game;
           startScene.shouldStartGame = false;
         }
@@ -44,6 +43,14 @@ class SceneManager {
       }
       case SceneType::death: {
         deathScene.update(dt);
+        if (deathScene.shouldRetry) {
+          gameScene.reset();
+          sceneType = SceneType::game;
+          deathScene.shouldRetry = false;
+        } else if (deathScene.shouldBeBackToStart) {
+          sceneType = SceneType::start;
+          deathScene.shouldBeBackToStart = false;
+        }
         break;
       }
     }
@@ -53,6 +60,9 @@ class SceneManager {
     switch (sceneType) {
       case SceneType::start:
         startScene.handleEvent(event);
+        break;
+      case SceneType::death:
+        deathScene.handleEvent(event);
         break;
       default:
         break;

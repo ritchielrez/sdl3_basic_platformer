@@ -20,17 +20,6 @@ void Player::update(const SDLState& sdlState, SDL_FRect& cam,
                     const std::vector<DynTile>& dynTiles,
                     std::vector<Coin>& coins, size_t& collectedCoins,
                     const std::vector<Enemy>& enemies, float dt) {
-  int16_t currDir = 0;
-  if (sdlState.keys[SDL_SCANCODE_A]) {
-    currDir -= 1;
-  }
-  if (sdlState.keys[SDL_SCANCODE_D]) {
-    currDir += 1;
-  }
-  if (currDir != 0) {
-    dir = currDir;
-  }
-
   if (grounded && sdlState.keys[SDL_SCANCODE_SPACE]) {
     vel.y = jumpVel;
     currAnim = PlayerAnim::jump;
@@ -52,6 +41,17 @@ void Player::update(const SDLState& sdlState, SDL_FRect& cam,
   if (dashDuration.isStarted() && !dashDuration.isTimeOut()) {
     vel.x += static_cast<float>(dir) * dashSpeed * dt;
     dashDuration.step(dt);
+  }
+
+  int16_t currDir = 0;
+  if (sdlState.keys[SDL_SCANCODE_A]) {
+    currDir -= 1;
+  }
+  if (sdlState.keys[SDL_SCANCODE_D]) {
+    currDir += 1;
+  }
+  if (currDir != 0) {
+    dir = currDir;
   }
 
   switch (currAnim) {
@@ -133,8 +133,11 @@ void Player::update(const SDLState& sdlState, SDL_FRect& cam,
   // center of the screen, after which it begins smooth tracking.
   if (!passedCamRuler && pos.x >= camRuler) passedCamRuler = true;
   if (passedCamRuler) {
-    if (pos.x >= camRuler) {
+    if (pos.x >= camRuler &&
+        !(dashDuration.isStarted() && !dashDuration.isTimeOut())) {
       cam.x = glm::lerp(cam.x, targetX, camXSmoothness * dt);
+    } else if (pos.x >= camRuler) {
+      cam.x = glm::lerp(cam.x, targetX, camXSmoothness / 2 * dt);
     } else {
       cam.x = glm::lerp(cam.x, 0.0f, camXSmoothness * dt);
     }

@@ -28,7 +28,7 @@ class StartScene {
       : sdlState(sdlState),
         playText(sdlState, "Play", glm::vec2(0)),
         exitText(sdlState, "Exit", glm::vec2(0)),
-        selectedBtn(StartSceneBtns::PLAY) {
+        selectedBtn(0) {
     int playTextWidth, playTextHeight, exitTextWidth, exitTextHeight;
     playText.getSize(&playTextWidth, &playTextHeight);
     exitText.getSize(&exitTextWidth, &exitTextHeight);
@@ -57,7 +57,7 @@ class StartScene {
         mouseX <= playText.pos.x + static_cast<float>(playTextWidth) &&
         mouseY >= playText.pos.y &&
         mouseY <= playText.pos.y + static_cast<float>(playTextHeight)) {
-      selectedBtn = 0;
+      selectedBtn = StartSceneBtns::PLAY;
     }
 
     // Check hover for Exit
@@ -67,11 +67,11 @@ class StartScene {
         mouseX <= exitText.pos.x + static_cast<float>(exitTextWidth) &&
         mouseY >= exitText.pos.y &&
         mouseY <= exitText.pos.y + static_cast<float>(exitTextHeight)) {
-      selectedBtn = 1;
+      selectedBtn = StartSceneBtns::EXIT;
     }
 
     // Update colors based on selection
-    if (selectedBtn == 0) {
+    if (selectedBtn == StartSceneBtns::PLAY) {
       playText.setColor(255, 255, 0);    // Yellow
       exitText.setColor(255, 255, 255);  // White
     } else {
@@ -85,15 +85,15 @@ class StartScene {
       switch (event.key.scancode) {
         case SDL_SCANCODE_UP:
         case SDL_SCANCODE_W:
-          selectedBtn = 0;
+          selectedBtn -= 1;
           break;
         case SDL_SCANCODE_DOWN:
         case SDL_SCANCODE_S:
-          selectedBtn = 1;
+          selectedBtn += 1;
           break;
         case SDL_SCANCODE_RETURN:
         case SDL_SCANCODE_SPACE:
-          if (selectedBtn == 0)
+          if (selectedBtn == StartSceneBtns::PLAY)
             shouldStartGame = true;
           else
             shouldQuit = true;
