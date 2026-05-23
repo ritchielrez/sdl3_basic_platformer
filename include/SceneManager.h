@@ -37,8 +37,10 @@ class SceneManager {
         break;
       }
       case SceneType::game: {
+        const Player &player = gameScene.player;
         gameScene.update(dt);
-        if (gameScene.player.death) sceneType = SceneType::death;
+        if (player.death && player.anims[player.currAnim].isTimeOut())
+          sceneType = SceneType::death;
         break;
       }
       case SceneType::death: {

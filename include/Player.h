@@ -12,7 +12,7 @@
 #include "StaticTile.h"
 
 namespace PlayerAnim {
-enum { idle, run, jump, slide };
+enum { idle, run, jump, slide, death };
 }
 
 struct Player : public Entity {

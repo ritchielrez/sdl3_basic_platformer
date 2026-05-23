@@ -253,6 +253,7 @@ void Player::collision(const std::vector<StaticTile>& staticTiles,
                                      &intersectionRect)) {
       collided = true;
       death = true;
+      currAnim = PlayerAnim::death;
     }
   }
 

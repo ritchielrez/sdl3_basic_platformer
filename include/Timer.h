@@ -20,10 +20,11 @@ class Timer {
     }
   }
 
-  bool isTimeOut() const { return timeout; }
-  bool isStarted() const { return started; }
-  float getTime() const { return time; }
-  float getLen() const { return len; }
+  [[nodiscard]] bool isTimeOut() const { return timeout; }
+  [[nodiscard]] bool isStarted() const { return started; }
+  [[nodiscard]] float getTime() const { return time; }
+  [[nodiscard]] float getLen() const { return len; }
+
   void reset() {
     time = 0;
     timeout = false;

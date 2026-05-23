@@ -8,7 +8,6 @@
 #include "Map.h"
 
 void GameScene::createPlayer() {
-  constexpr size_t PLAYER_IDLE_FRAMES = 4;
   constexpr size_t PLAYER_RUN_FRAMES = 16;
   constexpr uint16_t PLAYER_SIZE = 32;
 
@@ -16,9 +15,9 @@ void GameScene::createPlayer() {
   playerAnims.resize(5);
 
   playerAnims[PlayerAnim::idle] = Frames(
-      PLAYER_IDLE_FRAMES, 0.15f,
+      4, 0.15f,
       std::vector<glm::vec2>{
-          glm::vec2(0 * PLAYER_SIZE, 0.0f), glm::vec2(1 * PLAYER_SIZE, 0.0f),
+          glm::vec2(0.0f, 0.0f), glm::vec2(1 * PLAYER_SIZE, 0.0f),
           glm::vec2(2 * PLAYER_SIZE, 0.0f), glm::vec2(3 * PLAYER_SIZE, 0.0f)},
       PLAYER_SIZE, PLAYER_SIZE);
 
@@ -38,6 +37,13 @@ void GameScene::createPlayer() {
       glm::vec2(2 * PLAYER_SIZE, 5 * PLAYER_SIZE), PLAYER_SIZE, PLAYER_SIZE);
   playerAnims[PlayerAnim::slide] = Frames(
       glm::vec2(2 * PLAYER_SIZE, 2 * PLAYER_SIZE), PLAYER_SIZE, PLAYER_SIZE);
+  playerAnims[PlayerAnim::death] = Frames(
+      4, 0.20f,
+      std::vector<glm::vec2>{glm::vec2(0.0f, 7 * PLAYER_SIZE),
+                             glm::vec2(1 * PLAYER_SIZE, 7 * PLAYER_SIZE),
+                             glm::vec2(2 * PLAYER_SIZE, 7 * PLAYER_SIZE),
+                             glm::vec2(3 * PLAYER_SIZE, 7 * PLAYER_SIZE)},
+      PLAYER_SIZE, PLAYER_SIZE);
 
   player.pos = glm::vec2(0, SDLState::logicalHeight - 3 * PLAYER_SIZE);
   player.tex = resourceManager.getPlayerTex();
