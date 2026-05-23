@@ -18,15 +18,15 @@ void DebugUI::drawCameraInfo(const SDL_FRect &cam) {
   ImGui::End();
 }
 
-void DebugUI::drawEnemiesInfo(const std::vector<Enemy> &enemies) {
+void DebugUI::drawSlimesInfo(const std::vector<Slime> &slimes) {
   if (!Game::debug) return;
 
-  ImGui::Begin("Enemies");
-  ImGui::Text("Total enemies: %zu\n", enemies.size());
-  for (size_t i = 0; i < enemies.size(); ++i) {
-    std::string label = fmt::format("Enemy {}", i);
+  ImGui::Begin("Slimes");
+  ImGui::Text("Total slimes: %zu\n", slimes.size());
+  for (size_t i = 0; i < slimes.size(); ++i) {
+    std::string label = fmt::format("Slime {}", i);
     if (ImGui::CollapsingHeader(label.c_str())) {
-      ImGui::Text("%s", enemies[i].inspect().c_str());
+      ImGui::Text("%s", slimes[i].inspect().c_str());
     }
   }
   ImGui::End();
@@ -45,12 +45,12 @@ void DebugUI::newFrame() {
                                ImGuiDockNodeFlags_PassthruCentralNode);
 }
 
-void DebugUI::drawFrame(const Player &player, const std::vector<Enemy> &enemies,
+void DebugUI::drawFrame(const Player &player, const std::vector<Slime> &slimes,
                         const SDL_FRect &cam) {
   if (!Game::debug) return;
 
   drawPlayerInfo(player);
-  drawEnemiesInfo(enemies);
+  drawSlimesInfo(slimes);
   drawCameraInfo(cam);
 
   ImGui::Render();

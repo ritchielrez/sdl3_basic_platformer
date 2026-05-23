@@ -372,37 +372,37 @@ void GameScene::createEntities() {
           break;
         }
         case Tiles::ENEMY: {
-          Enemy enemy{};
-          // NOTE: Subtracting by 4 pixels allows the enemy tile to be
+          Slime slime{};
+          // NOTE: Subtracting by 4 pixels allows the slime tile to be
           // perfectly aligned with other tiles horizontally.
-          enemy.w = 24.0f;
-          enemy.h = 16.0f;
-          enemy.pos =
+          slime.w = 24.0f;
+          slime.h = 16.0f;
+          slime.pos =
               glm::vec2(c * Map::TILE_SIZE - 4,
                         static_cast<float>(SDLState::logicalHeight -
                                            (mapMidLayer.getRows() - r - 1) *
                                                Map::TILE_SIZE) -
-                            enemy.h);
-          enemy.vel = glm::vec2(60.0f, 0.0f);
-          enemy.dir = 1;
-          enemy.tex = resourceManager.getEnemyTex();
-          enemy.collider.x = 8.0f;
-          enemy.collider.y = 13.0f;
-          enemy.collider.w = enemy.w - 16;
-          enemy.collider.h = enemy.h - 14;
+                            slime.h);
+          slime.vel = glm::vec2(60.0f, 0.0f);
+          slime.dir = 1;
+          slime.tex = resourceManager.getSlimeTex();
+          slime.collider.x = 8.0f;
+          slime.collider.y = 13.0f;
+          slime.collider.w = slime.w - 16;
+          slime.collider.h = slime.h - 14;
 
           constexpr size_t ENEMY_ANIM_FRAMES = 4;
-          std::vector<glm::vec2> enemyTexCoords{ENEMY_ANIM_FRAMES};
+          std::vector<glm::vec2> slimeTexCoords{ENEMY_ANIM_FRAMES};
           for (size_t i = 0; i < ENEMY_ANIM_FRAMES; i++) {
-            enemyTexCoords[i].x = static_cast<float>(i) * enemy.w;
-            enemyTexCoords[i].y = 32.0f;
+            slimeTexCoords[i].x = static_cast<float>(i) * slime.w;
+            slimeTexCoords[i].y = 32.0f;
           }
-          enemy.anims = {Frames(ENEMY_ANIM_FRAMES, 0.1f, enemyTexCoords,
-                                static_cast<uint16_t>(enemy.w),
-                                static_cast<uint16_t>(enemy.h))};
-          enemy.currAnim = 0;
+          slime.anims = {Frames(ENEMY_ANIM_FRAMES, 0.1f, slimeTexCoords,
+                                static_cast<uint16_t>(slime.w),
+                                static_cast<uint16_t>(slime.h))};
+          slime.currAnim = 0;
 
-          enemies.push_back(enemy);
+          slimes.push_back(slime);
           break;
         };
         case Tiles::NONE:
@@ -430,7 +430,7 @@ void GameScene::update(float dt) {
     player.anims[player.currAnim].step(dt);
   }
   player.update(sdlState, cam, staticTiles, dynTiles, coins, collectedCoins,
-                enemies, dt);
+                slimes, dt);
 
   for (auto &dynTile : dynTiles) {
     dynTile.update(staticTiles, dt, cam);
@@ -441,9 +441,9 @@ void GameScene::update(float dt) {
   }
   coinText.assign(fmt::format("Coins: {}", collectedCoins));
 
-  for (auto &enemy : enemies) {
-    enemy.anims[enemy.currAnim].step(dt);
-    enemy.update(staticTiles, dt, cam);
+  for (auto &slime : slimes) {
+    slime.anims[slime.currAnim].step(dt);
+    slime.update(staticTiles, dt, cam);
   }
 
   // If the player fall 150 pixels below of the bottom of the screen, they
@@ -471,8 +471,8 @@ void GameScene::draw() {
   for (auto &coin : coins) {
     coin.draw(sdlState, cam);
   }
-  for (auto &enemy : enemies) {
-    enemy.draw(sdlState, cam);
+  for (auto &slime : slimes) {
+    slime.draw(sdlState, cam);
   }
 
   coinText.draw();

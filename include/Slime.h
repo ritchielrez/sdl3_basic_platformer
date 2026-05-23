@@ -9,10 +9,10 @@
 #include "StaticTile.h"
 #include "fmt/format.h"
 
-struct Enemy : public Entity {
+struct Slime : public Entity {
   bool collided;
 
-  Enemy() : collided(false) {}
+  Slime() : collided(false) {}
 
   void update(const std::vector<StaticTile>& staticTiles, float dt,
               const SDL_FRect& cam) {

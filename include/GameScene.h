@@ -5,11 +5,11 @@
 
 #include "Coin.h"
 #include "DynTile.h"
-#include "Enemy.h"
 #include "Map.h"
 #include "Player.h"
 #include "ResourceManager.h"
 #include "SDLState.h"
+#include "Slime.h"
 #include "StaticTile.h"
 #include "Text.h"
 
@@ -21,7 +21,7 @@ struct GameScene {
   Map mapMidLayer;
   Player player{};
   SDL_Texture *bgTex;
-  std::vector<Enemy> enemies;
+  std::vector<Slime> slimes;
   std::vector<StaticTile> staticTiles;
   std::vector<DynTile> dynTiles;
   std::vector<Coin> coins;
@@ -68,7 +68,7 @@ struct GameScene {
     mapBgLayer = Map();
     mapMidLayer = Map();
     player = Player();
-    enemies.clear();
+    slimes.clear();
     staticTiles.clear();
     dynTiles.clear();
     coins.clear();

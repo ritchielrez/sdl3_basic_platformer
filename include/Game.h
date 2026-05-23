@@ -113,7 +113,7 @@ struct Game {
       // Render the debug information on to the screen.
 #ifdef DEBUG
       debugUI.newFrame();
-      debugUI.drawFrame(player, sceneManager.gameScene.enemies,
+      debugUI.drawFrame(player, sceneManager.gameScene.slimes,
                         sceneManager.gameScene.cam);
 #endif
 

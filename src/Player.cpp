@@ -6,8 +6,8 @@
 
 #include "Coin.h"
 #include "DynTile.h"
-#include "Enemy.h"
 #include "Map.h"
+#include "Slime.h"
 #include "StaticTile.h"
 
 #define GLM_ENABLE_EXPERIMENTAL
@@ -19,7 +19,7 @@ void Player::update(const SDLState& sdlState, SDL_FRect& cam,
                     const std::vector<StaticTile>& staticTiles,
                     const std::vector<DynTile>& dynTiles,
                     std::vector<Coin>& coins, size_t& collectedCoins,
-                    const std::vector<Enemy>& enemies, float dt) {
+                    const std::vector<Slime>& slimes, float dt) {
   if (grounded && sdlState.keys[SDL_SCANCODE_SPACE]) {
     vel.y = jumpVel;
     currAnim = PlayerAnim::jump;
@@ -112,7 +112,7 @@ void Player::update(const SDLState& sdlState, SDL_FRect& cam,
   }
 
   pos += velFrame;
-  collision(staticTiles, dynTiles, coins, collectedCoins, enemies);
+  collision(staticTiles, dynTiles, coins, collectedCoins, slimes);
 
   // --- Horizontal Camera System ---
   // The 'camRuler' is the point where the player is exactly in the center of
@@ -157,7 +157,7 @@ void Player::update(const SDLState& sdlState, SDL_FRect& cam,
 void Player::collision(const std::vector<StaticTile>& staticTiles,
                        const std::vector<DynTile>& dynTiles,
                        std::vector<Coin>& coins, size_t& collectedCoins,
-                       const std::vector<Enemy>& enemies) {
+                       const std::vector<Slime>& slimes) {
   SDL_FRect playerCollider{.x = pos.x + collider.x,
                            .y = pos.y + collider.y,
                            .w = collider.w,
@@ -243,11 +243,11 @@ void Player::collision(const std::vector<StaticTile>& staticTiles,
     }
   }
 
-  for (auto& enemy : enemies) {
-    collidedRect.x = enemy.pos.x + enemy.collider.x;
-    collidedRect.y = enemy.pos.y + enemy.collider.y;
-    collidedRect.w = enemy.collider.w;
-    collidedRect.h = enemy.collider.h;
+  for (auto& slime : slimes) {
+    collidedRect.x = slime.pos.x + slime.collider.x;
+    collidedRect.y = slime.pos.y + slime.collider.y;
+    collidedRect.w = slime.collider.w;
+    collidedRect.h = slime.collider.h;
 
     if (SDL_GetRectIntersectionFloat(&playerCollider, &collidedRect,
                                      &intersectionRect)) {
