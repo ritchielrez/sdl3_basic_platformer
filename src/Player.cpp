@@ -124,10 +124,8 @@ void Player::update(const SDLState& sdlState, SDL_FRect& cam,
   // Velocity Look-Ahead:
   // Standard lerp smoothing causes a steady-state lag where the camera trails
   // the player. We offset the target by a fraction of the velocity to
-  // compensate. Using 0.12f allows the player to "lead" the camera slightly
-  // during high-speed bursts (like dashing), making the speed visible, while
-  // still centering them at normal speeds.
-  targetX += vel.x * 0.12f;
+  // compensate.
+  targetX += vel.x * 0.20f;
 
   // Threshold Logic: The camera stays at 0 until the player first reaches the
   // center of the screen, after which it begins smooth tracking.
