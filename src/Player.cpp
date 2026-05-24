@@ -261,7 +261,7 @@ void Player::collision(const std::vector<StaticTile>& staticTiles,
 
       if (vel.y > 0 &&
           (playerCollider.y + playerCollider.h - intersectionRect.h) <=
-              slimes[k].pos.y + slimes[k].collider.y) {
+              slimes[k].pos.y + slimes[k].collider.y + 5.0f) {
         slimes[k] = slimes.back();
         slimes.pop_back();
         continue;
