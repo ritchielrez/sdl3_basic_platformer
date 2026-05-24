@@ -17,10 +17,12 @@ struct GameScene {
   const SDLState &sdlState;
   const ResourceManager &resourceManager;
   static constexpr float maxPhysicsDt = 0.017f;
-  Map mapBgLayer;
+  Map mapBgLayer1;
+  Map mapBgLayer2;
   Map mapMidLayer;
   Player player{};
-  SDL_Texture *bgTex;
+  SDL_Texture *bgTex1;
+  SDL_Texture *bgTex2;
   std::vector<Slime> slimes;
   std::vector<StaticTile> staticTiles;
   std::vector<DynTile> dynTiles;
@@ -35,7 +37,10 @@ struct GameScene {
   void createEntities();
 
   void init() {
-    if (!mapBgLayer.parse("./assets/levels/1/bg.csv")) {
+    if (!mapBgLayer1.parse("./assets/levels/1/bg1.csv")) {
+      exit(1);
+    }
+    if (!mapBgLayer2.parse("./assets/levels/1/bg2.csv")) {
       exit(1);
     }
     if (!mapMidLayer.parse("./assets/levels/1/mid.csv")) {
@@ -56,7 +61,8 @@ struct GameScene {
   GameScene(const SDLState &sdlState, const ResourceManager &resourceManager)
       : sdlState(sdlState),
         resourceManager(resourceManager),
-        bgTex(nullptr),
+        bgTex1(nullptr),
+        bgTex2(nullptr),
         cam(0.0f),
         collectedCoins(0),
         coinText(sdlState, fmt::format("Coins: {}", collectedCoins),
@@ -65,7 +71,8 @@ struct GameScene {
   }
 
   void reset() {
-    mapBgLayer = Map();
+    mapBgLayer1 = Map();
+    mapBgLayer2 = Map();
     mapMidLayer = Map();
     player = Player();
     slimes.clear();
@@ -79,11 +86,8 @@ struct GameScene {
   void update(float dt);
   void draw();
 
-  // NOTE: We are forced to define an explictit `free()`, because static `Text`
-  // instances may be created by `Game` class and they need to be freed manually
-  // before `main()` ends. `SDL_ttf` requires a strict order of
-  // deinitialization.
-  // TODO: Implement `TextManager`, so static `Text` instances do not need to be
-  // created.
-  ~GameScene() { SDL_DestroyTexture(bgTex); }
+  ~GameScene() {
+    SDL_DestroyTexture(bgTex1);
+    SDL_DestroyTexture(bgTex2);
+  }
 };

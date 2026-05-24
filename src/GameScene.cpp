@@ -62,17 +62,17 @@ void GameScene::createPlayer() {
 }
 
 void GameScene::createBg() {
-  bgTex = SDL_CreateTexture(
+  bgTex1 = SDL_CreateTexture(
       sdlState.renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET,
-      static_cast<int>(mapBgLayer.getCols() * Map::TILE_SIZE),
-      static_cast<int>(mapBgLayer.getRows() * Map::TILE_SIZE));
-  SDL_SetTextureScaleMode(bgTex, SDL_SCALEMODE_PIXELART);
-  SDL_SetRenderTarget(sdlState.renderer, bgTex);
+      static_cast<int>(mapBgLayer1.getCols() * Map::TILE_SIZE),
+      static_cast<int>(mapBgLayer1.getRows() * Map::TILE_SIZE));
+  SDL_SetTextureScaleMode(bgTex1, SDL_SCALEMODE_PIXELART);
+  SDL_SetRenderTarget(sdlState.renderer, bgTex1);
 
-  // `mapBgLayer` refers to the background layer of the level map that defines
-  // what the background should look like.
-  for (size_t r = 0; r < mapBgLayer.getRows(); r++) {
-    for (size_t c = 0; c < mapBgLayer.getCols(); c++) {
+  // `mapBgLayer1` refers to the first background layer of the level map that
+  // defines what the background should look like.
+  for (size_t r = 0; r < mapBgLayer1.getRows(); r++) {
+    for (size_t c = 0; c < mapBgLayer1.getCols(); c++) {
       SDL_FRect src{.x = 0,
                     .y = 0,
                     .w = static_cast<float>(Map::TILE_SIZE),
@@ -82,7 +82,7 @@ void GameScene::createBg() {
                           .w = static_cast<float>(Map::TILE_SIZE),
                           .h = static_cast<float>(Map::TILE_SIZE)};
 
-      switch (mapBgLayer.getTiles()[r * mapBgLayer.getCols() + c]) {
+      switch (mapBgLayer1.getTiles()[r * mapBgLayer1.getCols() + c]) {
         case Tiles::SKY_PEACH: {
           src.x = Map::TILE_SIZE;
           src.y = 11 * Map::TILE_SIZE;
@@ -124,37 +124,37 @@ void GameScene::createBg() {
           break;
         }
         case Tiles::SKY_WHITE: {
-          src.x = 0;
+          src.x = 0.0f;
           src.y = 9 * Map::TILE_SIZE;
           break;
         }
         case Tiles::CLOUD_WHITE: {
-          src.x = 0;
+          src.x = 0.0f;
           src.y = 10 * Map::TILE_SIZE;
           break;
         }
         case Tiles::SKY_LIGHT_BLUE: {
-          src.x = 0;
+          src.x = 0.0f;
           src.y = 11 * Map::TILE_SIZE;
           break;
         }
         case Tiles::CLOUD_LIGHT_BLUE: {
-          src.x = 0;
+          src.x = 0.0f;
           src.y = 12 * Map::TILE_SIZE;
           break;
         }
         case Tiles::SKY_MEDIUM_BLUE: {
-          src.x = 0;
+          src.x = 0.0f;
           src.y = 13 * Map::TILE_SIZE;
           break;
         }
         case Tiles::CLOUD_MEDIUM_BLUE: {
-          src.x = 0;
+          src.x = 0.0f;
           src.y = 14 * Map::TILE_SIZE;
           break;
         }
         case Tiles::SKY_DARK_BLUE: {
-          src.x = 0;
+          src.x = 0.0f;
           src.y = 15 * Map::TILE_SIZE;
           break;
         }
@@ -233,19 +233,71 @@ void GameScene::createBg() {
         default:
           SDL_ShowSimpleMessageBox(
               SDL_MESSAGEBOX_ERROR, "Error",
-              fmt::format(
-                  "Unreachable: unhandled tile type of {} for background layer",
-                  mapMidLayer.getTiles()[r * mapMidLayer.getCols() + c])
+              fmt::format("Unreachable: unhandled tile type of {} for "
+                          "background layer 1",
+                          mapBgLayer1.getTiles()[r * mapBgLayer1.getCols() + c])
                   .data(),
               nullptr);
           exit(1);
       }
-
       SDL_RenderTexture(sdlState.renderer, resourceManager.getWorldTex(), &src,
                         &dst);
     }
   }
+  SDL_SetRenderTarget(sdlState.renderer, nullptr);
 
+  bgTex2 = SDL_CreateTexture(
+      sdlState.renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET,
+      static_cast<int>(mapBgLayer1.getCols() * Map::TILE_SIZE),
+      static_cast<int>(mapBgLayer1.getRows() * Map::TILE_SIZE));
+  SDL_SetTextureScaleMode(bgTex2, SDL_SCALEMODE_PIXELART);
+  SDL_SetRenderTarget(sdlState.renderer, bgTex2);
+
+  // `mapBgLayer2` refers to the second background layer of the level map that
+  // defines what the background should look like.
+  for (size_t r = 0; r < mapBgLayer2.getRows(); r++) {
+    for (size_t c = 0; c < mapBgLayer2.getCols(); c++) {
+      SDL_FRect src{.x = 0,
+                    .y = 0,
+                    .w = static_cast<float>(Map::TILE_SIZE),
+                    .h = static_cast<float>(Map::TILE_SIZE)};
+      const SDL_FRect dst{.x = static_cast<float>(c * Map::TILE_SIZE),
+                          .y = static_cast<float>(r * Map::TILE_SIZE),
+                          .w = static_cast<float>(Map::TILE_SIZE),
+                          .h = static_cast<float>(Map::TILE_SIZE)};
+
+      switch (mapBgLayer2.getTiles()[r * mapBgLayer2.getCols() + c]) {
+        case Tiles::TREE_CANOPY: {
+          src.x = 0.0f;
+          src.y = 3 * Map::TILE_SIZE;
+          break;
+        }
+        case Tiles::TREE_MID: {
+          src.x = 0.0f;
+          src.y = 4 * Map::TILE_SIZE;
+          break;
+        }
+        case Tiles::TREE_BASE: {
+          src.x = 0.0f;
+          src.y = 5 * Map::TILE_SIZE;
+          break;
+        }
+        case Tiles::NONE:
+          continue;
+        default:
+          SDL_ShowSimpleMessageBox(
+              SDL_MESSAGEBOX_ERROR, "Error",
+              fmt::format("Unreachable: unhandled tile type of {} for "
+                          "background layer 2",
+                          mapBgLayer2.getTiles()[r * mapBgLayer2.getCols() + c])
+                  .data(),
+              nullptr);
+          exit(1);
+      }
+      SDL_RenderTexture(sdlState.renderer, resourceManager.getWorldTex(), &src,
+                        &dst);
+    }
+  }
   SDL_SetRenderTarget(sdlState.renderer, nullptr);
 }
 
@@ -461,12 +513,21 @@ void GameScene::update(float dt) {
 
 void GameScene::draw() {
   constexpr float parallaxFactor = -0.3f;
-  const SDL_FRect bgTexDst = {
+  const SDL_FRect bgTex1Dst = {
       .x = parallaxFactor * cam.x,
       .y = -Map::TILE_SIZE,
-      .w = static_cast<float>(mapBgLayer.getCols() * Map::TILE_SIZE),
-      .h = static_cast<float>(mapBgLayer.getRows() * Map::TILE_SIZE)};
-  SDL_RenderTexture(sdlState.renderer, bgTex, nullptr, &bgTexDst);
+      .w = static_cast<float>(mapBgLayer1.getCols() * Map::TILE_SIZE),
+      .h = static_cast<float>(mapBgLayer1.getRows() * Map::TILE_SIZE)};
+  SDL_RenderTexture(sdlState.renderer, bgTex1, nullptr, &bgTex1Dst);
+
+  const SDL_FRect bgTex2Dst = {
+      .x = 0.0f,
+      .y = SDLState::logicalHeight -
+           static_cast<float>(mapBgLayer1.getRows() * Map::TILE_SIZE),
+      .w = static_cast<float>(mapBgLayer1.getCols() * Map::TILE_SIZE),
+      .h = SDLState::logicalHeight,
+  };
+  SDL_RenderTexture(sdlState.renderer, bgTex2, nullptr, &bgTex2Dst);
 
   for (auto &staticTile : staticTiles) {
     staticTile.draw(sdlState, cam);

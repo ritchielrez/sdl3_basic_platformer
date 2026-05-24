@@ -48,6 +48,9 @@ enum {
   SKY_DARK_SILVER,
   CLOUD_DARK_SILVER,
   SKY_GRAY,
+  TREE_CANOPY,
+  TREE_MID,
+  TREE_BASE,
 };
 }
 
