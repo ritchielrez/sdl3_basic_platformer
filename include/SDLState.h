@@ -6,6 +6,8 @@
 
 #include <cstdlib>
 
+#include "SDL3/SDL_render.h"
+
 // `SDLState` is a class holding internal data that are needed for SDL to
 // function.
 struct SDLState {
@@ -27,7 +29,7 @@ struct SDLState {
   // Because this is a pixel art game though the upscaling is not going to cause
   // any blurriness, so many pixel art games actually render at low resolutions
   // like 180p.
-  static constexpr uint32_t logicalWidth = 320, logicalHeight = 180;
+  static constexpr uint16_t logicalWidth = 320, logicalHeight = 180;
 
   // No argument constructor setting everything to the default value of
   // `nullptr`. This does not construct any SDL related objects.
@@ -56,6 +58,10 @@ struct SDLState {
                                "Could not create renderer", nullptr);
       exit(1);
     }
+
+    // Enable adaptive VSync, so the renderer will automatically adjust to the
+    // monitor's refresh rate.
+    SDL_SetRenderVSync(renderer, SDL_RENDERER_VSYNC_ADAPTIVE);
 
     // Set the logical resolution of the window. Ensure that the game only
     // upscaled by integer multiples.

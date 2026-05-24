@@ -6,6 +6,7 @@
 #include <cstdlib>
 #include <string_view>
 
+#include "SDL3/SDL_pixels.h"
 #include "SDL3/SDL_surface.h"
 #include "SDLState.h"
 
@@ -18,7 +19,7 @@ class ResourceManager {
   SDL_Texture *playerTex;
   SDL_Texture *worldTex;
   SDL_Texture *platformsTex;
-  SDL_Texture *enemyTex;
+  SDL_Texture *slimeTex;
 
  public:
   // No argument constructor setting everything to the default value of
@@ -28,7 +29,7 @@ class ResourceManager {
         playerTex(nullptr),
         worldTex(nullptr),
         platformsTex(nullptr),
-        enemyTex(nullptr) {}
+        slimeTex(nullptr) {}
   // Parameterized constructor to initialize everything properly. This does
   // create the necessary textures.
   ResourceManager(SDLState &sdlState) {
@@ -63,10 +64,10 @@ class ResourceManager {
       exit(1);
     }
 
-    enemyTex = loadTex(sdlState, "assets/sprites/slime_green.png");
-    if (!enemyTex) {
+    slimeTex = loadTex(sdlState, "assets/sprites/slime_green.png");
+    if (!slimeTex) {
       SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error",
-                               "Enemy texture could not be loaded", nullptr);
+                               "Slime texture could not be loaded", nullptr);
       exit(1);
     }
   }
@@ -102,9 +103,9 @@ class ResourceManager {
         width, height, SDL_PIXELFORMAT_RGBA32, pixData, width * 4);
     // Create a SDL_Texture from a SDL_Surface.
     SDL_Texture *tex = SDL_CreateTextureFromSurface(sdlState.renderer, surface);
-    // Set the texture scaling mode to pixel art so when the textures are
-    // upscaled they do not get blurry.
-    SDL_SetTextureScaleMode(tex, SDL_SCALEMODE_PIXELART);
+    // Set the texture scaling mode to nearest so when the textures are
+    // upscaled they do not get blurry and do not bleed.
+    SDL_SetTextureScaleMode(tex, SDL_SCALEMODE_NEAREST);
 
     // The SDL_Surface is not needed anymore, it is an intermediate resource
     // used to create a texture.
@@ -121,7 +122,7 @@ class ResourceManager {
   [[nodiscard]] SDL_Texture *getPlayerTex() const { return playerTex; }
   [[nodiscard]] SDL_Texture *getWorldTex() const { return worldTex; }
   [[nodiscard]] SDL_Texture *getPlatformTex() const { return platformsTex; }
-  [[nodiscard]] SDL_Texture *getEnemyTex() const { return enemyTex; }
+  [[nodiscard]] SDL_Texture *getSlimeTex() const { return slimeTex; }
 
   // Destructor to deallocate all textures. This prevents any memory
   // leaks.
@@ -130,6 +131,6 @@ class ResourceManager {
     SDL_DestroyTexture(playerTex);
     SDL_DestroyTexture(worldTex);
     SDL_DestroyTexture(platformsTex);
-    SDL_DestroyTexture(enemyTex);
+    SDL_DestroyTexture(slimeTex);
   }
 };

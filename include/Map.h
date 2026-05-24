@@ -2,6 +2,7 @@
 
 #include <SDL3/SDL.h>
 
+#include <cstdint>
 #include <cstdlib>
 #include <fstream>
 #include <sstream>
@@ -15,12 +16,7 @@ enum {
   DIRT1,
   DIRT2,
   DIRT3,
-  BRIDGE1,
-  BRIDGE2,
-  BRIDGE3,
-  TREE1,
-  TREE2,
-  TREE3,
+  MOVING_PLATFORM_GRASS,
   COIN,
   ENEMY,
   SKY_PEACH,
@@ -56,7 +52,7 @@ enum {
 }
 
 struct Map {
-  static constexpr float TILE_SIZE = 16.0f;
+  static constexpr uint16_t TILE_SIZE = 16;
 
  private:
   std::vector<uint16_t> tiles;

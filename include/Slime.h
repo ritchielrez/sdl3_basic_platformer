@@ -1,21 +1,23 @@
 #pragma once
 
-#include <fmt/format.h>
+#include <SDL3/SDL.h>
 
+#include <glm/glm.hpp>
 #include <string>
 
 #include "Entity.h"
 #include "StaticTile.h"
+#include "fmt/format.h"
 
-struct DynTile : public Entity {
+struct Slime : public Entity {
   bool collided;
 
-  DynTile() : collided() {}
+  Slime() : collided(false) {}
 
   void update(const std::vector<StaticTile>& staticTiles, float dt,
               const SDL_FRect& cam) {
-    const SDL_FRect dynTileRect{.x = pos.x, .y = pos.y, .w = w, .h = h};
-    if (SDL_HasRectIntersectionFloat(&dynTileRect, &cam)) {
+    const SDL_FRect enemyRect{.x = pos.x, .y = pos.y, .w = w, .h = h};
+    if (SDL_HasRectIntersectionFloat(&enemyRect, &cam)) {
       pos += vel * dt;
       collision(staticTiles);
     }

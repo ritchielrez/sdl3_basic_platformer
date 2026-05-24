@@ -10,43 +10,47 @@
 class Frames {
   Timer timer;
   size_t frameCount;
-  float frameWidth, frameHeight;
+  uint16_t frameWidth, frameHeight;
   std::vector<glm::vec2> texCoords;
 
  public:
   Frames()
       : timer(0), frameCount(0), frameWidth(0), frameHeight(0), texCoords() {}
-  Frames(glm::vec2 &&texCoord, float frameWidth, float frameHeight)
+  Frames(glm::vec2 &&texCoord, uint16_t frameWidth, uint16_t frameHeight)
       : timer(0),
         frameCount(1),
         frameWidth(frameWidth),
         frameHeight(frameHeight),
         texCoords(1, texCoord) {}
   Frames(int frameCount, float len, std::vector<glm::vec2> &&texCoords,
-         float frameWidth, float frameHeight)
+         uint16_t frameWidth, uint16_t frameHeight)
       : timer(len * frameCount),
         frameCount(frameCount),
         frameWidth(frameWidth),
         frameHeight(frameHeight),
         texCoords(texCoords) {}
   Frames(int frameCount, float len, std::vector<glm::vec2> &texCoords,
-         float frameWidth, float frameHeight)
+         uint16_t frameWidth, uint16_t frameHeight)
       : timer(len * frameCount),
         frameCount(frameCount),
         frameWidth(frameWidth),
         frameHeight(frameHeight),
         texCoords(texCoords) {}
 
-  int frameIdx() const {
+  [[nodiscard]] int frameIdx() const {
     assert(frameCount != 0);
     return frameCount != 1
                ? static_cast<int>(timer.getTime() / timer.getLen() * frameCount)
                : 0;
   }
-  float getLen() const { return timer.getLen(); }
-  float getFrameWidth() const { return frameWidth; }
-  float getFrameHeight() const { return frameWidth; }
-  glm::vec2 getTexCoord() const { return texCoords.at(frameIdx()); }
+  [[nodiscard]] bool isTimeOut() const { return timer.isTimeOut(); }
+  [[nodiscard]] bool isStarted() const { return timer.isStarted(); }
+  [[nodiscard]] float getLen() const { return timer.getLen(); }
+  [[nodiscard]] uint16_t getFrameWidth() const { return frameWidth; }
+  [[nodiscard]] uint16_t getFrameHeight() const { return frameHeight; }
+  [[nodiscard]] glm::vec2 getTexCoord() const {
+    return texCoords.at(frameIdx());
+  }
 
   void step(float dt) { timer.step(dt); }
 };
