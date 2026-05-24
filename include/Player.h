@@ -16,16 +16,15 @@ enum { idle, run, jump, slide, death };
 }
 
 struct Player : public Entity {
-  glm::vec2 accel;
-  float jumpVel, gravVel, maxSpeedX, dashSpeed;
+  glm::vec2 accel, maxSpeed;
+  float jumpVel, dashSpeed;
   bool collided, death, grounded, passedCamRuler;
   Timer dashDuration, dashCooldown;
 
   Player()
       : accel(glm::vec2(0)),
+        maxSpeed(glm::vec2(0)),
         jumpVel(0),
-        gravVel(0),
-        maxSpeedX(0),
         dashSpeed(0),
         collided(false),
         death(false),
@@ -36,11 +35,10 @@ struct Player : public Entity {
   void update(const SDLState& sdlState, SDL_FRect& cam,
               const std::vector<StaticTile>& staticTiles,
               const std::vector<DynTile>& dynTiles, std::vector<Coin>& coins,
-              size_t& collectedCoins, const std::vector<Slime>& slimes,
-              float dt);
+              size_t& collectedCoins, std::vector<Slime>& slimes, float dt);
   void collision(const std::vector<StaticTile>& staticTiles,
                  const std::vector<DynTile>& dynTiles, std::vector<Coin>& coins,
-                 size_t& collectedCoins, const std::vector<Slime>& slimes);
+                 size_t& collectedCoins, std::vector<Slime>& slimes);
 
   [[nodiscard]] std::string inspect() const {
     std::string playerState{8, 0};
@@ -59,6 +57,10 @@ struct Player : public Entity {
       }
       case PlayerAnim::jump: {
         playerState = "jump";
+        break;
+      }
+      case PlayerAnim::death: {
+        playerState = "death";
         break;
       }
     }

@@ -19,8 +19,9 @@ void Player::update(const SDLState& sdlState, SDL_FRect& cam,
                     const std::vector<StaticTile>& staticTiles,
                     const std::vector<DynTile>& dynTiles,
                     std::vector<Coin>& coins, size_t& collectedCoins,
-                    const std::vector<Slime>& slimes, float dt) {
-  if (grounded && sdlState.keys[SDL_SCANCODE_SPACE]) {
+                    std::vector<Slime>& slimes, float dt) {
+  if (currAnim != PlayerAnim::death && grounded &&
+      sdlState.keys[SDL_SCANCODE_SPACE]) {
     vel.y = jumpVel;
     currAnim = PlayerAnim::jump;
   }
@@ -44,10 +45,10 @@ void Player::update(const SDLState& sdlState, SDL_FRect& cam,
   }
 
   int16_t currDir = 0;
-  if (sdlState.keys[SDL_SCANCODE_A]) {
+  if (currAnim != PlayerAnim::death && sdlState.keys[SDL_SCANCODE_A]) {
     currDir -= 1;
   }
-  if (sdlState.keys[SDL_SCANCODE_D]) {
+  if (currAnim != PlayerAnim::death && sdlState.keys[SDL_SCANCODE_D]) {
     currDir += 1;
   }
   if (currDir != 0) {
@@ -97,28 +98,34 @@ void Player::update(const SDLState& sdlState, SDL_FRect& cam,
   vel += static_cast<float>(currDir) * accel * dt;
 
   if (!dashDuration.isStarted() || dashDuration.isTimeOut()) {
-    vel.x = glm::clamp(vel.x, -maxSpeedX, maxSpeedX);
+    vel.x = glm::clamp(vel.x, -maxSpeed.x, maxSpeed.x);
   } else {
-    vel.x = glm::clamp(vel.x, -maxSpeedX - dashSpeed, maxSpeedX + dashSpeed);
+    vel.x = glm::clamp(vel.x, -maxSpeed.x - dashSpeed, maxSpeed.x + dashSpeed);
   }
 
   constexpr float gravity = 980.0f;
   if (!grounded) vel.y += gravity * dt;
 
+  if (maxSpeed.y > 0.0f) {
+    vel.y = glm::clamp(vel.y, -maxSpeed.y, maxSpeed.y);
+  }
+
   glm::vec2 velFrame = vel * dt;
 
   if (velFrame.y >= Map::TILE_SIZE) {
     velFrame.y = Map::TILE_SIZE - 1;
+    vel.y = velFrame.y / dt;
   }
 
   pos += velFrame;
+  if (pos.x <= 0) pos.x = 0;
   collision(staticTiles, dynTiles, coins, collectedCoins, slimes);
 
   // --- Horizontal Camera System ---
   // The 'camRuler' is the point where the player is exactly in the center of
   // the screen.
   float camRuler = (SDLState::logicalWidth - w) / 2;
-  constexpr float camXSmoothness = 4.0f;
+  constexpr float camXSmoothness = 3.0f;
   float targetX = pos.x - camRuler;
 
   // Velocity Look-Ahead:
@@ -157,7 +164,7 @@ void Player::update(const SDLState& sdlState, SDL_FRect& cam,
 void Player::collision(const std::vector<StaticTile>& staticTiles,
                        const std::vector<DynTile>& dynTiles,
                        std::vector<Coin>& coins, size_t& collectedCoins,
-                       const std::vector<Slime>& slimes) {
+                       std::vector<Slime>& slimes) {
   SDL_FRect playerCollider{.x = pos.x + collider.x,
                            .y = pos.y + collider.y,
                            .w = collider.w,
@@ -206,8 +213,7 @@ void Player::collision(const std::vector<StaticTile>& staticTiles,
     groundSensor.h = 1;
 
     if (SDL_GetRectIntersectionFloat(&groundSensor, &collidedRect,
-                                     &intersectionRect) &&
-        intersectionRect.w > intersectionRect.h) {
+                                     &intersectionRect)) {
       foundGround = true;
     }
   }
@@ -243,18 +249,27 @@ void Player::collision(const std::vector<StaticTile>& staticTiles,
     }
   }
 
-  for (auto& slime : slimes) {
-    collidedRect.x = slime.pos.x + slime.collider.x;
-    collidedRect.y = slime.pos.y + slime.collider.y;
-    collidedRect.w = slime.collider.w;
-    collidedRect.h = slime.collider.h;
+  for (size_t k = 0; k < slimes.size();) {
+    collidedRect.x = slimes[k].pos.x + slimes[k].collider.x;
+    collidedRect.y = slimes[k].pos.y + slimes[k].collider.y;
+    collidedRect.w = slimes[k].collider.w;
+    collidedRect.h = slimes[k].collider.h;
 
     if (SDL_GetRectIntersectionFloat(&playerCollider, &collidedRect,
                                      &intersectionRect)) {
       collided = true;
+
+      if (vel.y > 0 &&
+          (playerCollider.y + playerCollider.h - intersectionRect.h) <=
+              slimes[k].pos.y + slimes[k].collider.y) {
+        slimes[k] = slimes.back();
+        slimes.pop_back();
+        continue;
+      }
       death = true;
       currAnim = PlayerAnim::death;
     }
+    k++;
   }
 
   if (grounded != foundGround) {

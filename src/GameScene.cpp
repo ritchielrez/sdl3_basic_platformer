@@ -47,7 +47,7 @@ void GameScene::createPlayer() {
 
   player.pos = glm::vec2(0, SDLState::logicalHeight - 3 * PLAYER_SIZE);
   player.tex = resourceManager.getPlayerTex();
-  player.maxSpeedX = 130.0f;
+  player.maxSpeed = glm::vec2(130.0f, 350.0f);
   player.dashSpeed = 200.0f;
   player.jumpVel = -350.0f;
   player.w = PLAYER_SIZE;
@@ -393,9 +393,9 @@ void GameScene::createEntities() {
           slime.dir = 1;
           slime.tex = resourceManager.getSlimeTex();
           slime.collider.x = 8.0f;
-          slime.collider.y = 13.0f;
-          slime.collider.w = slime.w - 16;
-          slime.collider.h = slime.h - 14;
+          slime.collider.y = 5.0f;
+          slime.collider.w = 8.0f;
+          slime.collider.h = 10.0f;
 
           constexpr size_t ENEMY_ANIM_FRAMES = 4;
           std::vector<glm::vec2> slimeTexCoords{ENEMY_ANIM_FRAMES};
@@ -452,9 +452,9 @@ void GameScene::update(float dt) {
     slime.update(staticTiles, dt, cam);
   }
 
-  // If the player fall 150 pixels below of the bottom of the screen, they
-  // die.
-  if (player.pos.y >= SDLState::logicalHeight + 150.0f) {
+  // If the player fall below the screen, they die.
+  if (player.pos.y >= SDLState::logicalHeight) {
+    player.currAnim = PlayerAnim::death;
     player.death = true;
   }
 }

@@ -44,6 +44,7 @@ class Frames {
                : 0;
   }
   [[nodiscard]] bool isTimeOut() const { return timer.isTimeOut(); }
+  [[nodiscard]] bool isStarted() const { return timer.isStarted(); }
   [[nodiscard]] float getLen() const { return timer.getLen(); }
   [[nodiscard]] uint16_t getFrameWidth() const { return frameWidth; }
   [[nodiscard]] uint16_t getFrameHeight() const { return frameHeight; }
