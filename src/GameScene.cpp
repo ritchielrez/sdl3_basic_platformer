@@ -282,6 +282,26 @@ void GameScene::createBg() {
           src.y = 5 * Map::TILE_SIZE;
           break;
         }
+        case Tiles::BUSH1: {
+          src.x = 1 * Map::TILE_SIZE;
+          src.y = 3 * Map::TILE_SIZE;
+          break;
+        }
+        case Tiles::BUSH2: {
+          src.x = 1 * Map::TILE_SIZE;
+          src.y = 4 * Map::TILE_SIZE;
+          break;
+        }
+        case Tiles::BUSH3: {
+          src.x = 1 * Map::TILE_SIZE;
+          src.y = 5 * Map::TILE_SIZE;
+          break;
+        }
+        case Tiles::FLOWER_BUSH: {
+          src.x = 1 * Map::TILE_SIZE;
+          src.y = 6 * Map::TILE_SIZE;
+          break;
+        }
         case Tiles::NONE:
           continue;
         default:

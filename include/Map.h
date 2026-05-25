@@ -51,6 +51,10 @@ enum {
   TREE_CANOPY,
   TREE_MID,
   TREE_BASE,
+  BUSH1,
+  BUSH2,
+  BUSH3,
+  FLOWER_BUSH
 };
 }
 
