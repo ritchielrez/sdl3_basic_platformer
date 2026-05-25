@@ -458,10 +458,10 @@ void GameScene::createEntities() {
           staticTile.tex = resourceManager.getWorldTex();
           staticTile.w = static_cast<float>(Map::TILE_SIZE);
           staticTile.h = static_cast<float>(Map::TILE_SIZE);
-          staticTile.collider.x = 0;
-          staticTile.collider.y = 0;
+          staticTile.collider.x = 0.0f;
+          staticTile.collider.y = 0.0f;
           staticTile.collider.w = staticTile.w;
-          staticTile.collider.h = staticTile.h;
+          staticTile.collider.h = staticTile.h - 8;
           staticTile.anims =
               std::vector<Frames>{Frames(glm::vec2(9 * Map::TILE_SIZE, 0.0f),
                                          Map::TILE_SIZE, Map::TILE_SIZE)};
@@ -477,10 +477,10 @@ void GameScene::createEntities() {
           staticTile.tex = resourceManager.getWorldTex();
           staticTile.w = static_cast<float>(Map::TILE_SIZE);
           staticTile.h = static_cast<float>(Map::TILE_SIZE);
-          staticTile.collider.x = 0;
-          staticTile.collider.y = 0;
+          staticTile.collider.x = 0.0f;
+          staticTile.collider.y = 0.0f;
           staticTile.collider.w = staticTile.w;
-          staticTile.collider.h = staticTile.h;
+          staticTile.collider.h = staticTile.h - 8;
           staticTile.anims =
               std::vector<Frames>{Frames(glm::vec2(10 * Map::TILE_SIZE, 0.0f),
                                          Map::TILE_SIZE, Map::TILE_SIZE)};
@@ -496,10 +496,10 @@ void GameScene::createEntities() {
           staticTile.tex = resourceManager.getWorldTex();
           staticTile.w = static_cast<float>(Map::TILE_SIZE);
           staticTile.h = static_cast<float>(Map::TILE_SIZE);
-          staticTile.collider.x = 0;
-          staticTile.collider.y = 0;
+          staticTile.collider.x = 0.0f;
+          staticTile.collider.y = 0.0f;
           staticTile.collider.w = staticTile.w;
-          staticTile.collider.h = staticTile.h;
+          staticTile.collider.h = staticTile.h - 8;
           staticTile.anims =
               std::vector<Frames>{Frames(glm::vec2(11 * Map::TILE_SIZE, 0.0f),
                                          Map::TILE_SIZE, Map::TILE_SIZE)};

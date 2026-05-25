@@ -169,7 +169,6 @@ void Player::collision(const std::vector<StaticTile>& staticTiles,
                            .y = pos.y + collider.y,
                            .w = collider.w,
                            .h = collider.h};
-  SDL_FRect groundSensor{0, 0, 0, 0};
   SDL_FRect collidedRect{0, 0, 0, 0};
   SDL_FRect intersectionRect{0, 0, 0, 0};
 
@@ -201,20 +200,14 @@ void Player::collision(const std::vector<StaticTile>& staticTiles,
         }
         vel.x = 0;
       }
-    }
 
-    // Recalculate playerCollider after the player has moved due to collision.
-    playerCollider.x = pos.x + collider.x;
-    playerCollider.y = pos.y + collider.y;
+      // Recalculate playerCollider after the player has moved due to collision.
+      playerCollider.x = pos.x + collider.x;
+      playerCollider.y = pos.y + collider.y;
 
-    groundSensor.x = playerCollider.x;
-    groundSensor.y = playerCollider.y + playerCollider.h;
-    groundSensor.w = playerCollider.w;
-    groundSensor.h = 1;
-
-    if (SDL_GetRectIntersectionFloat(&groundSensor, &collidedRect,
-                                     &intersectionRect)) {
-      foundGround = true;
+      if (playerCollider.y + playerCollider.h <= collidedRect.y) {
+        foundGround = true;
+      }
     }
   }
 
