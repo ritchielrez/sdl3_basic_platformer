@@ -74,7 +74,7 @@ void Player::update(const SDLState& sdlState, SDL_FRect& cam,
     dashCooldown.step(dt);
   }
 
-  if (currAnim == PlayerAnim::run &&
+  if ((currAnim == PlayerAnim::run || currAnim == PlayerAnim::jump) &&
       (!dashCooldown.isStarted() || dashCooldown.isTimeOut()) &&
       sdlState.keys[SDL_SCANCODE_LSHIFT]) {
     dashDuration.reset();
@@ -150,9 +150,7 @@ void Player::update(const SDLState& sdlState, SDL_FRect& cam,
   constexpr float gravity = 980.0f;
   if (!grounded) vel.y += gravity * dt;
 
-  if (maxSpeed.y > 0.0f) {
-    vel.y = glm::clamp(vel.y, -maxSpeed.y, maxSpeed.y);
-  }
+  vel.y = glm::clamp(vel.y, -maxSpeed.y, maxSpeed.y);
 
   glm::vec2 velFrame = vel * dt;
 
