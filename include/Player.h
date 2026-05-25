@@ -18,8 +18,12 @@ enum { idle, run, jump, slide, death };
 struct Player : public Entity {
   glm::vec2 accel, maxSpeed;
   float jumpVel, dashSpeed;
-  bool collided, death, grounded, passedCamRuler;
+  bool collided, death, grounded, wasGrounded, wasJumpDown, passedCamRuler;
+  // Movement mechanic timers
   Timer dashDuration, dashCooldown;
+  // Movement polish timers
+  Timer coyoteTimer;      // Allow jumping briefly after walking off a ledge
+  Timer jumpBufferTimer;  // Buffer a jump pressed just before landing
 
   Player()
       : accel(glm::vec2(0)),
@@ -29,9 +33,13 @@ struct Player : public Entity {
         collided(false),
         death(false),
         grounded(false),
+        wasGrounded(false),
+        wasJumpDown(false),
         passedCamRuler(false),
         dashDuration(0.25f),
-        dashCooldown(0.2f) {}
+        dashCooldown(0.2f),
+        coyoteTimer(0.1f),
+        jumpBufferTimer(0.12f) {}
   void update(const SDLState& sdlState, SDL_FRect& cam,
               const std::vector<StaticTile>& staticTiles,
               const std::vector<DynTile>& dynTiles, std::vector<Coin>& coins,
@@ -67,9 +75,11 @@ struct Player : public Entity {
     return fmt::format(
         "Position: ({}, {})\nVelocity: ({}, {})\nState: {}\nCollision: "
         "{}\nGrounded: {}\nDash duration active: {}\nDash cooldown active: "
-        "{}\n",
+        "{}\nCoyote active: {}\nJump buffered: {}\n",
         pos.x, pos.y, vel.x, vel.y, playerState, collided, grounded,
         dashDuration.isStarted() && !dashDuration.isTimeOut(),
-        dashCooldown.isStarted() && !dashCooldown.isTimeOut());
+        dashCooldown.isStarted() && !dashCooldown.isTimeOut(),
+        coyoteTimer.isStarted() && !coyoteTimer.isTimeOut(),
+        jumpBufferTimer.isStarted() && !jumpBufferTimer.isTimeOut());
   }
 };

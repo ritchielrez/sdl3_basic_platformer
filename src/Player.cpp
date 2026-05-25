@@ -20,10 +20,54 @@ void Player::update(const SDLState& sdlState, SDL_FRect& cam,
                     const std::vector<DynTile>& dynTiles,
                     std::vector<Coin>& coins, size_t& collectedCoins,
                     std::vector<Slime>& slimes, float dt) {
-  if (currAnim != PlayerAnim::death && grounded &&
-      sdlState.keys[SDL_SCANCODE_SPACE]) {
+  // --- Jump Buffering: Record a jump press for use on the next landing ---
+  const bool jumpDown = sdlState.keys[SDL_SCANCODE_SPACE];
+  // We only want the rising edge of the Space key press.
+  const bool jumpJustPressed = jumpDown && !wasJumpDown;
+  wasJumpDown = jumpDown;
+
+  if (jumpJustPressed) {
+    jumpBufferTimer.reset();
+    jumpBufferTimer.step(dt);
+  } else if (jumpBufferTimer.isStarted() && !jumpBufferTimer.isTimeOut()) {
+    jumpBufferTimer.step(dt);
+  }
+
+  // --- Coyote Time: Allow jumping briefly after walking off a ledge ---
+  // Start the coyote window on the first frame the player becomes airborne
+  // without having jumped (i.e., walked off an edge).
+  if (wasGrounded && !grounded && currAnim != PlayerAnim::jump) {
+    coyoteTimer.reset();
+    coyoteTimer.step(dt);
+  } else if (coyoteTimer.isStarted() && !coyoteTimer.isTimeOut()) {
+    coyoteTimer.step(dt);
+  }
+  wasGrounded = grounded;
+
+  // Determine whether the player is allowed to jump right now:
+  //   - grounded, OR within the coyote window
+  const bool canJump =
+      (grounded || (coyoteTimer.isStarted() && !coyoteTimer.isTimeOut())) &&
+      currAnim != PlayerAnim::death;
+
+  // Trigger jump if:
+  //   - Space was just pressed (or is buffered from a recent press), AND
+  //   - the player is in a jumpable state
+  const bool jumpBuffered =
+      jumpBufferTimer.isStarted() && !jumpBufferTimer.isTimeOut();
+
+  if (canJump && (jumpJustPressed || jumpBuffered)) {
     vel.y = jumpVel;
     currAnim = PlayerAnim::jump;
+    // Consume both the buffer and the coyote window so they don't re-trigger.
+    jumpBufferTimer.reset();
+    coyoteTimer.reset();
+  }
+
+  // --- Variable Jump Height: Cut upward velocity when Space is released ---
+  // Only applies while the player is still rising from a jump.
+  if (!jumpDown && vel.y < 0) {
+    vel.y *= 0.90f;  // Dampen rise per-frame; acts as a soft cut
   }
 
   if (dashCooldown.isStarted() && !dashCooldown.isTimeOut()) {

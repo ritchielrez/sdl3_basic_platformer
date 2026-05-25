@@ -3,9 +3,9 @@
 This document outlines potential mechanics to be implemented within a one-month timeframe to enhance "game feel" and gameplay variety.
 
 ## 1. Movement Polish (Game Feel)
-*   **Coyote Time**: Allow jumping for a brief window (0.1s) after leaving a platform.
-*   **Jump Buffering**: Buffer a jump input if pressed shortly before landing.
-*   **Variable Jump Height**: Control jump height by holding/releasing the jump button.
+- [x] **Coyote Time**: Allow jumping for a brief window (0.1s) after leaving a platform.
+- [x] **Jump Buffering**: Buffer a jump input if pressed shortly before landing.
+- **Variable Jump Height**: Control jump height by holding/releasing the jump button.
 
 ## 2. Mobility Enhancements
 *   **Double Jump**: Allow one additional jump in mid-air.
@@ -22,5 +22,5 @@ This document outlines potential mechanics to be implemented within a one-month 
 *   **One-Way Platforms**: Platforms that can be jumped through from below but stood upon.
 
 ---
-**Status**: Proposed
+**Status**: In Progress
 **Deadline**: ~1 Month
