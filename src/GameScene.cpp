@@ -248,8 +248,8 @@ void GameScene::createBg() {
 
   bgTex2 = SDL_CreateTexture(
       sdlState.renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET,
-      static_cast<int>(mapBgLayer1.getCols() * Map::TILE_SIZE),
-      static_cast<int>(mapBgLayer1.getRows() * Map::TILE_SIZE));
+      static_cast<int>(mapBgLayer2.getCols() * Map::TILE_SIZE),
+      static_cast<int>(mapBgLayer2.getRows() * Map::TILE_SIZE));
   SDL_SetTextureScaleMode(bgTex2, SDL_SCALEMODE_PIXELART);
   SDL_SetRenderTarget(sdlState.renderer, bgTex2);
 
@@ -512,21 +512,21 @@ void GameScene::update(float dt) {
 }
 
 void GameScene::draw() {
-  constexpr float parallaxFactor = -0.3f;
+  constexpr float parallaxFactor[] = {-0.3f, -0.4f};
+
   const SDL_FRect bgTex1Dst = {
-      .x = parallaxFactor * cam.x,
+      .x = parallaxFactor[0] * cam.x,
       .y = -Map::TILE_SIZE,
       .w = static_cast<float>(mapBgLayer1.getCols() * Map::TILE_SIZE),
       .h = static_cast<float>(mapBgLayer1.getRows() * Map::TILE_SIZE)};
   SDL_RenderTexture(sdlState.renderer, bgTex1, nullptr, &bgTex1Dst);
 
   const SDL_FRect bgTex2Dst = {
-      .x = 0.0f,
+      .x = -cam.x,
       .y = SDLState::logicalHeight -
-           static_cast<float>(mapBgLayer1.getRows() * Map::TILE_SIZE),
-      .w = static_cast<float>(mapBgLayer1.getCols() * Map::TILE_SIZE),
-      .h = SDLState::logicalHeight,
-  };
+           static_cast<float>(mapBgLayer2.getRows() * Map::TILE_SIZE) - cam.y,
+      .w = static_cast<float>(mapBgLayer2.getCols() * Map::TILE_SIZE),
+      .h = static_cast<float>(mapBgLayer2.getRows() * Map::TILE_SIZE)};
   SDL_RenderTexture(sdlState.renderer, bgTex2, nullptr, &bgTex2Dst);
 
   for (auto &staticTile : staticTiles) {
