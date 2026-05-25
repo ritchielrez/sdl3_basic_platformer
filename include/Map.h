@@ -54,7 +54,10 @@ enum {
   BUSH1,
   BUSH2,
   BUSH3,
-  FLOWER_BUSH
+  FLOWER_BUSH,
+  BRIDGE1,
+  BRIDGE2,
+  BRIDGE3
 };
 }
 
