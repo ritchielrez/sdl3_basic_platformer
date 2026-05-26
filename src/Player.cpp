@@ -20,8 +20,13 @@ void Player::update(const SDLState& sdlState, SDL_FRect& cam,
                     const std::vector<DynTile>& dynTiles,
                     std::vector<Coin>& coins, size_t& collectedCoins,
                     std::vector<Slime>& slimes, float dt) {
+  // Save previous grounded state and update for this frame.
+  // Must happen before canJump is computed so wasGrounded reflects last frame.
+  wasGrounded = grounded;
+
   // --- Jump Buffering: Record a jump press for use on the next landing ---
   const bool jumpDown = sdlState.keys[SDL_SCANCODE_SPACE];
+
   // We only want the rising edge of the Space key press.
   const bool jumpJustPressed = jumpDown && !wasJumpDown;
   wasJumpDown = jumpDown;
@@ -33,21 +38,10 @@ void Player::update(const SDLState& sdlState, SDL_FRect& cam,
     jumpBufferTimer.step(dt);
   }
 
-  // --- Coyote Time: Allow jumping briefly after walking off a ledge ---
-  // Start the coyote window on the first frame the player becomes airborne
-  // without having jumped (i.e., walked off an edge).
-  if (wasGrounded && !grounded && currAnim != PlayerAnim::jump) {
-    coyoteTimer.reset();
-    coyoteTimer.step(dt);
-  } else if (coyoteTimer.isStarted() && !coyoteTimer.isTimeOut()) {
-    coyoteTimer.step(dt);
-  }
-  wasGrounded = grounded;
-
   // Determine whether the player is allowed to jump right now:
   //   - grounded, OR within the coyote window
   const bool canJump =
-      (grounded || (coyoteTimer.isStarted() && !coyoteTimer.isTimeOut())) &&
+      (wasGrounded || (coyoteTimer.isStarted() && !coyoteTimer.isTimeOut())) &&
       currAnim != PlayerAnim::death;
 
   // Trigger jump if:
@@ -201,6 +195,16 @@ void Player::update(const SDLState& sdlState, SDL_FRect& cam,
     cam.y = glm::lerp(cam.y, -30.0f, camYSmoothness * dt);
   } else {
     cam.y = glm::lerp(cam.y, 0.0f, camYSmoothness * dt);
+  }
+
+  // --- Coyote Time: Allow jumping briefly after walking off a ledge ---
+  // Start the coyote window on the first frame the player becomes airborne
+  // without having jumped (i.e., walked off an edge).
+  if (wasGrounded && !grounded && currAnim != PlayerAnim::jump) {
+    coyoteTimer.reset();
+    coyoteTimer.step(dt);
+  } else if (coyoteTimer.isStarted() && !coyoteTimer.isTimeOut()) {
+    coyoteTimer.step(dt);
   }
 }
 

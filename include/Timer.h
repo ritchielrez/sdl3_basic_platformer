@@ -28,5 +28,6 @@ class Timer {
   void reset() {
     time = 0;
     timeout = false;
+    started = false;
   }
 };
