@@ -506,6 +506,25 @@ void GameScene::createEntities() {
           staticTiles.push_back(staticTile);
           break;
         }
+        case Tiles::BOX: {
+          StaticTile staticTile{};
+          staticTile.pos =
+              glm::vec2(c * Map::TILE_SIZE,
+                        SDLState::logicalHeight -
+                            (mapMidLayer.getRows() - r) * Map::TILE_SIZE);
+          staticTile.tex = resourceManager.getWorldTex();
+          staticTile.w = static_cast<float>(Map::TILE_SIZE);
+          staticTile.h = static_cast<float>(Map::TILE_SIZE);
+          staticTile.collider.x = 0;
+          staticTile.collider.y = 0;
+          staticTile.collider.w = staticTile.w;
+          staticTile.collider.h = staticTile.h;
+          staticTile.anims = std::vector<Frames>{
+              Frames(glm::vec2(3 * Map::TILE_SIZE, 7 * Map::TILE_SIZE), Map::TILE_SIZE,
+                     Map::TILE_SIZE)};
+          staticTiles.push_back(staticTile);
+          break;
+        }
         case Tiles::ENEMY: {
           Slime slime{};
           // NOTE: Subtracting by 4 pixels allows the slime tile to be

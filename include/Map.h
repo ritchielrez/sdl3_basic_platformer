@@ -57,7 +57,8 @@ enum {
   FLOWER_BUSH,
   BRIDGE1,
   BRIDGE2,
-  BRIDGE3
+  BRIDGE3,
+  BOX,
 };
 }
 
