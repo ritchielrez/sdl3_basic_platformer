@@ -70,6 +70,7 @@ struct GameScene {
         resourceManager(resourceManager),
         bgTex1(nullptr),
         bgTex2(nullptr),
+        fgTex(nullptr),
         cam(0.0f),
         collectedCoins(0),
         coinText(sdlState, fmt::format("Coins: {}", collectedCoins),
