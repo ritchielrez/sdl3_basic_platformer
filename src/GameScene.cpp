@@ -302,6 +302,16 @@ void GameScene::createBg() {
           src.y = 6 * Map::TILE_SIZE;
           break;
         }
+        case Tiles::WAVES: {
+          src.x = 4 * Map::TILE_SIZE;
+          src.y = 9 * Map::TILE_SIZE;
+          break;
+        }
+        case Tiles::WATER: {
+          src.x = 4 * Map::TILE_SIZE;
+          src.y = 10 * Map::TILE_SIZE;
+          break;
+        }
         case Tiles::NONE:
           continue;
         default:
@@ -310,6 +320,57 @@ void GameScene::createBg() {
               fmt::format("Unreachable: unhandled tile type of {} for "
                           "background layer 2",
                           mapBgLayer2.getTiles()[r * mapBgLayer2.getCols() + c])
+                  .data(),
+              nullptr);
+          exit(1);
+      }
+      SDL_RenderTexture(sdlState.renderer, resourceManager.getWorldTex(), &src,
+                        &dst);
+    }
+  }
+  SDL_SetRenderTarget(sdlState.renderer, nullptr);
+}
+
+void GameScene::createFg() {
+  fgTex = SDL_CreateTexture(
+      sdlState.renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET,
+      static_cast<int>(mapFgLayer.getCols() * Map::TILE_SIZE),
+      static_cast<int>(mapFgLayer.getRows() * Map::TILE_SIZE));
+  SDL_SetTextureScaleMode(fgTex, SDL_SCALEMODE_PIXELART);
+  SDL_SetRenderTarget(sdlState.renderer, fgTex);
+
+  // `mapFgLayer` refers to the first background layer of the level map that
+  // defines what the background should look like.
+  for (size_t r = 0; r < mapFgLayer.getRows(); r++) {
+    for (size_t c = 0; c < mapFgLayer.getCols(); c++) {
+      SDL_FRect src{.x = 0,
+                    .y = 0,
+                    .w = static_cast<float>(Map::TILE_SIZE),
+                    .h = static_cast<float>(Map::TILE_SIZE)};
+      const SDL_FRect dst{.x = static_cast<float>(c * Map::TILE_SIZE),
+                          .y = static_cast<float>(r * Map::TILE_SIZE),
+                          .w = static_cast<float>(Map::TILE_SIZE),
+                          .h = static_cast<float>(Map::TILE_SIZE)};
+
+      switch (mapFgLayer.getTiles()[r * mapFgLayer.getCols() + c]) {
+        case Tiles::WAVES: {
+          src.x = 4 * Map::TILE_SIZE;
+          src.y = 9 * Map::TILE_SIZE;
+          break;
+        }
+        case Tiles::WATER: {
+          src.x = 4 * Map::TILE_SIZE;
+          src.y = 10 * Map::TILE_SIZE;
+          break;
+        }
+        case Tiles::NONE:
+          continue;
+        default:
+          SDL_ShowSimpleMessageBox(
+              SDL_MESSAGEBOX_ERROR, "Error",
+              fmt::format("Unreachable: unhandled tile type of {} for "
+                          "foreground layer",
+                          mapFgLayer.getTiles()[r * mapFgLayer.getCols() + c])
                   .data(),
               nullptr);
           exit(1);
@@ -641,4 +702,12 @@ void GameScene::draw() {
   coinText.draw();
 
   player.draw(sdlState, cam);
+
+  const SDL_FRect fgTexDst = {
+      .x = -cam.x,
+      .y = SDLState::logicalHeight -
+           static_cast<float>(mapBgLayer2.getRows() * Map::TILE_SIZE) - cam.y,
+      .w = static_cast<float>(mapBgLayer2.getCols() * Map::TILE_SIZE),
+      .h = static_cast<float>(mapBgLayer2.getRows() * Map::TILE_SIZE)};
+  SDL_RenderTexture(sdlState.renderer, fgTex, nullptr, &fgTexDst);
 }

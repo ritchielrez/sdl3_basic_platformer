@@ -20,9 +20,11 @@ struct GameScene {
   Map mapBgLayer1;
   Map mapBgLayer2;
   Map mapMidLayer;
+  Map mapFgLayer;
   Player player{};
   SDL_Texture *bgTex1;
   SDL_Texture *bgTex2;
+  SDL_Texture *fgTex;
   std::vector<Slime> slimes;
   std::vector<StaticTile> staticTiles;
   std::vector<DynTile> dynTiles;
@@ -34,6 +36,7 @@ struct GameScene {
  private:
   void createPlayer();
   void createBg();
+  void createFg();
   void createEntities();
 
   void init() {
@@ -46,8 +49,12 @@ struct GameScene {
     if (!mapMidLayer.parse("./assets/levels/1/mid.csv")) {
       exit(1);
     }
+    if (!mapFgLayer.parse("./assets/levels/1/fg.csv")) {
+      exit(1);
+    }
 
     createBg();
+    createFg();
     createEntities();
     createPlayer();
 
@@ -74,6 +81,7 @@ struct GameScene {
     mapBgLayer1 = Map();
     mapBgLayer2 = Map();
     mapMidLayer = Map();
+    mapFgLayer = Map();
     player = Player();
     slimes.clear();
     staticTiles.clear();

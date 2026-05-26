@@ -55,6 +55,8 @@ enum {
   BUSH2,
   BUSH3,
   FLOWER_BUSH,
+  WAVES,
+  WATER,
   BRIDGE1,
   BRIDGE2,
   BRIDGE3,
