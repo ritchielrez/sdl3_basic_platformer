@@ -36,8 +36,8 @@ struct Player : public Entity {
         wasGrounded(false),
         wasJumpDown(false),
         passedCamRuler(false),
-        dashDuration(0.25f),
-        dashCooldown(0.2f),
+        dashDuration(0.75f),
+        dashCooldown(5.0f),
         coyoteTimer(0.1f),
         jumpBufferTimer(0.12f) {}
   void update(const SDLState& sdlState, SDL_FRect& cam,
