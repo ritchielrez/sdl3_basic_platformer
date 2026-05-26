@@ -66,9 +66,10 @@ void Player::update(const SDLState& sdlState, SDL_FRect& cam,
 
   // --- Variable Jump Height: Cut upward velocity when Space is released ---
   // Only applies while the player is still rising from a jump.
-  if (!jumpDown && vel.y < 0) {
-    vel.y *= 0.90f;  // Dampen rise per-frame; acts as a soft cut
-  }
+  // TODO: This implmentation is not concrete.
+  // if (!jumpDown && vel.y < 0) {
+  //   vel.y *= 0.90f;  // Dampen rise per-frame; acts as a soft cut
+  // }
 
   if (dashCooldown.isStarted() && !dashCooldown.isTimeOut()) {
     dashCooldown.step(dt);
