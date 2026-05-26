@@ -520,8 +520,8 @@ void GameScene::createEntities() {
           staticTile.collider.w = staticTile.w;
           staticTile.collider.h = staticTile.h;
           staticTile.anims = std::vector<Frames>{
-              Frames(glm::vec2(3 * Map::TILE_SIZE, 7 * Map::TILE_SIZE), Map::TILE_SIZE,
-                     Map::TILE_SIZE)};
+              Frames(glm::vec2(7 * Map::TILE_SIZE, 3 * Map::TILE_SIZE),
+                     Map::TILE_SIZE, Map::TILE_SIZE)};
           staticTiles.push_back(staticTile);
           break;
         }
