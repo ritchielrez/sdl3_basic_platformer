@@ -560,7 +560,7 @@ void GameScene::createEntities() {
           break;
         };
         case Tiles::NONE:
-          break;
+          continue;
         default:
           SDL_ShowSimpleMessageBox(
               SDL_MESSAGEBOX_ERROR, "Error",
