@@ -132,6 +132,11 @@ void Player::update(const SDLState& sdlState, SDL_FRect& cam,
       }
       break;
     }
+    case PlayerAnim::jump: {
+      if (grounded) {
+        currAnim = PlayerAnim::idle;
+      }
+    }
   }
 
   vel += static_cast<float>(currDir) * accel * dt;
