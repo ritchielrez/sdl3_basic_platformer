@@ -302,14 +302,14 @@ void GameScene::createBg() {
           src.y = 6 * Map::TILE_SIZE;
           break;
         }
-        case Tiles::WAVES: {
+        case Tiles::YELLOW_WAVES: {
           src.x = 4 * Map::TILE_SIZE;
-          src.y = 9 * Map::TILE_SIZE;
+          src.y = 13 * Map::TILE_SIZE;
           break;
         }
-        case Tiles::WATER: {
+        case Tiles::YELLOW_WATER: {
           src.x = 4 * Map::TILE_SIZE;
-          src.y = 10 * Map::TILE_SIZE;
+          src.y = 14 * Map::TILE_SIZE;
           break;
         }
         case Tiles::NONE:
@@ -337,6 +337,8 @@ void GameScene::createFg() {
       static_cast<int>(mapFgLayer.getCols() * Map::TILE_SIZE),
       static_cast<int>(mapFgLayer.getRows() * Map::TILE_SIZE));
   SDL_SetTextureScaleMode(fgTex, SDL_SCALEMODE_PIXELART);
+  SDL_SetTextureColorMod(fgTex, 255, 255, 200);
+  SDL_SetTextureAlphaMod(fgTex, 200);
   SDL_SetRenderTarget(sdlState.renderer, fgTex);
 
   // `mapFgLayer` refers to the first background layer of the level map that
@@ -353,14 +355,14 @@ void GameScene::createFg() {
                           .h = static_cast<float>(Map::TILE_SIZE)};
 
       switch (mapFgLayer.getTiles()[r * mapFgLayer.getCols() + c]) {
-        case Tiles::WAVES: {
+        case Tiles::YELLOW_WAVES: {
           src.x = 4 * Map::TILE_SIZE;
-          src.y = 9 * Map::TILE_SIZE;
+          src.y = 13 * Map::TILE_SIZE;
           break;
         }
-        case Tiles::WATER: {
+        case Tiles::YELLOW_WATER: {
           src.x = 4 * Map::TILE_SIZE;
-          src.y = 10 * Map::TILE_SIZE;
+          src.y = 14 * Map::TILE_SIZE;
           break;
         }
         case Tiles::NONE:

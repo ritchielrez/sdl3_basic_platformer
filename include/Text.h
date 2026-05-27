@@ -42,6 +42,9 @@ class Text {
   void assign(const std::string_view str) {
     TTF_SetTextString(ttfText, str.data(), str.size());
   }
+  void prepend(const std::string_view prefix) {
+    TTF_InsertTextString(ttfText, 0, prefix.data(), prefix.size());
+  }
 
   void getSize(int *w, int *h) const { TTF_GetTextSize(ttfText, w, h); }
 
