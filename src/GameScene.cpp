@@ -469,17 +469,22 @@ void GameScene::createEntities() {
         }
         case Tiles::MOVING_PLATFORM_GRASS: {
           DynTile dynTile{};
+          dynTile.origPos =
+              glm::vec2(c * Map::TILE_SIZE,
+                        SDLState::logicalHeight -
+                            (mapMidLayer.getRows() - r) * Map::TILE_SIZE);
           dynTile.pos =
               glm::vec2(c * Map::TILE_SIZE,
                         SDLState::logicalHeight -
                             (mapMidLayer.getRows() - r) * Map::TILE_SIZE);
+          dynTile.vel.x = 100.0f;
           dynTile.tex = resourceManager.getPlatformTex();
           dynTile.w = static_cast<float>(Map::TILE_SIZE);
           dynTile.h = static_cast<float>(Map::TILE_SIZE);
           dynTile.collider.x = 0;
           dynTile.collider.y = 0;
           dynTile.collider.w = dynTile.w;
-          dynTile.collider.h = dynTile.h;
+          dynTile.collider.h = dynTile.h - 7;
           dynTile.anims = std::vector<Frames>{
               Frames(glm::vec2(0, 0), Map::TILE_SIZE, Map::TILE_SIZE)};
           dynTiles.push_back(dynTile);

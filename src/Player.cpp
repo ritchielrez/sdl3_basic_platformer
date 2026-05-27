@@ -269,11 +269,33 @@ void Player::collision(const std::vector<StaticTile>& staticTiles,
     collidedRect.w = dynTile.collider.w;
     collidedRect.h = dynTile.collider.h;
 
-    // TODO: Implement collision behaviour of player with moving platform
-    // tiles.
     if (SDL_GetRectIntersectionFloat(&playerCollider, &collidedRect,
                                      &intersectionRect)) {
       collided = true;
+
+      if (intersectionRect.w > intersectionRect.h) {
+        if (vel.y > 0) {
+          pos.y -= intersectionRect.h;
+        } else if (vel.y < 0) {
+          pos.y += intersectionRect.h;
+        }
+        vel.y = 0;
+      } else {
+        if (vel.x > 0) {
+          pos.x -= intersectionRect.w;
+        } else if (vel.x < 0) {
+          pos.x += intersectionRect.w;
+        }
+        vel.x = 0;
+      }
+
+      // Recalculate playerCollider after the player has moved due to collision.
+      playerCollider.x = pos.x + collider.x;
+      playerCollider.y = pos.y + collider.y;
+
+      if (playerCollider.y + playerCollider.h <= collidedRect.y) {
+        foundGround = true;
+      }
     }
   }
 
