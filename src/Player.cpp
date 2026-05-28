@@ -161,7 +161,7 @@ void Player::update(const SDLState& sdlState, SDL_FRect& cam,
 
   pos += velFrame;
   if (pos.x <= 0) pos.x = 0;
-  collision(staticTiles, dynTiles, coins, collectedCoins, slimes);
+  collision(staticTiles, dynTiles, coins, collectedCoins, slimes, dt);
 
   // --- Horizontal Camera System ---
   // The 'camRuler' is the point where the player is exactly in the center of
@@ -216,7 +216,7 @@ void Player::update(const SDLState& sdlState, SDL_FRect& cam,
 void Player::collision(const std::vector<StaticTile>& staticTiles,
                        const std::vector<DynTile>& dynTiles,
                        std::vector<Coin>& coins, size_t& collectedCoins,
-                       std::vector<Slime>& slimes) {
+                       std::vector<Slime>& slimes, float dt) {
   SDL_FRect playerCollider{.x = pos.x + collider.x,
                            .y = pos.y + collider.y,
                            .w = collider.w,
@@ -296,6 +296,8 @@ void Player::collision(const std::vector<StaticTile>& staticTiles,
       if (playerCollider.y + playerCollider.h <= collidedRect.y) {
         foundGround = true;
       }
+
+      pos.x += dir * glm::abs(dynTile.vel.x) * dt;
     }
   }
 
