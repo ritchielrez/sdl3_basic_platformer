@@ -6,7 +6,6 @@
 
 #include "Entity.h"
 #include "Map.h"
-#include "StaticTile.h"
 
 struct DynTile : public Entity {
   glm::vec2 origin;
