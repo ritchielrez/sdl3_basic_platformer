@@ -656,7 +656,7 @@ void GameScene::update(float dt) {
                 slimes, dt);
 
   for (auto &dynTile : dynTiles) {
-    dynTile.update(staticTiles, dt, cam);
+    dynTile.update(dt, cam);
   }
 
   for (auto &coin : coins) {
