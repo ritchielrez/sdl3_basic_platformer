@@ -31,7 +31,9 @@ struct GameScene {
   std::vector<Coin> coins;
   SDL_FRect cam;
   size_t collectedCoins;
+  size_t slainSlimes;
   Text coinText;
+  Text slimesText;
 
  private:
   void createPlayer();
@@ -73,9 +75,14 @@ struct GameScene {
         fgTex(nullptr),
         cam(0.0f),
         collectedCoins(0),
+        slainSlimes(0),
         coinText(sdlState, fmt::format("Coins: {}", collectedCoins),
-                 glm::vec2(10, 10)) {
+                 glm::vec2(5, 5)),
+        slimesText(sdlState, fmt::format("Slain enemies: {}", slainSlimes),
+                   glm::vec2(5, 15)) {
     init();
+    coinText.setColor(50, 40, 15);
+    slimesText.setColor(50, 40, 15);
   }
 
   void reset() {
@@ -89,6 +96,7 @@ struct GameScene {
     dynTiles.clear();
     coins.clear();
     collectedCoins = 0;
+    slainSlimes = 0;
     init();
   }
 

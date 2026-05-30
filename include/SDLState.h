@@ -18,6 +18,8 @@ struct SDLState {
   // `TTF_Font` is a class that allows a certain font to be used for text
   // rendering.
   TTF_Font *font;
+  // Set the font size to be globally 8 pts.
+  static constexpr float fontSize = 8.0f;
   // `TTF_TextEngine` is a class that allows text to be rendered with dynamic
   // layouts.
   TTF_TextEngine *textEngine;
@@ -84,7 +86,7 @@ struct SDLState {
 
     // Open a font file so it can be used for text rendering. Set the font size
     // to be 8pt.
-    font = TTF_OpenFont("assets/fonts/PixelOperator8.ttf", 8.0f);
+    font = TTF_OpenFont("assets/fonts/PixelOperator8.ttf", fontSize);
     if (!font) {
       SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error",
                                "Could not open font", nullptr);

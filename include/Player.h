@@ -43,10 +43,12 @@ struct Player : public Entity {
   void update(const SDLState& sdlState, SDL_FRect& cam,
               const std::vector<StaticTile>& staticTiles,
               const std::vector<DynTile>& dynTiles, std::vector<Coin>& coins,
-              size_t& collectedCoins, std::vector<Slime>& slimes, float dt);
+              size_t& collectedCoins, std::vector<Slime>& slimes,
+              size_t& slainSlimes, float dt);
   void collision(const std::vector<StaticTile>& staticTiles,
                  const std::vector<DynTile>& dynTiles, std::vector<Coin>& coins,
-                 size_t& collectedCoins, std::vector<Slime>& slimes, float dt);
+                 size_t& collectedCoins, std::vector<Slime>& slimes,
+                 size_t& slainSlimes, float dt);
 
   [[nodiscard]] std::string inspect() const {
     std::string playerState{8, 0};
@@ -74,9 +76,11 @@ struct Player : public Entity {
     }
     return fmt::format(
         "Position: ({}, {})\nVelocity: ({}, {})\nState: {}\nCollision: "
-        "{}\nGrounded: {}\nWas grounded: {}\nPressed jump down (last frame): {}\nDash duration active: {}\nDash cooldown active: "
+        "{}\nGrounded: {}\nWas grounded: {}\nPressed jump down (last frame): "
+        "{}\nDash duration active: {}\nDash cooldown active: "
         "{}\nCoyote active: {}\nJump buffered: {}\n",
-        pos.x, pos.y, vel.x, vel.y, playerState, collided, grounded, wasGrounded, wasJumpDown,
+        pos.x, pos.y, vel.x, vel.y, playerState, collided, grounded,
+        wasGrounded, wasJumpDown,
         dashDuration.isStarted() && !dashDuration.isTimeOut(),
         dashCooldown.isStarted() && !dashCooldown.isTimeOut(),
         coyoteTimer.isStarted() && !coyoteTimer.isTimeOut(),

@@ -653,7 +653,7 @@ void GameScene::update(float dt) {
     player.anims[player.currAnim].step(dt);
   }
   player.update(sdlState, cam, staticTiles, dynTiles, coins, collectedCoins,
-                slimes, dt);
+                slimes, slainSlimes, dt);
 
   for (auto &dynTile : dynTiles) {
     dynTile.update(dt, cam);
@@ -668,6 +668,7 @@ void GameScene::update(float dt) {
     slime.anims[slime.currAnim].step(dt);
     slime.update(staticTiles, dt, cam);
   }
+  slimesText.assign(fmt::format("Slain enemies: {}", slainSlimes));
 
   // If the player fall below the screen, they die.
   if (player.pos.y >= SDLState::logicalHeight) {
@@ -708,6 +709,7 @@ void GameScene::draw() {
   }
 
   coinText.draw();
+  slimesText.draw();
 
   player.draw(sdlState, cam);
 

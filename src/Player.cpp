@@ -19,7 +19,7 @@ void Player::update(const SDLState& sdlState, SDL_FRect& cam,
                     const std::vector<StaticTile>& staticTiles,
                     const std::vector<DynTile>& dynTiles,
                     std::vector<Coin>& coins, size_t& collectedCoins,
-                    std::vector<Slime>& slimes, float dt) {
+                    std::vector<Slime>& slimes, size_t& slainSlimes, float dt) {
   // Save previous grounded state and update for this frame.
   // Must happen before canJump is computed so wasGrounded reflects last frame.
   wasGrounded = grounded;
@@ -155,62 +155,66 @@ void Player::update(const SDLState& sdlState, SDL_FRect& cam,
 
   pos += velFrame;
   if (pos.x <= 0) pos.x = 0;
-  collision(staticTiles, dynTiles, coins, collectedCoins, slimes, dt);
+  collision(staticTiles, dynTiles, coins, collectedCoins, slimes, slainSlimes,
+            dt);
 
-  // --- Horizontal Camera System ---
-  // The 'camRuler' is the point where the player is exactly in the center of
-  // the screen.
-  float camRuler = (SDLState::logicalWidth - w) / 2;
-  constexpr float camXSmoothness = 3.0f;
-  float targetX = pos.x - camRuler;
+  if (currAnim != PlayerAnim::death) {
+    // --- Horizontal Camera System ---
+    // The 'camRuler' is the point where the player is exactly in the center of
+    // the screen.
+    float camRuler = (SDLState::logicalWidth - w) / 2;
+    constexpr float camXSmoothness = 3.0f;
+    float targetX = pos.x - camRuler;
 
-  // Velocity Look-Ahead:
-  // Standard lerp smoothing causes a steady-state lag where the camera trails
-  // the player. We offset the target by a fraction of the velocity to
-  // compensate.
-  targetX += vel.x * 0.20f;
+    // Velocity Look-Ahead:
+    // Standard lerp smoothing causes a steady-state lag where the camera trails
+    // the player. We offset the target by a fraction of the velocity to
+    // compensate.
+    targetX += vel.x * 0.20f;
 
-  // Threshold Logic: The camera stays at 0 until the player first reaches the
-  // center of the screen, after which it begins smooth tracking.
-  if (!passedCamRuler && pos.x >= camRuler) passedCamRuler = true;
-  if (passedCamRuler) {
-    if (pos.x >= camRuler &&
-        !(dashDuration.isStarted() && !dashDuration.isTimeOut())) {
-      cam.x = glm::lerp(cam.x, targetX, camXSmoothness * dt);
-    } else if (pos.x >= camRuler) {
-      cam.x = glm::lerp(cam.x, targetX, camXSmoothness / 2 * dt);
-    } else {
-      cam.x = glm::lerp(cam.x, 0.0f, camXSmoothness * dt);
+    // Threshold Logic: The camera stays at 0 until the player first reaches the
+    // center of the screen, after which it begins smooth tracking.
+    if (!passedCamRuler && pos.x >= camRuler) passedCamRuler = true;
+    if (passedCamRuler) {
+      if (pos.x >= camRuler &&
+          !(dashDuration.isStarted() && !dashDuration.isTimeOut())) {
+        cam.x = glm::lerp(cam.x, targetX, camXSmoothness * dt);
+      } else if (pos.x >= camRuler) {
+        cam.x = glm::lerp(cam.x, targetX, camXSmoothness / 2 * dt);
+      } else {
+        cam.x = glm::lerp(cam.x, 0.0f, camXSmoothness * dt);
+      }
     }
-  }
 
-  // --- Vertical Camera System ---
-  // If the player is close to the top of the screen, then move the camera up
-  // slightly so it does not look like the player is touching the ceiling or
-  // going beyond it.
-  constexpr float camYSmoothness = 5.0f;
+    // --- Vertical Camera System ---
+    // If the player is close to the top of the screen, then move the camera up
+    // slightly so it does not look like the player is touching the ceiling or
+    // going beyond it.
+    constexpr float camYSmoothness = 5.0f;
 
-  if (pos.y <= 10) {
-    cam.y = glm::lerp(cam.y, -30.0f, camYSmoothness * dt);
-  } else {
-    cam.y = glm::lerp(cam.y, 0.0f, camYSmoothness * dt);
-  }
+    if (pos.y <= 10) {
+      cam.y = glm::lerp(cam.y, -30.0f, camYSmoothness * dt);
+    } else {
+      cam.y = glm::lerp(cam.y, 0.0f, camYSmoothness * dt);
+    }
 
-  // --- Coyote Time: Allow jumping briefly after walking off a ledge ---
-  // Start the coyote window on the first frame the player becomes airborne
-  // without having jumped (i.e., walked off an edge).
-  if (wasGrounded && !grounded && currAnim != PlayerAnim::jump) {
-    coyoteTimer.reset();
-    coyoteTimer.step(dt);
-  } else if (coyoteTimer.isStarted() && !coyoteTimer.isTimeOut()) {
-    coyoteTimer.step(dt);
+    // --- Coyote Time: Allow jumping briefly after walking off a ledge ---
+    // Start the coyote window on the first frame the player becomes airborne
+    // without having jumped (i.e., walked off an edge).
+    if (wasGrounded && !grounded && currAnim != PlayerAnim::jump) {
+      coyoteTimer.reset();
+      coyoteTimer.step(dt);
+    } else if (coyoteTimer.isStarted() && !coyoteTimer.isTimeOut()) {
+      coyoteTimer.step(dt);
+    }
   }
 }
 
 void Player::collision(const std::vector<StaticTile>& staticTiles,
                        const std::vector<DynTile>& dynTiles,
                        std::vector<Coin>& coins, size_t& collectedCoins,
-                       std::vector<Slime>& slimes, float dt) {
+                       std::vector<Slime>& slimes, size_t& slainSlimes,
+                       float dt) {
   SDL_FRect playerCollider{.x = pos.x + collider.x,
                            .y = pos.y + collider.y,
                            .w = collider.w,
@@ -327,6 +331,7 @@ void Player::collision(const std::vector<StaticTile>& staticTiles,
               slimes[k].pos.y + slimes[k].collider.y + 5.0f) {
         slimes[k] = slimes.back();
         slimes.pop_back();
+        slainSlimes++;
         continue;
       }
       death = true;
