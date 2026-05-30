@@ -50,6 +50,7 @@ class SceneManager {
           sceneType = SceneType::game;
           deathScene.shouldRetry = false;
         } else if (deathScene.shouldBeBackToStart) {
+          gameScene.reset();
           sceneType = SceneType::start;
           deathScene.shouldBeBackToStart = false;
         }
