@@ -21,6 +21,7 @@ class ResourceManager {
   SDL_Texture *platformsTex;
   SDL_Texture *slimeTex;
   SDL_Texture *startSceneBgTex;
+  SDL_Texture *deathSceneBgTex;
 
  public:
   // Default constructor — all textures null. Exists so ResourceManager can
@@ -81,6 +82,15 @@ class ResourceManager {
           nullptr);
       exit(1);
     }
+
+    deathSceneBgTex = loadTex(sdlState, "assets/sprites/death_scene_bg.png");
+    if (!deathSceneBgTex) {
+      SDL_ShowSimpleMessageBox(
+          SDL_MESSAGEBOX_ERROR, "Error",
+          "The background texture for death scene could not be loaded",
+          nullptr);
+      exit(1);
+    }
   }
 
   ResourceManager(const ResourceManager &) = delete;
@@ -130,6 +140,9 @@ class ResourceManager {
   [[nodiscard]] SDL_Texture *getStartSceneBgTex() const {
     return startSceneBgTex;
   }
+  [[nodiscard]] SDL_Texture *getDeathSceneBgTex() const {
+    return deathSceneBgTex;
+  }
 
   // Destructor releases all GPU memory. Each SDL_DestroyTexture decrements
   // the texture's internal reference count and frees the VRAM allocation.
@@ -140,5 +153,6 @@ class ResourceManager {
     SDL_DestroyTexture(platformsTex);
     SDL_DestroyTexture(slimeTex);
     SDL_DestroyTexture(startSceneBgTex);
+    SDL_DestroyTexture(deathSceneBgTex);
   }
 };

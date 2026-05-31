@@ -24,8 +24,8 @@ enum {
 class StartScene {
   const SDLState &sdlState;
   const ResourceManager &resourceManager;
-  Text playText;
-  Text exitText;
+  Text playText; // "Play" button --- starts the game
+  Text exitText; // "Exit" button - closes the game
   // Currently highlighted button index (0 = Play, 1 = Exit). Modulo-wrapped
   // on up/down input.
   uint8_t selectedBtn;
@@ -52,7 +52,7 @@ class StartScene {
     // middle of the logical screen (320×180).
     playText.pos = {
         (SDLState::logicalWidth - static_cast<float>(playTextWidth)) / 2.0f,
-        (SDLState::logicalHeight / 2.0f) - static_cast<float>(playTextHeight)};
+        (SDLState::logicalHeight / 2.0f) - static_cast<float>(playTextHeight) / 2.0f};
     exitText.pos = {
         (SDLState::logicalWidth - static_cast<float>(exitTextWidth)) / 2.0f,
         (SDLState::logicalHeight / 2.0f) + 10.0f};

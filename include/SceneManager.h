@@ -32,7 +32,7 @@ class SceneManager {
       : sceneType(SceneType::start),
         startScene(sdlState, resourceManager),
         gameScene(sdlState, resourceManager),
-        deathScene(sdlState) {}
+        deathScene(sdlState, resourceManager) {}
 
   // Tick the active scene. Also checks for scene transitions:
   //   - Start → Game when the player presses "Play"

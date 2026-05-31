@@ -21,9 +21,12 @@ enum {
 // input, same as StartScene.
 class DeathScene {
   const SDLState &sdlState;
-  Text deathText;        // "You Died!!!" — static header
-  Text retryText;        // "Retry" — restarts the level
-  Text backToStartText;  // "Back to Start Screen" — back to title
+  const ResourceManager &resourceManager;
+  Text deathText;        // "You Died!!!" —  static header
+  Text retryText;        // "Retry" button —  restarts the level
+  Text backToStartText;  // "Back to Start Screen" button —  back to title
+  // Currently highlighted button index (0 = Retry, 1 = Back to Start Scene). Modulo-wrapped
+  // on up/down input.
   uint8_t selectedBtn;
 
  public:
@@ -34,11 +37,12 @@ class DeathScene {
   // game scene and transitions to SceneType::start.
   bool shouldBeBackToStart = false;
 
-  DeathScene(const SDLState &sdlState)
+  DeathScene(const SDLState &sdlState, const ResourceManager &resourceManager)
       : sdlState(sdlState),
+        resourceManager(resourceManager),
         deathText(sdlState, "You Died!!!", glm::vec2(0)),
         retryText(sdlState, "Retry", glm::vec2(0)),
-        backToStartText(sdlState, "Back to Start Screen", glm::vec2(0)),
+        backToStartText(sdlState, "Back to Start", glm::vec2(0)),
         selectedBtn(0) {
     int deathTextWidth, deathTextHeight, retryTextWidth, retryTextHeight,
         backToStartTextWidth, backToStartTextHeight;
@@ -61,7 +65,7 @@ class DeathScene {
             2.0f,
         (SDLState::logicalHeight / 2.0f) + 10.0f};
 
-    deathText.setColor(255, 255, 255);
+    deathText.setColor(Colors::fg.r, Colors::fg.g, Colors::fg.b, Colors::fg.a);
   }
 
   void update([[maybe_unused]] float dt) {
@@ -111,10 +115,14 @@ class DeathScene {
         case SDL_SCANCODE_UP:
         case SDL_SCANCODE_W:
           selectedBtn -= 1;
+          if (selectedBtn > DeathSceneBtns::BACK_TO_START)
+            selectedBtn = DeathSceneBtns::RETRY;
           break;
         case SDL_SCANCODE_DOWN:
         case SDL_SCANCODE_S:
           selectedBtn += 1;
+          if (selectedBtn > DeathSceneBtns::BACK_TO_START)
+            selectedBtn = DeathSceneBtns::BACK_TO_START;
           break;
         case SDL_SCANCODE_RETURN:
         case SDL_SCANCODE_SPACE:
@@ -158,6 +166,9 @@ class DeathScene {
   }
 
   void draw() {
+    // Draw the background image stretched to fill the entire screen.
+    SDL_RenderTexture(sdlState.renderer, resourceManager.getDeathSceneBgTex(),
+                      nullptr, nullptr);
     deathText.draw();
     retryText.draw();
     backToStartText.draw();

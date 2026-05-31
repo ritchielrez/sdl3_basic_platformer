@@ -63,6 +63,10 @@ class Text {
     TTF_SetTextColor(ttfText, r, g, b, a);
   }
 
+  void setWrapWidth(int w) const {
+    TTF_SetTextWrapWidth(ttfText, w);
+  }
+
   // Draw the text at its screen-space position. This renders directly to the
   // current SDL renderer target using the text engine.
   void draw() const { TTF_DrawRendererText(ttfText, pos.x, pos.y); }
