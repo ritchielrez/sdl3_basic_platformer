@@ -673,7 +673,6 @@ void GameScene::update(float dt) {
   // If the player fall below the screen, they die.
   if (player.pos.y >= SDLState::logicalHeight) {
     player.currAnim = PlayerAnim::death;
-    player.death = true;
   }
 }
 

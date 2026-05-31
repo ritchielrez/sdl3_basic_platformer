@@ -385,13 +385,12 @@ void Player::collision(const std::vector<StaticTile>& staticTiles,
         slainSlimes++;
         continue;
       }
-      death = true;
       currAnim = PlayerAnim::death;
     }
     k++;
   }
 
-  if (grounded != foundGround) {
+  if (currAnim != PlayerAnim::death && grounded != foundGround) {
     grounded = foundGround;
     if (foundGround) {
       currAnim = PlayerAnim::run;

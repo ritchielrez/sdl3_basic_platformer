@@ -33,8 +33,6 @@ struct Player : public Entity {
   float dashSpeed;
   // True when the player is intersecting a solid tile this frame.
   bool collided;
-  // True when the death animation has been triggered.
-  bool death;
   // True when the player is standing on solid ground (vel.y == 0 after
   // collision resolution).
   bool grounded;
@@ -75,7 +73,6 @@ struct Player : public Entity {
         jumpVel(0),
         dashSpeed(0),
         collided(false),
-        death(false),
         grounded(false),
         wasGrounded(false),
         wasJumpDown(false),
