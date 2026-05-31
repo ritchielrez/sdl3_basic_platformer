@@ -224,6 +224,7 @@ void Player::collision(const std::vector<StaticTile>& staticTiles,
 
   collided = false;
   bool foundGround = false;
+  bool collidedWithDynTile = false;
 
   for (auto& staticTile : staticTiles) {
     collidedRect.x = staticTile.pos.x + staticTile.collider.x;
@@ -270,6 +271,7 @@ void Player::collision(const std::vector<StaticTile>& staticTiles,
     if (SDL_GetRectIntersectionFloat(&playerCollider, &collidedRect,
                                      &intersectionRect)) {
       collided = true;
+      collidedWithDynTile = true;
 
       if (intersectionRect.w > intersectionRect.h) {
         if (vel.y > 0) {
@@ -295,7 +297,56 @@ void Player::collision(const std::vector<StaticTile>& staticTiles,
         foundGround = true;
       }
 
+      // The `dynTile` velocity carries or pushes the player.
       pos.x += dynTile.vel.x * dt;
+      // A player can collide with one `dynTile` at a time, so if detected
+      // collision with one, stop checking for more collisions with other
+      // `dynTiles`.
+      break;
+    }
+  }
+
+  // If the player collides with a `dynTile` then immediately collides with a
+  // `staticTile`, it means the player is being squished between two tiles. In
+  // that case the player should die.
+  if (collidedWithDynTile) {
+    for (auto& staticTile : staticTiles) {
+      collidedRect.x = staticTile.pos.x + staticTile.collider.x;
+      collidedRect.y = staticTile.pos.y + staticTile.collider.y;
+      collidedRect.w = staticTile.collider.w;
+      collidedRect.h = staticTile.collider.h;
+
+      if (SDL_GetRectIntersectionFloat(&playerCollider, &collidedRect,
+                                       &intersectionRect)) {
+        collided = true;
+
+        if (intersectionRect.w > intersectionRect.h) {
+          if (vel.y > 0) {
+            pos.y -= intersectionRect.h;
+          } else if (vel.y < 0) {
+            pos.y += intersectionRect.h;
+          }
+          vel.y = 0;
+        } else {
+          if (vel.x > 0) {
+            pos.x -= intersectionRect.w;
+          } else if (vel.x < 0) {
+            pos.x += intersectionRect.w;
+          }
+          vel.x = 0;
+        }
+
+        // Recalculate playerCollider after the player has moved due to
+        // collision.
+        playerCollider.x = pos.x + collider.x;
+        playerCollider.y = pos.y + collider.y;
+
+        if (playerCollider.y + playerCollider.h <= collidedRect.y) {
+          foundGround = true;
+        } else {
+          currAnim = PlayerAnim::death;
+        }
+      }
     }
   }
 
