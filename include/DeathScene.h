@@ -25,8 +25,8 @@ class DeathScene {
   Text deathText;        // "You Died!!!" —  static header
   Text retryText;        // "Retry" button —  restarts the level
   Text backToStartText;  // "Back to Start Screen" button —  back to title
-  // Currently highlighted button index (0 = Retry, 1 = Back to Start Scene). Modulo-wrapped
-  // on up/down input.
+  // Currently highlighted button index (0 = Retry, 1 = Back to Start Scene).
+  // Modulo-wrapped on up/down input.
   uint8_t selectedBtn;
 
  public:
@@ -43,7 +43,7 @@ class DeathScene {
         deathText(sdlState, "You Died!!!", glm::vec2(0)),
         retryText(sdlState, "Retry", glm::vec2(0)),
         backToStartText(sdlState, "Back to Start", glm::vec2(0)),
-        selectedBtn(0) {
+        selectedBtn(DeathSceneBtns::RETRY) {
     int deathTextWidth, deathTextHeight, retryTextWidth, retryTextHeight,
         backToStartTextWidth, backToStartTextHeight;
     deathText.getSize(&deathTextWidth, &deathTextHeight);

@@ -18,14 +18,14 @@ enum {
 };
 }  // namespace StartSceneBtns
 
-// The title / main menu scene. Displays a background image, a "Play" button,
+// The title/main menu scene. Displays a background image, a "Play" button,
 // and an "Exit" button. Supports both keyboard navigation (WASD / arrows +
 // Enter/Space) and mouse (hover + click).
 class StartScene {
   const SDLState &sdlState;
   const ResourceManager &resourceManager;
-  Text playText; // "Play" button --- starts the game
-  Text exitText; // "Exit" button - closes the game
+  Text playText;  // "Play" button --- starts the game
+  Text exitText;  // "Exit" button --- closes the game
   // Currently highlighted button index (0 = Play, 1 = Exit). Modulo-wrapped
   // on up/down input.
   uint8_t selectedBtn;
@@ -43,7 +43,7 @@ class StartScene {
         resourceManager(resourceManager),
         playText(sdlState, "Play", glm::vec2(0)),
         exitText(sdlState, "Exit", glm::vec2(0)),
-        selectedBtn(0) {
+        selectedBtn(StartSceneBtns::PLAY) {
     int playTextWidth, playTextHeight, exitTextWidth, exitTextHeight;
     playText.getSize(&playTextWidth, &playTextHeight);
     exitText.getSize(&exitTextWidth, &exitTextHeight);
@@ -52,7 +52,8 @@ class StartScene {
     // middle of the logical screen (320×180).
     playText.pos = {
         (SDLState::logicalWidth - static_cast<float>(playTextWidth)) / 2.0f,
-        (SDLState::logicalHeight / 2.0f) - static_cast<float>(playTextHeight) / 2.0f};
+        (SDLState::logicalHeight / 2.0f) -
+            static_cast<float>(playTextHeight) / 2.0f};
     exitText.pos = {
         (SDLState::logicalWidth - static_cast<float>(exitTextWidth)) / 2.0f,
         (SDLState::logicalHeight / 2.0f) + 10.0f};

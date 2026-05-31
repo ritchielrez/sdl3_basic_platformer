@@ -53,7 +53,8 @@ class SceneManager {
         gameScene.update(dt);
         // Wait for the death animation to finish playing before showing the
         // death screen — gives the player visual feedback of dying.
-        if (player.death && player.anims[player.currAnim].isTimeOut())
+        if (player.anims[PlayerAnim::death].isStarted() &&
+            player.anims[PlayerAnim::death].isTimeOut())
           sceneType = SceneType::death;
         break;
       }
