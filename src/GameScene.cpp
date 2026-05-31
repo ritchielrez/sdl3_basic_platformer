@@ -647,14 +647,6 @@ void GameScene::createEntities() {
 void GameScene::update(float dt) {
   dt = glm::min(dt, maxPhysicsDt);
 
-  // Only animate the player if the current animation has multiple frames.
-  // If it has one frame, the timer length/duration is set to 0.
-  if (player.anims[player.currAnim].getLen() != 0) {
-    player.anims[player.currAnim].step(dt);
-  }
-  player.update(sdlState, cam, staticTiles, dynTiles, coins, collectedCoins,
-                slimes, slainSlimes, dt);
-
   for (auto &dynTile : dynTiles) {
     dynTile.update(dt, cam);
   }
@@ -669,6 +661,14 @@ void GameScene::update(float dt) {
     slime.update(staticTiles, dt, cam);
   }
   slimesText.assign(fmt::format("Slain enemies: {}", slainSlimes));
+
+  // Only animate the player if the current animation has multiple frames.
+  // If it has one frame, the timer length/duration is set to 0.
+  if (player.anims[player.currAnim].getLen() != 0) {
+    player.anims[player.currAnim].step(dt);
+  }
+  player.update(sdlState, cam, staticTiles, dynTiles, coins, collectedCoins,
+                slimes, slainSlimes, dt);
 
   // If the player fall below the screen, they die.
   if (player.pos.y >= SDLState::logicalHeight) {
