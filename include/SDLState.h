@@ -8,44 +8,49 @@
 
 #include "SDL3/SDL_render.h"
 
-// `SDLState` is a class holding internal data that are needed for SDL to
-// function.
+// Holds all SDL3 subsystems needed to run the game: window, renderer, font
+// engine, and keyboard state. Initialization order matters — some subsystems
+// depend on others (e.g. the text engine needs a renderer). Acts as the single
+// point of contact with the underlying graphics API.
 struct SDLState {
   SDL_Window *win;
-  // `SDL_Renderer` is a simple 2D rendering API. This handles cross platform
-  // rendering of graphics.
+  // SDL_Renderer is the cross-platform 2D rendering API. It abstracts over
+  // Direct3D, OpenGL, Metal, and Vulkan so the same draw calls work everywhere.
   SDL_Renderer *renderer;
-  // `TTF_Font` is a class that allows a certain font to be used for text
-  // rendering.
+  // Loaded TrueType font, used by the text engine for all UI text.
   TTF_Font *font;
-  // Set the font size to be globally 8 pts.
+  // Font size in points. 8pt works well for pixel-art text at 320×180.
   static constexpr float fontSize = 8.0f;
-  // `TTF_TextEngine` is a class that allows text to be rendered with dynamic
-  // layouts.
+  // TTF_TextEngine handles text layout (kerning, wrapping) and renders glyphs
+  // into textures via the renderer.
   TTF_TextEngine *textEngine;
-  // This holds an array of the state of each key of the keyboard.
+  // Array of keyboard scancode states obtained from SDL. Each element is true
+  // while the corresponding key is held down. Indexed by SDL_SCANCODE_* values.
   const bool *keys;
-  // Set the default window size to be 1280x720.
+  // Window dimensions in physical (monitor) pixels. The window starts at
+  // 1280×720 but can be resized at runtime.
   int winWidth = 1280, winHeight = 720;
-  // However, internally the game is going to be rendered at 320x180.
-  // Because this is a pixel art game though the upscaling is not going to cause
-  // any blurriness, so many pixel art games actually render at low resolutions
-  // like 180p.
+  // Internal logical resolution: 320×180. The game world is rendered at this
+  // low resolution, then upscaled to the window via SDL_LOGICAL_PRESENTATION_INTEGER_SCALE.
+  // Pixel art looks crisp with nearest-neighbor upscaling because there is no
+  // sub-pixel blending. The 16:9 aspect ratio (320/180 = 16/9) matches common
+  // display ratios.
   static constexpr uint16_t logicalWidth = 320, logicalHeight = 180;
 
-  // No argument constructor setting everything to the default value of
-  // `nullptr`. This does not construct any SDL related objects.
+  // Default constructor — all pointers null. Exists so SDLState can be
+  // declared before the real constructor runs.
   SDLState()
       : win(nullptr),
         renderer(nullptr),
         font(nullptr),
         textEngine(nullptr),
         keys(nullptr) {}
-  // Parameterized constructor to initialize everything properly. This does
-  // construct the necessary SDL related objects.
+  // Full initializer: creates window, renderer, loads font, sets up text
+  // engine, and queries keyboard state. Exits with an error dialog if any
+  // critical step fails — there is no point running without a window or
+  // renderer.
   SDLState(const char *winTitle, SDL_WindowFlags winFlags,
            const char *rendererName) {
-    // Create the game window, if it fails then exit early.
     win = SDL_CreateWindow(winTitle, winWidth, winHeight, winFlags);
     if (!win) {
       SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error",
@@ -53,7 +58,6 @@ struct SDLState {
       exit(1);
     }
 
-    // Construct a `SDL_Renderer` object, if it fails then exit early.
     renderer = SDL_CreateRenderer(win, rendererName);
     if (!renderer) {
       SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error",
@@ -61,39 +65,45 @@ struct SDLState {
       exit(1);
     }
 
-    // Enable adaptive VSync, so the renderer will automatically adjust to the
-    // monitor's refresh rate.
+    // Adaptive VSync tells the renderer to wait for the monitor's vertical
+    // blank before swapping buffers, eliminating screen tearing. "Adaptive"
+    // means it also tries to match the monitor's refresh rate dynamically.
     SDL_SetRenderVSync(renderer, SDL_RENDERER_VSYNC_ADAPTIVE);
 
-    // Set the logical resolution of the window. Ensure that the game only
-    // upscaled by integer multiples.
+    // Set logical resolution to 320×180 with integer scaling. This means:
+    // 1. All draw calls use the small coordinate space (320×180).
+    // 2. SDL automatically upscales the final buffer to the window size.
+    // 3. Integer scaling prevents pixel distortion (each game pixel maps to
+    //    an integer number of screen pixels, e.g. 4×4 at 1280×720).
     SDL_SetRenderLogicalPresentation(renderer, logicalWidth, logicalHeight,
                                      SDL_LOGICAL_PRESENTATION_INTEGER_SCALE);
 
-    // Tell SDL how to use the alpha values, so transparency is enabled.
+    // Enable per-pixel alpha blending so translucent elements (fading UI,
+    // particle effects) composite correctly over the scene.
     SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
 
-    // Ask SDL about the keyboard state, so basically which keys are being
-    // pressed and which are not.
+    // Retrieve a snapshot of the keyboard state. SDL_GetKeyboardState returns
+    // a pointer to an internal array that is live-updated as keys are pressed
+    // and released. This is more responsive than polling per-event for
+    // continuous input like running.
     keys = SDL_GetKeyboardState(nullptr);
 
-    // Initialize a `TTF_Font` object, if it fails then exit early.
     if (!TTF_Init()) {
       SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error",
                                "Could not initialize SDL_ttf", nullptr);
       exit(1);
     }
 
-    // Open a font file so it can be used for text rendering. Set the font size
-    // to be 8pt.
-    font = TTF_OpenFont("assets/fonts/PixelOperator8.ttf", fontSize);
+    // PixelOperator8-Bold is a pixel-art monospace font that matches the
+    // 320×180 aesthetic. Size 8pt keeps text readable without consuming
+    // precious screen real estate.
+    font = TTF_OpenFont("assets/fonts/PixelOperator8-Bold.ttf", fontSize);
     if (!font) {
       SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error",
                                "Could not open font", nullptr);
       exit(1);
     }
 
-    // Initialize a `TTF_TextEngine` object, if it fails then exit early.
     textEngine = TTF_CreateRendererTextEngine(renderer);
     if (!textEngine) {
       SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error",
@@ -102,19 +112,18 @@ struct SDLState {
     }
   }
 
-  // Delete copy constructor and copy assignment operator. This way, a
-  // `SDLState` object cannot be copied.
+  // Non-copyable: there must only be one owner of SDL resources (window,
+  // renderer). Copying would lead to double-free on destruction.
   SDLState(const SDLState &) = delete;
   SDLState &operator=(const SDLState &) = delete;
 
-  // Use default move constructor and move assignment operator. This way,
-  // `SDLState` object can only be moved, because I do not want to have any
-  // copies of internal SDL data. Having copies may lead to confusion.
+  // Movable: ownership of SDL handles can be transferred (e.g. when storing
+  // SDLState in a struct). The moved-from object becomes null.
   SDLState(SDLState &&) noexcept = default;
   SDLState &operator=(SDLState &&) noexcept = default;
 
-  // Destructor to deinitialize any SDL related data. This prevents any memory
-  // leaks.
+  // Tear down SDL subsystems in reverse order of creation. Each Destroy/Close
+  // call releases internal resources held by the corresponding subsystem.
   ~SDLState() {
     TTF_DestroyRendererTextEngine(textEngine);
     TTF_CloseFont(font);

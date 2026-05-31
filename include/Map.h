@@ -9,18 +9,23 @@
 #include <string>
 #include <vector>
 
+// Tile type identifiers used in the CSV level files. Each value matches an
+// index in the world_tileset.png sprite sheet (0 = empty/transparent).
+// The naming convention groups tiles visually: e.g. SKY_* / CLOUD_* pairs
+// are background sky gradients with matching cloud decorations, TREE_* forms
+// a multi-tile tree, and BRIDGE* spans gaps over water.
 namespace Tiles {
 enum {
-  NONE,
-  GRASS,
-  DIRT1,
+  NONE,              // 0 = empty cell, not rendered
+  GRASS,             // Solid ground tile (grass on top)
+  DIRT1,             // Underground dirt variations
   DIRT2,
   DIRT3,
-  MOVING_PLATFORM_GRASS,
-  COIN,
-  ENEMY,
-  SKY_PEACH,
-  CLOUD_PEACH,
+  MOVING_PLATFORM_GRASS,  // Moving platform (see DynTile)
+  COIN,                    // Collectible coin (see Coin)
+  ENEMY,                   // Enemy spawn point (see Slime)
+  SKY_PEACH,               // Background sky tiles (parallax layer 1)
+  CLOUD_PEACH,             // Cloud overlay (parallax layer 2)
   SKY_YELLOW,
   CLOUD_YELLOW,
   SKY_ORANGE,
@@ -48,31 +53,40 @@ enum {
   SKY_DARK_SILVER,
   CLOUD_DARK_SILVER,
   SKY_GRAY,
-  TREE_CANOPY,
-  TREE_MID,
-  TREE_BASE,
-  BUSH1,
+  TREE_CANOPY,    // Tree foliage (midground parallax)
+  TREE_MID,       // Tree trunk middle
+  TREE_BASE,      // Tree trunk base
+  BUSH1,          // Decorative bushes
   BUSH2,
   BUSH3,
   FLOWER_BUSH,
-  YELLOW_WAVES,
-  YELLOW_WATER,
-  BRIDGE1,
+  YELLOW_WAVES,   // Animated water surface
+  YELLOW_WATER,   // Deep water tiles
+  BRIDGE1,        // Wooden bridge sections (midground)
   BRIDGE2,
   BRIDGE3,
-  BOX,
+  BOX,            // Breakable/collidable crate
 };
 }
 
+// A tile map loaded from a CSV file. The grid is stored in row-major order in
+// a flat vector for cache-friendly iteration. Each cell value corresponds to a
+// Tiles enum entry and maps to a 16×16 pixel region in the world tileset.
 struct Map {
+  // Each tile is 16×16 pixels at the game's logical resolution.
   static constexpr uint16_t TILE_SIZE = 16;
 
  private:
+  // Flat array of tile IDs in row-major order: index = row * cols + col.
   std::vector<uint16_t> tiles;
   size_t rows = 0;
   size_t cols = 0;
 
  public:
+  // Parse a comma-separated CSV file into the tile grid. The first row
+  // determines the expected column count; subsequent rows are validated
+  // against it. Empty lines are skipped. An error dialog is shown if the
+  // file cannot be opened or has inconsistent row lengths.
   bool parse(const std::string& filePath) {
     std::ifstream input{filePath};
     tiles.reserve(10000);

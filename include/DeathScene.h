@@ -4,9 +4,11 @@
 
 #include <cstdint>
 
+#include "Colors.h"
 #include "SDLState.h"
 #include "Text.h"
 
+// Button identifiers for the death screen. Mirrors the pattern from StartScene.
 namespace DeathSceneBtns {
 enum {
   RETRY,
@@ -14,15 +16,22 @@ enum {
 };
 }  // namespace DeathSceneBtns
 
+// Shown after the player dies. Displays "You Died!!!" and two options: retry
+// the current level or return to the start menu. Supports keyboard and mouse
+// input, same as StartScene.
 class DeathScene {
   const SDLState &sdlState;
-  Text deathText;
-  Text retryText;
-  Text backToStartText;
+  Text deathText;        // "You Died!!!" — static header
+  Text retryText;        // "Retry" — restarts the level
+  Text backToStartText;  // "Back to Start Screen" — back to title
   uint8_t selectedBtn;
 
  public:
+  // Set to true when the player confirms "Retry". Triggers GameScene::reset()
+  // and transitions back to SceneType::game.
   bool shouldRetry = false;
+  // Set to true when the player confirms "Back to Start Screen". Resets the
+  // game scene and transitions to SceneType::start.
   bool shouldBeBackToStart = false;
 
   DeathScene(const SDLState &sdlState)
@@ -37,7 +46,9 @@ class DeathScene {
     retryText.getSize(&retryTextWidth, &retryTextHeight);
     backToStartText.getSize(&backToStartTextWidth, &backToStartTextHeight);
 
-    // Center horizontally, space vertically in the middle
+    // "You Died!!!" centered, 40px above the vertical center.
+    // "Retry" centered at vertical center.
+    // "Back to Start Screen" centered, 10px below vertical center.
     deathText.pos = {
         (SDLState::logicalWidth - static_cast<float>(deathTextWidth)) / 2.0f,
         (SDLState::logicalHeight / 2.0f) - 40.0f};
@@ -50,7 +61,7 @@ class DeathScene {
             2.0f,
         (SDLState::logicalHeight / 2.0f) + 10.0f};
 
-    deathText.setColor(255, 255, 255);  // White
+    deathText.setColor(255, 255, 255);
   }
 
   void update([[maybe_unused]] float dt) {
@@ -61,7 +72,6 @@ class DeathScene {
     SDL_RenderCoordinatesFromWindow(sdlState.renderer, windowMouseX,
                                     windowMouseY, &mouseX, &mouseY);
 
-    // Check hover for Retry
     int retryTextWidth, retryTextHeight;
     retryText.getSize(&retryTextWidth, &retryTextHeight);
     if (mouseX >= retryText.pos.x &&
@@ -71,7 +81,6 @@ class DeathScene {
       selectedBtn = DeathSceneBtns::RETRY;
     }
 
-    // Check hover for Back to Start Screen
     int backToStartTextWidth, backToStartTextHeight;
     backToStartText.getSize(&backToStartTextWidth, &backToStartTextHeight);
     if (mouseX >= backToStartText.pos.x &&
@@ -83,13 +92,16 @@ class DeathScene {
       selectedBtn = DeathSceneBtns::BACK_TO_START;
     }
 
-    // Update colors based on selection
     if (selectedBtn == DeathSceneBtns::RETRY) {
-      retryText.setColor(255, 255, 0);          // Yellow
-      backToStartText.setColor(255, 255, 255);  // White
+      retryText.setColor(Colors::hl.r, Colors::hl.g, Colors::hl.b,
+                         Colors::hl.a);
+      backToStartText.setColor(Colors::fg.r, Colors::fg.g, Colors::fg.b,
+                               Colors::fg.a);
     } else {
-      retryText.setColor(255, 255, 255);
-      backToStartText.setColor(255, 255, 0);
+      retryText.setColor(Colors::fg.r, Colors::fg.g, Colors::fg.b,
+                         Colors::fg.a);
+      backToStartText.setColor(Colors::hl.r, Colors::hl.g, Colors::hl.b,
+                               Colors::hl.a);
     }
   }
 

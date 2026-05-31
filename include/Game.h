@@ -16,25 +16,26 @@
 #include "DebugUI.h"
 #endif
 
+// Top-level game struct that owns the window, resources, scenes, and the main
+// loop. This is the entry point for all game systems — initialization, the
+// frame loop, and shutdown.
 struct Game {
-  // `SDLState` object which initializes a window and a renderer (allows
-  // the user to use GPU to render graphics).
+  // SDL abstraction: window, renderer, font engine, keyboard state.
   SDLState sdlState;
-  // `ResourceManager` object which initializes textures needed to render
-  // game entities.
+  // All loaded textures (player, tiles, UI) cached in GPU VRAM.
   ResourceManager resourceManager;
-  // `SceneManager` object which manages the current scene (main menu, game,
-  // death screen).
+  // Scene state machine: start menu → gameplay → death screen.
   SceneManager sceneManager;
-  // `DebugUI` object to show debug information using imgui. Only created in
-  // debug build.
 #ifdef DEBUG
+  // ImGui debug overlay for inspecting entity state, camera, and frame timing
+  // at runtime. Only compiled in debug builds to avoid shipping dev tools.
   DebugUI debugUI{sdlState, "assets/fonts/Roboto-Regular.ttf", 20.0f};
 #endif
 
   SDL_FRect noiseRect;
 
-  // Declare `debug` as static, so any part of the prograqm toggle debug mode.
+  // Static flag readable from anywhere (including Log::debug). Toggled with F1
+  // to show/hide the debug overlay and enable verbose logging.
   static inline bool debug = false;
 
   Game(const char *winTitle, SDL_WindowFlags winFlags, const char *rendererName)
@@ -51,50 +52,51 @@ struct Game {
     }
   }
 
+  // The main game loop. Each iteration is one frame consisting of:
+  //   1. Event pump — process OS input (quit, resize, key events for menus).
+  //   2. Debug UI begin — start the ImGui frame.
+  //   3. Clear — fill the backbuffer with black.
+  //   4. Update — advance game logic by dt seconds.
+  //   5. Draw — render the current scene.
+  //   6. Debug UI end — render and present the ImGui overlay.
+  //   7. Present — swap the front and back buffers (double buffering).
+  //
+  // Delta time (dt) is computed as the wall-clock time elapsed since the
+  // previous frame, clamped to prevent spiral-of-death on lag spikes.
   void run() {
-    // Keep track of the time when the previous frame started rendering.
     uint64_t prevTime = SDL_GetTicks();
     bool running = true;
     while (running) {
-      // Keep track of the time when the current frame starts processing.
       uint64_t nowTime = SDL_GetTicks();
-      // Find the delta time, which tells us how much time did it take to
-      // process the last frame in seconds.
+      // dt in seconds. If the frame took 16ms, dt ≈ 0.016. Large dt values
+      // (e.g. from a debugger breakpoint) are passed through — the physics
+      // cap in GameScene::maxPhysicsDt handles excessive time steps.
       float dt = static_cast<float>((nowTime - prevTime)) / 1000.0f;
 
       SDL_Event event{0};
-      // Start looking through all the events that the operating system is
-      // trying to send us for processing. These events can be something as
-      // basic as mouse clicks, certains keys being pressed, window being
-      // resized etc.
+      // Poll all pending OS events. Unlike continuous key state polling
+      // (SDL_GetKeyboardState), events are discrete — they fire once per
+      // press/release. This makes them ideal for menu navigation and one-shot
+      // actions, but not for held-key movement (which uses keyboard state).
       while (SDL_PollEvent(&event)) {
-        // Imgui needs to have some control over the event handling if it is
-        // being used. This is a requirment of the library.
 #ifdef DEBUG
         if (debug) ImGui_ImplSDL3_ProcessEvent(&event);
 #endif
         sceneManager.handleEvent(event);
 
         switch (event.type) {
-          // If the user clicked on the close button stop running the game.
           case SDL_EVENT_QUIT: {
             running = false;
             break;
           }
-          // Keep track of the window width and height internally when it has
-          // been resized.
           case SDL_EVENT_WINDOW_RESIZED: {
+            // Keep our own copy of the window dimensions so the game can
+            // respond to layout changes (e.g. repositioning debug UI).
             sdlState.winWidth = event.window.data1;
             sdlState.winHeight = event.window.data2;
             break;
           }
-          // Handle when keys are being pressed down by the user.
-          // NOTE: Keyboard events are better if you do not want multiple key
-          // down events in a single frame. With events, there is a delay
-          // between consecutive key down events.
           case SDL_EVENT_KEY_DOWN: {
-            // Toggle showing debug information when the
-            // user presses F1, only if a debug build is being run.
 #ifdef DEBUG
             if (event.key.scancode == SDL_SCANCODE_F1) debug = !debug;
 #endif
@@ -107,38 +109,31 @@ struct Game {
         running = false;
       }
 
-      // Create a shorthand alias for player.
       Player &player = sceneManager.gameScene.player;
 
-      // Render the debug information on to the screen.
 #ifdef DEBUG
       debugUI.newFrame();
       debugUI.drawFrame(player, sceneManager.gameScene.slimes,
                         sceneManager.gameScene.cam);
 #endif
 
-      // Clear the screen with black color.
+      // Clear to black before drawing the new frame. Without this, the
+      // previous frame's pixels would remain on screen, causing ghosting.
       SDL_SetRenderDrawColor(sdlState.renderer, 0, 0, 0, 255);
       SDL_RenderClear(sdlState.renderer);
 
-      // If the player did not die, keep updating the game state and rendering
-      // game entities on to the screen.
       sceneManager.update(dt);
       sceneManager.draw();
 
-      // Show the debug UI on to the screen.
 #ifdef DEBUG
       debugUI.presentFrame();
 #endif
 
-      // Swap buffers. GPU buffers are general-purpose blocks of memory
-      // allocated by the GPU, primarily used to store data for the pixels that
-      // are rendered onto the screen.
+      // Double buffering: the renderer draws to a hidden backbuffer while the
+      // frontbuffer is displayed. SDL_RenderPresent swaps them atomically on
+      // the vertical blank (when VSync is enabled), preventing visible tearing.
       SDL_RenderPresent(sdlState.renderer);
 
-      // The current frame has been fully rendered, so this frame's starting
-      // time is going to be the previous frame's time relative to the next
-      // frame.
       prevTime = nowTime;
     }
   }

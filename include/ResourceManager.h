@@ -10,31 +10,33 @@
 #include "SDL3/SDL_surface.h"
 #include "SDLState.h"
 
-// `ResourceManager` is a class that, you guessed it right manages resources.
-// Here resources refer to textures, which are basically images that are loaded
-// onto the GPU VRAM.
+// Manages all textures (GPU-resident images) the game needs. Textures are
+// loaded from PNG files via stb_image, uploaded to GPU VRAM through SDL, then
+// cached for the lifetime of the game. The manager is non-copyable and
+// non-movable so texture ownership is clear — destruction frees all GPU memory.
 class ResourceManager {
-  // Here is a list of textures the game needs.
   SDL_Texture *coinTex;
   SDL_Texture *playerTex;
   SDL_Texture *worldTex;
   SDL_Texture *platformsTex;
   SDL_Texture *slimeTex;
+  SDL_Texture *startSceneBgTex;
 
  public:
-  // No argument constructor setting everything to the default value of
-  // `nullptr`. This does not create any textures.
+  // Default constructor — all textures null. Exists so ResourceManager can
+  // be declared before the real load happens.
   ResourceManager()
       : coinTex(nullptr),
         playerTex(nullptr),
         worldTex(nullptr),
         platformsTex(nullptr),
-        slimeTex(nullptr) {}
-  // Parameterized constructor to initialize everything properly. This does
-  // create the necessary textures.
+        slimeTex(nullptr),
+        startSceneBgTex(nullptr) {}
+  // Load all game textures from disk. Each PNG is decoded via stb_image into
+  // CPU-side pixel data, converted to an SDL_Surface (system RAM), and then
+  // uploaded to an SDL_Texture (GPU VRAM). If any texture fails to load the
+  // game exits with an error — there is no graceful fallback for missing art.
   ResourceManager(SDLState &sdlState) {
-    // Create all of these textures from image files, if any of them failed to
-    // create then exit early.
     coinTex = loadTex(sdlState, "assets/sprites/coin.png");
     if (!coinTex) {
       SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error",
@@ -70,67 +72,73 @@ class ResourceManager {
                                "Slime texture could not be loaded", nullptr);
       exit(1);
     }
+
+    startSceneBgTex = loadTex(sdlState, "assets/sprites/start_scene_bg.png");
+    if (!startSceneBgTex) {
+      SDL_ShowSimpleMessageBox(
+          SDL_MESSAGEBOX_ERROR, "Error",
+          "The background texture for start scene could not be loaded",
+          nullptr);
+      exit(1);
+    }
   }
 
-  // Delete copy and move constructors and copy and move assignment operators.
-  // This way, a `ResourceManager` object cannot be copied or moved into a new
-  // `ResourceManager` object.
   ResourceManager(const ResourceManager &) = delete;
   ResourceManager &operator=(const ResourceManager &) = delete;
   ResourceManager(ResourceManager &&) noexcept = delete;
   ResourceManager &operator=(ResourceManager &&) noexcept = delete;
 
-  // This is a custom method that creates a texture from an image.
+  // Load a single texture from a PNG image file. The pipeline is:
+  //   1. stbi_load() decodes PNG → raw RGBA pixel data in RAM.
+  //   2. SDL_CreateSurfaceFrom() wraps that data in an SDL_Surface.
+  //   3. SDL_CreateTextureFromSurface() uploads the surface to GPU VRAM.
+  //   4. Texture scale mode is set to NEAREST so pixel-art upscaling remains
+  //      crisp without bilinear filtering blur.
   SDL_Texture *loadTex(const SDLState &sdlState,
                        const std::string_view &filePath) {
-    // These values are needed by stb_image in order to load pixel data from any
-    // image.
-    int width = 0;     // width of the picture
-    int height = 0;    // height of the picture
-    int channels = 0;  // number of values used to represent one pixel (3 for
-                       // RGB, 4 for RGBA)
-    // Use stb_image to load the pixel color data of the image. stb_image is a
-    // very well-known imager loading library used by many games and game
-    // engines.
+    int width = 0;
+    int height = 0;
+    int channels = 0;
+    // stb_image is a single-header C library for loading images. It handles
+    // PNG, JPEG, BMP, GIF, and others. Requesting 4 channels forces RGBA
+    // output regardless of the source format.
     stbi_uc *pixData =
         stbi_load(filePath.data(), &width, &height, &channels, 4);
 
-    // Create a SDL_Surface from the pixel data of the image, because you cannot
-    // create a SDL_Texture directly from the pixel data. NOTE: SDL_Surface and
-    // SDL_Texture are pretty much the same, except SDL_Surface stores texture
-    // data in RAM whereas SDL_Texture stores texture data in GPU VRAM.
+    // SDL_Surface resides in system RAM and is the only way to create an
+    // SDL_Texture from raw pixel data. The pitch (stride) is width × 4 bytes
+    // since we use RGBA32 format (4 bytes per pixel).
     SDL_Surface *surface = SDL_CreateSurfaceFrom(
         width, height, SDL_PIXELFORMAT_RGBA32, pixData, width * 4);
-    // Create a SDL_Texture from a SDL_Surface.
     SDL_Texture *tex = SDL_CreateTextureFromSurface(sdlState.renderer, surface);
-    // Set the texture scaling mode to nearest so when the textures are
-    // upscaled they do not get blurry and do not bleed.
+
+    // Nearest-neighbor filtering: each pixel in the source maps to an integer
+    // block of screen pixels. This preserves the hard edges of pixel art.
     SDL_SetTextureScaleMode(tex, SDL_SCALEMODE_NEAREST);
 
-    // The SDL_Surface is not needed anymore, it is an intermediate resource
-    // used to create a texture.
     SDL_DestroySurface(surface);
     stbi_image_free(pixData);
 
-    // Return the created texture.
     return tex;
   }
 
-  // Getter methods for the textures. [[nodiscard]] ensures that the return
-  // value of the getter cannot be unused by the caller.
   [[nodiscard]] SDL_Texture *getCoinTex() const { return coinTex; }
   [[nodiscard]] SDL_Texture *getPlayerTex() const { return playerTex; }
   [[nodiscard]] SDL_Texture *getWorldTex() const { return worldTex; }
   [[nodiscard]] SDL_Texture *getPlatformTex() const { return platformsTex; }
   [[nodiscard]] SDL_Texture *getSlimeTex() const { return slimeTex; }
+  [[nodiscard]] SDL_Texture *getStartSceneBgTex() const {
+    return startSceneBgTex;
+  }
 
-  // Destructor to deallocate all textures. This prevents any memory
-  // leaks.
+  // Destructor releases all GPU memory. Each SDL_DestroyTexture decrements
+  // the texture's internal reference count and frees the VRAM allocation.
   ~ResourceManager() {
     SDL_DestroyTexture(coinTex);
     SDL_DestroyTexture(playerTex);
     SDL_DestroyTexture(worldTex);
     SDL_DestroyTexture(platformsTex);
     SDL_DestroyTexture(slimeTex);
+    SDL_DestroyTexture(startSceneBgTex);
   }
 };

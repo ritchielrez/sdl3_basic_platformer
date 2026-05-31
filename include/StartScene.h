@@ -4,9 +4,13 @@
 
 #include <cstdint>
 
+#include "Colors.h"
+#include "ResourceManager.h"
 #include "SDLState.h"
 #include "Text.h"
 
+// Button identifiers for the start menu. Used to track which button is
+// selected (highlighted) and which action to take on confirm.
 namespace StartSceneBtns {
 enum {
   PLAY,
@@ -14,18 +18,29 @@ enum {
 };
 }  // namespace StartSceneBtns
 
+// The title / main menu scene. Displays a background image, a "Play" button,
+// and an "Exit" button. Supports both keyboard navigation (WASD / arrows +
+// Enter/Space) and mouse (hover + click).
 class StartScene {
   const SDLState &sdlState;
+  const ResourceManager &resourceManager;
   Text playText;
   Text exitText;
+  // Currently highlighted button index (0 = Play, 1 = Exit). Modulo-wrapped
+  // on up/down input.
   uint8_t selectedBtn;
 
  public:
+  // Set to true when the player confirms "Play". Read by SceneManager to
+  // transition to the game scene.
   bool shouldStartGame = false;
+  // Set to true when the player confirms "Exit" or clicks the window close
+  // button. Read by Game::run to break the main loop.
   bool shouldQuit = false;
 
-  StartScene(const SDLState &sdlState)
+  StartScene(const SDLState &sdlState, const ResourceManager &resourceManager)
       : sdlState(sdlState),
+        resourceManager(resourceManager),
         playText(sdlState, "Play", glm::vec2(0)),
         exitText(sdlState, "Exit", glm::vec2(0)),
         selectedBtn(0) {
@@ -33,7 +48,8 @@ class StartScene {
     playText.getSize(&playTextWidth, &playTextHeight);
     exitText.getSize(&exitTextWidth, &exitTextHeight);
 
-    // Center horizontally, space vertically in the middle
+    // Position buttons centered horizontally, stacked vertically around the
+    // middle of the logical screen (320×180).
     playText.pos = {
         (SDLState::logicalWidth - static_cast<float>(playTextWidth)) / 2.0f,
         (SDLState::logicalHeight / 2.0f) - static_cast<float>(playTextHeight)};
@@ -43,6 +59,9 @@ class StartScene {
   }
 
   void update([[maybe_unused]] float dt) {
+    // Mouse coordinates come in window pixels (e.g. 1280×720) and need to be
+    // converted to logical coordinates (320×180) for accurate hit-testing.
+    // SDL_RenderCoordinatesFromWindow handles this transformation.
     float windowMouseX, windowMouseY;
     SDL_GetMouseState(&windowMouseX, &windowMouseY);
     float mouseX = windowMouseX;
@@ -50,7 +69,6 @@ class StartScene {
     SDL_RenderCoordinatesFromWindow(sdlState.renderer, windowMouseX,
                                     windowMouseY, &mouseX, &mouseY);
 
-    // Check hover for Play
     int playTextWidth, playTextHeight;
     playText.getSize(&playTextWidth, &playTextHeight);
     if (mouseX >= playText.pos.x &&
@@ -60,7 +78,6 @@ class StartScene {
       selectedBtn = StartSceneBtns::PLAY;
     }
 
-    // Check hover for Exit
     int exitTextWidth, exitTextHeight;
     exitText.getSize(&exitTextWidth, &exitTextHeight);
     if (mouseX >= exitText.pos.x &&
@@ -70,13 +87,14 @@ class StartScene {
       selectedBtn = StartSceneBtns::EXIT;
     }
 
-    // Update colors based on selection
+    // Highlight the selected button in yellow, dim the other to the default
+    // foreground color. Provides visual feedback for which option is active.
     if (selectedBtn == StartSceneBtns::PLAY) {
-      playText.setColor(255, 255, 0);    // Yellow
-      exitText.setColor(255, 255, 255);  // White
+      playText.setColor(Colors::hl.r, Colors::hl.g, Colors::hl.b, Colors::hl.a);
+      exitText.setColor(Colors::fg.r, Colors::fg.g, Colors::fg.b, Colors::fg.a);
     } else {
-      playText.setColor(255, 255, 255);
-      exitText.setColor(255, 255, 0);
+      playText.setColor(Colors::fg.r, Colors::fg.g, Colors::fg.b, Colors::fg.a);
+      exitText.setColor(Colors::hl.r, Colors::hl.g, Colors::hl.b, Colors::hl.a);
     }
   }
 
@@ -86,10 +104,14 @@ class StartScene {
         case SDL_SCANCODE_UP:
         case SDL_SCANCODE_W:
           selectedBtn -= 1;
+          if (selectedBtn > StartSceneBtns::EXIT)
+            selectedBtn = StartSceneBtns::PLAY;
           break;
         case SDL_SCANCODE_DOWN:
         case SDL_SCANCODE_S:
           selectedBtn += 1;
+          if (selectedBtn > StartSceneBtns::EXIT)
+            selectedBtn = StartSceneBtns::EXIT;
           break;
         case SDL_SCANCODE_RETURN:
         case SDL_SCANCODE_SPACE:
@@ -132,6 +154,9 @@ class StartScene {
   }
 
   void draw() {
+    // Draw the background image stretched to fill the entire screen.
+    SDL_RenderTexture(sdlState.renderer, resourceManager.getStartSceneBgTex(),
+                      nullptr, nullptr);
     playText.draw();
     exitText.draw();
   }

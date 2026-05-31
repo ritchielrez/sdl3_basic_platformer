@@ -9,11 +9,17 @@
 #include "StaticTile.h"
 #include "fmt/format.h"
 
+// A basic enemy — the green slime. Patrols back and forth, reversing direction
+// when it hits a wall. Defeated when the player stomps it from above.
 struct Slime : public Entity {
+  // True when the slime is overlapping a solid tile (wall collision).
   bool collided;
 
   Slime() : collided(false) {}
 
+  // Update patrol movement and collision, but only if the slime is within the
+  // camera's view (frustum culling). This saves CPU cycles for off-screen
+  // enemies.
   void update(const std::vector<StaticTile>& staticTiles, float dt,
               const SDL_FRect& cam) {
     const SDL_FRect enemyRect{.x = pos.x, .y = pos.y, .w = w, .h = h};
@@ -23,6 +29,10 @@ struct Slime : public Entity {
     }
   }
 
+  // AABB-vs-AABB collision with static tiles. When the slime hits a wall, it
+  // reverses horizontal velocity and direction (so its sprite flips). Only
+  // horizontal collision is resolved — slimes don't respond to floors/ceilings
+  // (they have gravity disabled; they patrol on their spawn y-level).
   void collision(const std::vector<StaticTile>& staticTiles) {
     SDL_FRect enemyCollider{.x = pos.x + collider.x,
                             .y = pos.y + collider.y,
@@ -41,6 +51,9 @@ struct Slime : public Entity {
       if (SDL_GetRectIntersectionFloat(&enemyCollider, &collidedRect,
                                        &intersectionRect)) {
         collided = true;
+        // Only resolve the collision along the axis of least overlap
+        // (horizontal for wall-bouncing enemies). If intersection is wider
+        // than tall, it's a vertical collision and we skip it.
         if (intersectionRect.w < intersectionRect.h) {
           if (vel.x > 0) {
             pos.x -= intersectionRect.w;
@@ -51,7 +64,6 @@ struct Slime : public Entity {
           dir *= -1;
         }
 
-        // Recalculate enemyCollider after the enemy has moved due to collision.
         enemyCollider.x = pos.x + collider.x;
       }
     }

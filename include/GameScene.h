@@ -4,6 +4,7 @@
 #include <fmt/base.h>
 
 #include "Coin.h"
+#include "Colors.h"
 #include "DynTile.h"
 #include "Map.h"
 #include "Player.h"
@@ -13,25 +14,46 @@
 #include "StaticTile.h"
 #include "Text.h"
 
+// The main gameplay scene: owns all map layers, entities, the camera, and the
+// HUD. This is where the actual platforming takes place. The scene is fully
+// reset on retry or when returning to the start menu.
 struct GameScene {
   const SDLState &sdlState;
   const ResourceManager &resourceManager;
+
+  // Maximum delta time for physics updates (≈60 FPS). If a frame takes longer
+  // than 17ms (e.g. due to a lag spike), the game will run multiple fixed-size
+  // physics steps to keep the simulation stable. This prevents entities from
+  // tunneling through walls at low framerates.
   static constexpr float maxPhysicsDt = 0.017f;
+
+  // Four tilemap layers for parallax scrolling:
+  //   bgLayer1 — farthest background (sky, mountains)
+  //   bgLayer2 — clouds / mid-background decorations
+  //   midLayer — trees, bridges, foreground decorations (scrolls with camera)
+  //   fgLayer  — gameplay layer: ground, platforms, coins, enemies
   Map mapBgLayer1;
   Map mapBgLayer2;
   Map mapMidLayer;
   Map mapFgLayer;
+
   Player player{};
-  SDL_Texture *bgTex1;
-  SDL_Texture *bgTex2;
-  SDL_Texture *fgTex;
+  SDL_Texture *bgTex1;   // Rendered texture for bgLayer1
+  SDL_Texture *bgTex2;   // Rendered texture for bgLayer2
+  SDL_Texture *fgTex;    // Rendered texture for fgLayer (gameplay collisions)
   std::vector<Slime> slimes;
-  std::vector<StaticTile> staticTiles;
-  std::vector<DynTile> dynTiles;
+  std::vector<StaticTile> staticTiles;  // Collidable ground tiles
+  std::vector<DynTile> dynTiles;        // Moving platforms
   std::vector<Coin> coins;
+
+  // Camera defines the visible portion of the world. Centered on the player
+  // with smoothing. w/h match the logical resolution (320×180). Only entities
+  // intersecting the camera rect are drawn (frustum culling).
   SDL_FRect cam;
   size_t collectedCoins;
   size_t slainSlimes;
+
+  // HUD text rendered in screen space (not affected by camera).
   Text coinText;
   Text slimesText;
 
@@ -41,6 +63,8 @@ struct GameScene {
   void createFg();
   void createEntities();
 
+  // Load all four CSV tilemaps, then bake background/foreground textures and
+  // spawn entities. Called once at construction and again on reset().
   void init() {
     if (!mapBgLayer1.parse("./assets/levels/1/bg1.csv")) {
       exit(1);
@@ -81,10 +105,13 @@ struct GameScene {
         slimesText(sdlState, fmt::format("Slain enemies: {}", slainSlimes),
                    glm::vec2(5, 15)) {
     init();
-    coinText.setColor(50, 40, 15);
-    slimesText.setColor(50, 40, 15);
+    coinText.setColor(Colors::fg.r, Colors::fg.g, Colors::fg.b, Colors::fg.a);
+    slimesText.setColor(Colors::fg.r, Colors::fg.g, Colors::fg.b, Colors::fg.a);
   }
 
+  // Fully re-initialize the scene from scratch. Destroys and recreates maps,
+  // entities, camera, and HUD counters. Called when the player retries or
+  // returns to the start menu.
   void reset() {
     mapBgLayer1 = Map();
     mapBgLayer2 = Map();
