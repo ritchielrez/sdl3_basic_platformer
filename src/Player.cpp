@@ -295,7 +295,7 @@ void Player::collision(const std::vector<StaticTile>& staticTiles,
         foundGround = true;
       }
 
-      pos.x += dir * glm::abs(dynTile.vel.x) * dt;
+      pos.x += dynTile.vel.x * dt;
     }
   }
 
