@@ -662,6 +662,16 @@ void GameScene::update(float dt) {
   }
   slimesText.assign(fmt::format("Slain enemies: {}", slainSlimes));
 
+  if (player.dashDuration.isStarted() && !player.dashDuration.isTimeOut()) {
+    dashCooldownText.assign("Dashing!");
+  } else if (player.dashCooldown.isStarted() &&
+             !player.dashCooldown.isTimeOut()) {
+    float remaining = player.dashCooldown.getLen() - player.dashCooldown.getTime();
+    dashCooldownText.assign(fmt::format("Dash in active: {:.1f}s", remaining));
+  } else {
+    dashCooldownText.assign("Dash ready!");
+  }
+
   // Only animate the player if the current animation has multiple frames.
   // If it has one frame, the timer length/duration is set to 0.
   if (player.anims[player.currAnim].getLen() != 0) {
@@ -709,6 +719,7 @@ void GameScene::draw() {
 
   coinText.draw();
   slimesText.draw();
+  dashCooldownText.draw();
 
   player.draw(sdlState, cam);
 

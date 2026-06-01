@@ -56,6 +56,7 @@ struct GameScene {
   // HUD text rendered in screen space (not affected by camera).
   Text coinText;
   Text slimesText;
+  Text dashCooldownText;
 
  private:
   void createPlayer();
@@ -103,10 +104,13 @@ struct GameScene {
         coinText(sdlState, fmt::format("Coins: {}", collectedCoins),
                  glm::vec2(5, 5)),
         slimesText(sdlState, fmt::format("Slain enemies: {}", slainSlimes),
-                   glm::vec2(5, 15)) {
+                   glm::vec2(5, 15)),
+        dashCooldownText(sdlState, "", glm::vec2(5, 25)) {
     init();
     coinText.setColor(Colors::fg.r, Colors::fg.g, Colors::fg.b, Colors::fg.a);
     slimesText.setColor(Colors::fg.r, Colors::fg.g, Colors::fg.b, Colors::fg.a);
+    dashCooldownText.setColor(Colors::fg.r, Colors::fg.g, Colors::fg.b,
+                              Colors::fg.a);
   }
 
   // Fully re-initialize the scene from scratch. Destroys and recreates maps,
