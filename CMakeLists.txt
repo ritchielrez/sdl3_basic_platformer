@@ -17,7 +17,18 @@ if(MSVC)
   add_definitions(/D_CRT_SECURE_NO_WARNINGS)
 endif()
 
-add_executable(main src/main.cpp src/DebugUI.cpp src/Entity.cpp src/Player.cpp src/GameScene.cpp)
+set(SOURCES
+  src/main.cpp
+  src/Entity.cpp
+  src/Player.cpp
+  src/GameScene.cpp
+)
+
+if (CMAKE_BUILD_TYPE STREQUAL "Debug" OR CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo")
+  list(APPEND SOURCES src/DebugUI.cpp)
+endif()
+
+add_executable(main ${SOURCES})
 set_target_properties(main PROPERTIES COMPILE_WARNING_AS_ERROR ON)
 target_include_directories(main PRIVATE include)
 target_compile_options(main PRIVATE
