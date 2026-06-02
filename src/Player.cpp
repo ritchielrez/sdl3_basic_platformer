@@ -216,6 +216,10 @@ void Player::update(const SDLState& sdlState, SDL_FRect& cam, float worldWidth,
     } else if (coyoteTimer.isStarted() && !coyoteTimer.isTimeOut()) {
       coyoteTimer.step(dt);
     }
+
+    if (currAnim == PlayerAnim::jump && grounded) {
+      currAnim = PlayerAnim::run;
+    }
   }
 }
 
