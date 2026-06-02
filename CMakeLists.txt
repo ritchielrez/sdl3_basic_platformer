@@ -14,6 +14,7 @@ if(MSVC)
   if(NOT CMAKE_GENERATOR STREQUAL "Ninja")
       add_definitions(/MP)				# parallelize each target, unless Ninja is the generator
   endif()
+  add_definitions(/D_CRT_SECURE_NO_WARNINGS)
 endif()
 
 add_executable(main src/main.cpp src/DebugUI.cpp src/Entity.cpp src/Player.cpp src/GameScene.cpp)
