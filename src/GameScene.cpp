@@ -46,7 +46,7 @@ void GameScene::createPlayer() {
       PLAYER_SIZE, PLAYER_SIZE);
 
   // player.pos = glm::vec2(0, SDLState::logicalHeight - 3 * PLAYER_SIZE);
-  player.pos = glm::vec2(1183, 72);
+  player.pos = glm::vec2(1827, 72);
   player.tex = resourceManager.getPlayerTex();
   player.maxSpeed = glm::vec2(130.0f, 350.0f);
   player.dashSpeed = 200.0f;
@@ -640,7 +640,7 @@ void GameScene::createEntities() {
                                                Map::TILE_SIZE) -
                             flagPost.h);
           flagPost.tex = resourceManager.getFlagPostTex();
-
+          SDL_SetTextureColorMod(flagPost.tex, 255, 155, 0);
           constexpr size_t FLAGPOST_ANIM_FRAMES = 5;
           std::vector<glm::vec2> flagPostTexCoords{};
           flagPostTexCoords.resize(FLAGPOST_ANIM_FRAMES);
