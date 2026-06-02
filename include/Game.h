@@ -109,8 +109,6 @@ struct Game {
         running = false;
       }
 
-      Player &player = sceneManager.gameScene.player;
-
 #ifdef DEBUG
       debugUI.newFrame();
       debugUI.drawFrame(player, sceneManager.gameScene.slimes,
