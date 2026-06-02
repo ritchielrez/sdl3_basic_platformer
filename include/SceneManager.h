@@ -6,6 +6,7 @@
 #include "ResourceManager.h"
 #include "SDLState.h"
 #include "StartScene.h"
+#include "Timer.h"
 
 // Finite-state machine driving the top-level game flow. The game transitions
 // between three scenes:
@@ -19,8 +20,14 @@ enum class SceneType {
   end,
 };
 
+enum class TransitionPhase { none, fadingOut, fadingIn };
+
 class SceneManager {
-  SceneType sceneType;
+  const SDLState &sdlState;
+  SceneType current;
+  TransitionPhase phase = TransitionPhase::none;
+  Timer timer{0.5f};
+  SceneType target;
 
  public:
   // All three scenes are instantiated at startup and persist for the game's
@@ -32,11 +39,35 @@ class SceneManager {
   EndScene endScene;
 
   SceneManager(const SDLState &sdlState, const ResourceManager &resourceManager)
-      : sceneType(SceneType::start),
+      : sdlState(sdlState),
+        current(SceneType::start),
         startScene(sdlState, resourceManager),
         gameScene(sdlState, resourceManager),
         deathScene(sdlState, resourceManager),
         endScene(sdlState, resourceManager) {}
+
+  void startTransition(SceneType dest) {
+    phase = TransitionPhase::fadingOut;
+    target = dest;
+    timer.reset();
+  }
+
+  void updateSceneOnly(float dt) {
+    switch (current) {
+      case SceneType::start:
+        startScene.update(dt);
+        break;
+      case SceneType::game:
+        gameScene.update(dt);
+        break;
+      case SceneType::death:
+        deathScene.update(dt);
+        break;
+      case SceneType::end:
+        endScene.update(dt);
+        break;
+    }
+  }
 
   // Tick the active scene. Also checks for scene transitions:
   //   - Start → Game when the player presses "Play"
@@ -45,11 +76,30 @@ class SceneManager {
   //   - Death → Game (retry) or Death → Start (back to menu)
   //   - End → Game (retry) or End → Start (back to menu)
   void update(float dt) {
-    switch (sceneType) {
+    if (phase != TransitionPhase::none) {
+      timer.step(dt);
+      if (phase == TransitionPhase::fadingOut) {
+        // Phase 1: fade out — freeze the outgoing scene
+        if (timer.isTimeOut()) {
+          current = target;
+          phase = TransitionPhase::fadingIn;
+          timer.reset();
+        }
+      } else {
+        // Phase 2: fade in — new scene runs behind shrinking overlay
+        updateSceneOnly(dt);
+        if (timer.isTimeOut()) {
+          phase = TransitionPhase::none;
+        }
+      }
+      return;
+    }
+
+    switch (current) {
       case SceneType::start: {
         startScene.update(dt);
         if (startScene.shouldStartGame) {
-          sceneType = SceneType::game;
+          startTransition(SceneType::game);
           startScene.shouldStartGame = false;
         }
         break;
@@ -57,30 +107,25 @@ class SceneManager {
       case SceneType::game: {
         const Player &player = gameScene.player;
         gameScene.update(dt);
-        // Check level completion before death so reaching the flagpost
-        // takes priority over a simultaneous death.
         if (gameScene.shouldLevelComplete) {
-          endScene.setPoints(gameScene.collectedCoins,
-                             gameScene.slainSlimes);
-          sceneType = SceneType::end;
+          endScene.setPoints(gameScene.collectedCoins, gameScene.slainSlimes);
+          startTransition(SceneType::end);
           break;
         }
-        // Wait for the death animation to finish playing before showing the
-        // death screen — gives the player visual feedback of dying.
         if (player.anims[PlayerAnim::death].isStarted() &&
             player.anims[PlayerAnim::death].isTimeOut())
-          sceneType = SceneType::death;
+          startTransition(SceneType::death);
         break;
       }
       case SceneType::death: {
         deathScene.update(dt);
         if (deathScene.shouldRetry) {
           gameScene.reset();
-          sceneType = SceneType::game;
+          startTransition(SceneType::game);
           deathScene.shouldRetry = false;
         } else if (deathScene.shouldBeBackToStart) {
           gameScene.reset();
-          sceneType = SceneType::start;
+          startTransition(SceneType::start);
           deathScene.shouldBeBackToStart = false;
         }
         break;
@@ -89,11 +134,11 @@ class SceneManager {
         endScene.update(dt);
         if (endScene.shouldRetry) {
           gameScene.reset();
-          sceneType = SceneType::game;
+          startTransition(SceneType::game);
           endScene.shouldRetry = false;
         } else if (endScene.shouldBeBackToStart) {
           gameScene.reset();
-          sceneType = SceneType::start;
+          startTransition(SceneType::start);
           endScene.shouldBeBackToStart = false;
         }
         break;
@@ -105,7 +150,7 @@ class SceneManager {
   // gameplay, input is polled directly from SDL_GetKeyboardState for
   // responsiveness (see Player::update).
   void handleEvent(const SDL_Event &event) {
-    switch (sceneType) {
+    switch (current) {
       case SceneType::start:
         startScene.handleEvent(event);
         break;
@@ -121,7 +166,7 @@ class SceneManager {
   }
 
   void draw() {
-    switch (sceneType) {
+    switch (current) {
       case SceneType::start:
         startScene.draw();
         break;
@@ -134,6 +179,14 @@ class SceneManager {
       case SceneType::end:
         endScene.draw();
         break;
+    }
+    if (phase != TransitionPhase::none) {
+      float t = timer.getTime() / timer.getLen();
+      float alpha = phase == TransitionPhase::fadingOut ? t : 1.0f - t;
+      SDL_SetRenderDrawColor(sdlState.renderer, 0, 0, 0,
+                             static_cast<uint8_t>(alpha * 255.0f));
+      SDL_SetRenderDrawBlendMode(sdlState.renderer, SDL_BLENDMODE_BLEND);
+      SDL_RenderFillRect(sdlState.renderer, nullptr);
     }
   }
 };

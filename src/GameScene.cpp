@@ -641,7 +641,7 @@ void GameScene::createEntities() {
                             flagPost.h);
           flagPost.tex = resourceManager.getFlagPostTex();
           SDL_SetTextureColorMod(flagPost.tex, 255, 155, 0);
-          flagPost.collider.x = 0;
+          flagPost.collider.x = 20;
           flagPost.collider.y = 0;
           flagPost.collider.w = flagPost.w;
           flagPost.collider.h = flagPost.h;
@@ -722,16 +722,14 @@ void GameScene::update(float dt) {
 
   // Check if the player reaches the flagpost.
   if (!shouldLevelComplete && player.currAnim != PlayerAnim::death) {
-    SDL_FRect playerCollider = {
-        .x = player.pos.x + player.collider.x,
-        .y = player.pos.y + player.collider.y,
-        .w = player.collider.w,
-        .h = player.collider.h};
-    SDL_FRect flagPostCollider = {
-        .x = flagPost.pos.x + flagPost.collider.x,
-        .y = flagPost.pos.y + flagPost.collider.y,
-        .w = flagPost.collider.w,
-        .h = flagPost.collider.h};
+    SDL_FRect playerCollider = {.x = player.pos.x + player.collider.x,
+                                .y = player.pos.y + player.collider.y,
+                                .w = player.collider.w,
+                                .h = player.collider.h};
+    SDL_FRect flagPostCollider = {.x = flagPost.pos.x + flagPost.collider.x,
+                                  .y = flagPost.pos.y + flagPost.collider.y,
+                                  .w = flagPost.collider.w,
+                                  .h = flagPost.collider.h};
     SDL_FRect intersection;
     if (SDL_GetRectIntersectionFloat(&playerCollider, &flagPostCollider,
                                      &intersection)) {
