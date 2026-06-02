@@ -45,7 +45,8 @@ void GameScene::createPlayer() {
                              glm::vec2(3 * PLAYER_SIZE, 7 * PLAYER_SIZE)},
       PLAYER_SIZE, PLAYER_SIZE);
 
-  player.pos = glm::vec2(0, SDLState::logicalHeight - 3 * PLAYER_SIZE);
+  // player.pos = glm::vec2(0, SDLState::logicalHeight - 3 * PLAYER_SIZE);
+  player.pos = glm::vec2(1183, 72);
   player.tex = resourceManager.getPlayerTex();
   player.maxSpeed = glm::vec2(130.0f, 350.0f);
   player.dashSpeed = 200.0f;
@@ -666,7 +667,8 @@ void GameScene::update(float dt) {
     dashCooldownText.assign("Dashing!");
   } else if (player.dashCooldown.isStarted() &&
              !player.dashCooldown.isTimeOut()) {
-    float remaining = player.dashCooldown.getLen() - player.dashCooldown.getTime();
+    float remaining =
+        player.dashCooldown.getLen() - player.dashCooldown.getTime();
     dashCooldownText.assign(fmt::format("Dash in active: {:.1f}s", remaining));
   } else {
     dashCooldownText.assign("Dash ready!");
@@ -677,8 +679,9 @@ void GameScene::update(float dt) {
   if (player.anims[player.currAnim].getLen() != 0) {
     player.anims[player.currAnim].step(dt);
   }
-  player.update(sdlState, cam, staticTiles, dynTiles, coins, collectedCoins,
-                slimes, slainSlimes, dt);
+  player.update(sdlState, cam, mapMidLayer.getCols() * Map::TILE_SIZE,
+                staticTiles, dynTiles, coins, collectedCoins, slimes,
+                slainSlimes, dt);
 
   // If the player fall below the screen, they die.
   if (player.pos.y >= SDLState::logicalHeight) {

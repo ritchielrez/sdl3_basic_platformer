@@ -16,16 +16,19 @@
 // a multi-tile tree, and BRIDGE* spans gaps over water.
 namespace Tiles {
 enum {
-  NONE,              // 0 = empty cell, not rendered
-  GRASS,             // Solid ground tile (grass on top)
-  DIRT1,             // Underground dirt variations
+  NONE,   // 0 = empty cell, not rendered
+  GRASS,  // Solid ground tile (grass on top)
+  // Underground dirt variations
+  DIRT1,
   DIRT2,
   DIRT3,
   MOVING_PLATFORM_GRASS,  // Moving platform (see DynTile)
-  COIN,                    // Collectible coin (see Coin)
-  ENEMY,                   // Enemy spawn point (see Slime)
-  SKY_PEACH,               // Background sky tiles (parallax layer 1)
-  CLOUD_PEACH,             // Cloud overlay (parallax layer 2)
+  COIN,                   // Collectible coin (see Coin)
+  ENEMY,                  // Enemy spawn point (see Slime)
+  // Different types of tiles for background layer 1 that make up the sky and
+  // the clouds
+  SKY_PEACH,
+  CLOUD_PEACH,
   SKY_YELLOW,
   CLOUD_YELLOW,
   SKY_ORANGE,
@@ -53,19 +56,19 @@ enum {
   SKY_DARK_SILVER,
   CLOUD_DARK_SILVER,
   SKY_GRAY,
-  TREE_CANOPY,    // Tree foliage (midground parallax)
-  TREE_MID,       // Tree trunk middle
-  TREE_BASE,      // Tree trunk base
-  BUSH1,          // Decorative bushes
+  TREE_CANOPY,  // Tree foliage (midground parallax)
+  TREE_MID,     // Tree trunk middle
+  TREE_BASE,    // Tree trunk base
+  BUSH1,        // Decorative bushes
   BUSH2,
   BUSH3,
   FLOWER_BUSH,
-  YELLOW_WAVES,   // Animated water surface
-  YELLOW_WATER,   // Deep water tiles
-  BRIDGE1,        // Wooden bridge sections (midground)
+  YELLOW_WAVES,  // Water surface
+  YELLOW_WATER,  // Deep water tiles
+  BRIDGE1,       // Wooden bridge sections (midground)
   BRIDGE2,
   BRIDGE3,
-  BOX,            // Breakable/collidable crate
+  BOX,  // Collidable crate
 };
 }
 

@@ -85,7 +85,7 @@ struct Player : public Entity {
   // Main update: reads input, applies movement physics, runs collision
   // detection/resolution, and steps animations. Also updates the camera to
   // follow the player.
-  void update(const SDLState& sdlState, SDL_FRect& cam,
+  void update(const SDLState& sdlState, SDL_FRect& cam, float worldWidth,
               const std::vector<StaticTile>& staticTiles,
               const std::vector<DynTile>& dynTiles, std::vector<Coin>& coins,
               size_t& collectedCoins, std::vector<Slime>& slimes,

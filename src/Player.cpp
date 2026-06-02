@@ -15,7 +15,7 @@
 
 #include "SDLState.h"
 
-void Player::update(const SDLState& sdlState, SDL_FRect& cam,
+void Player::update(const SDLState& sdlState, SDL_FRect& cam, float worldWidth,
                     const std::vector<StaticTile>& staticTiles,
                     const std::vector<DynTile>& dynTiles,
                     std::vector<Coin>& coins, size_t& collectedCoins,
@@ -154,7 +154,10 @@ void Player::update(const SDLState& sdlState, SDL_FRect& cam,
   }
 
   pos += velFrame;
-  if (pos.x <= 0) pos.x = 0;
+  if (pos.x <= 0)
+    pos.x = 0;
+  else if (pos.x + w >= worldWidth)
+    pos.x = worldWidth - w;
   collision(staticTiles, dynTiles, coins, collectedCoins, slimes, slainSlimes,
             dt);
 
@@ -176,8 +179,11 @@ void Player::update(const SDLState& sdlState, SDL_FRect& cam,
     // center of the screen, after which it begins smooth tracking.
     if (!passedCamRuler && pos.x >= camRuler) passedCamRuler = true;
     if (passedCamRuler) {
-      if (pos.x >= camRuler &&
-          !(dashDuration.isStarted() && !dashDuration.isTimeOut())) {
+      if (pos.x + SDLState::logicalWidth >= worldWidth) {
+        cam.x = glm::lerp(cam.x, worldWidth - SDLState::logicalWidth,
+                          camXSmoothness / 2 * dt);
+      } else if (pos.x >= camRuler &&
+                 !(dashDuration.isStarted() && !dashDuration.isTimeOut())) {
         cam.x = glm::lerp(cam.x, targetX, camXSmoothness * dt);
       } else if (pos.x >= camRuler) {
         cam.x = glm::lerp(cam.x, targetX, camXSmoothness / 2 * dt);
