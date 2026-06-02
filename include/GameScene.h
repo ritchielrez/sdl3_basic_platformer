@@ -54,6 +54,7 @@ struct GameScene {
   SDL_FRect cam;
   size_t collectedCoins;
   size_t slainSlimes;
+  bool shouldLevelComplete = false;
 
   // HUD text rendered in screen space (not affected by camera).
   Text coinText;
@@ -130,6 +131,7 @@ struct GameScene {
     coins.clear();
     collectedCoins = 0;
     slainSlimes = 0;
+    shouldLevelComplete = false;
     init();
   }
 

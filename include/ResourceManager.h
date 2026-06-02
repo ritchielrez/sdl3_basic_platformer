@@ -24,6 +24,7 @@ class ResourceManager {
   SDL_Texture *flagPostTex;
   SDL_Texture *startSceneBgTex;
   SDL_Texture *deathSceneBgTex;
+  SDL_Texture *endSceneBgTex;
 
  public:
   // Default constructor — all textures null. Exists so ResourceManager can
@@ -36,7 +37,8 @@ class ResourceManager {
         slimeTex(nullptr),
         flagPostTex(nullptr),
         startSceneBgTex(nullptr),
-        deathSceneBgTex(nullptr) {}
+        deathSceneBgTex(nullptr),
+        endSceneBgTex(nullptr) {}
   // Load all game textures from disk. Each PNG is decoded via stb_image into
   // CPU-side pixel data, converted to an SDL_Surface (system RAM), and then
   // uploaded to an SDL_Texture (GPU VRAM). If any texture fails to load the
@@ -104,6 +106,15 @@ class ResourceManager {
           nullptr);
       exit(1);
     }
+
+    endSceneBgTex = loadTex(sdlState, "assets/sprites/end_scene.png");
+    if (!endSceneBgTex) {
+      SDL_ShowSimpleMessageBox(
+          SDL_MESSAGEBOX_ERROR, "Error",
+          "The background texture for end scene could not be loaded",
+          nullptr);
+      exit(1);
+    }
   }
 
   ResourceManager(const ResourceManager &) = delete;
@@ -157,6 +168,9 @@ class ResourceManager {
   [[nodiscard]] SDL_Texture *getDeathSceneBgTex() const {
     return deathSceneBgTex;
   }
+  [[nodiscard]] SDL_Texture *getEndSceneBgTex() const {
+    return endSceneBgTex;
+  }
 
   // Destructor releases all GPU memory. Each SDL_DestroyTexture decrements
   // the texture's internal reference count and frees the VRAM allocation.
@@ -169,5 +183,6 @@ class ResourceManager {
     SDL_DestroyTexture(flagPostTex);
     SDL_DestroyTexture(startSceneBgTex);
     SDL_DestroyTexture(deathSceneBgTex);
+    SDL_DestroyTexture(endSceneBgTex);
   }
 };
