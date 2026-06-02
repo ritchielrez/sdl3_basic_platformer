@@ -16,6 +16,8 @@ platforms and coin (https://analogstudios.itch.io/four-seasons-platformer-sprite
 SPRITES by RottingPixels:
 world_tileset and fruit (https://rottingpixels.itch.io/four-seasons-platformer-tileset-16x16free)
 
+SPRITES by ankousse26:
+flag (https://ankousse26.itch.io/free-flag-with-animation)
 
 WORLD TILESET originally 
 

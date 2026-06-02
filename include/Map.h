@@ -56,19 +56,22 @@ enum {
   SKY_DARK_SILVER,
   CLOUD_DARK_SILVER,
   SKY_GRAY,
-  TREE_CANOPY,  // Tree foliage (midground parallax)
-  TREE_MID,     // Tree trunk middle
-  TREE_BASE,    // Tree trunk base
-  BUSH1,        // Decorative bushes
+  TREE_CANOPY,  // Tree foliage (middle layer)
+  TREE_MID,     // Tree trunk middle (middle layer)
+  TREE_BASE,    // Tree trunk base (middle layer)
+  // Decorative bushes
+  BUSH1,
   BUSH2,
   BUSH3,
   FLOWER_BUSH,
   YELLOW_WAVES,  // Water surface
   YELLOW_WATER,  // Deep water tiles
-  BRIDGE1,       // Wooden bridge sections (midground)
+  // Wooden bridge sections (middle layer)
+  BRIDGE1,
   BRIDGE2,
   BRIDGE3,
   BOX,  // Collidable crate
+  FLAGPOST,
 };
 }
 

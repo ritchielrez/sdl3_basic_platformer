@@ -597,10 +597,10 @@ void GameScene::createEntities() {
         }
         case Tiles::ENEMY: {
           Slime slime{};
-          // NOTE: Subtracting by 4 pixels allows the slime tile to be
-          // perfectly aligned with other tiles horizontally.
           slime.w = 24.0f;
           slime.h = 16.0f;
+          // NOTE: Subtracting by 4 pixels allows the slime tile to be
+          // perfectly aligned with other tiles horizontally.
           slime.pos =
               glm::vec2(c * Map::TILE_SIZE - 4,
                         static_cast<float>(SDLState::logicalHeight -
@@ -615,20 +615,46 @@ void GameScene::createEntities() {
           slime.collider.w = 8.0f;
           slime.collider.h = 10.0f;
 
-          constexpr size_t ENEMY_ANIM_FRAMES = 4;
-          std::vector<glm::vec2> slimeTexCoords{ENEMY_ANIM_FRAMES};
-          for (size_t i = 0; i < ENEMY_ANIM_FRAMES; i++) {
+          constexpr size_t SLIME_ANIM_FRAMES = 4;
+          std::vector<glm::vec2> slimeTexCoords{};
+          slimeTexCoords.resize(SLIME_ANIM_FRAMES);
+          for (size_t i = 0; i < SLIME_ANIM_FRAMES; i++) {
             slimeTexCoords[i].x = static_cast<float>(i) * slime.w;
             slimeTexCoords[i].y = 32.0f;
           }
-          slime.anims = {Frames(ENEMY_ANIM_FRAMES, 0.1f, slimeTexCoords,
+          slime.anims = {Frames(SLIME_ANIM_FRAMES, 0.1f, slimeTexCoords,
                                 static_cast<uint16_t>(slime.w),
                                 static_cast<uint16_t>(slime.h))};
           slime.currAnim = 0;
 
           slimes.push_back(slime);
           break;
-        };
+        }
+        case Tiles::FLAGPOST: {
+          flagPost.w = 60.0f;
+          flagPost.h = 58.0f;
+          flagPost.pos =
+              glm::vec2(c * Map::TILE_SIZE - 1,
+                        static_cast<float>(SDLState::logicalHeight -
+                                           (mapMidLayer.getRows() - r - 1) *
+                                               Map::TILE_SIZE) -
+                            flagPost.h);
+          flagPost.tex = resourceManager.getFlagPostTex();
+
+          constexpr size_t FLAGPOST_ANIM_FRAMES = 5;
+          std::vector<glm::vec2> flagPostTexCoords{};
+          flagPostTexCoords.resize(FLAGPOST_ANIM_FRAMES);
+          for (size_t i = 0; i < FLAGPOST_ANIM_FRAMES; i++) {
+            flagPostTexCoords[i].x = static_cast<float>(i) * flagPost.w;
+            flagPostTexCoords[i].y = 0.0f;
+          }
+          flagPost.anims = {Frames(FLAGPOST_ANIM_FRAMES, 0.1f,
+                                   flagPostTexCoords,
+                                   static_cast<uint16_t>(flagPost.w),
+                                   static_cast<uint16_t>(flagPost.h))};
+          flagPost.currAnim = 0;
+          break;
+        }
         case Tiles::NONE:
           continue;
         default:
@@ -674,14 +700,16 @@ void GameScene::update(float dt) {
     dashCooldownText.assign("Dash ready!");
   }
 
+  flagPost.anims[flagPost.currAnim].step(dt);
+
   // Only animate the player if the current animation has multiple frames.
   // If it has one frame, the timer length/duration is set to 0.
   if (player.anims[player.currAnim].getLen() != 0) {
     player.anims[player.currAnim].step(dt);
   }
-  player.update(sdlState, cam, mapMidLayer.getCols() * Map::TILE_SIZE,
-                staticTiles, dynTiles, coins, collectedCoins, slimes,
-                slainSlimes, dt);
+  player.update(
+      sdlState, cam, static_cast<float>(mapMidLayer.getCols() * Map::TILE_SIZE),
+      staticTiles, dynTiles, coins, collectedCoins, slimes, slainSlimes, dt);
 
   // If the player fall below the screen, they die.
   if (player.pos.y >= SDLState::logicalHeight) {
@@ -724,13 +752,15 @@ void GameScene::draw() {
   slimesText.draw();
   dashCooldownText.draw();
 
+  flagPost.draw(sdlState, cam);
+
   player.draw(sdlState, cam);
 
   const SDL_FRect fgTexDst = {
       .x = -cam.x,
       .y = SDLState::logicalHeight -
-           static_cast<float>(mapBgLayer2.getRows() * Map::TILE_SIZE) - cam.y,
-      .w = static_cast<float>(mapBgLayer2.getCols() * Map::TILE_SIZE),
-      .h = static_cast<float>(mapBgLayer2.getRows() * Map::TILE_SIZE)};
+           static_cast<float>(mapFgLayer.getRows() * Map::TILE_SIZE) - cam.y,
+      .w = static_cast<float>(mapFgLayer.getCols() * Map::TILE_SIZE),
+      .h = static_cast<float>(mapFgLayer.getRows() * Map::TILE_SIZE)};
   SDL_RenderTexture(sdlState.renderer, fgTex, nullptr, &fgTexDst);
 }

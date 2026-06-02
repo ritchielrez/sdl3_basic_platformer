@@ -3,6 +3,7 @@
 #include <SDL3/SDL.h>
 #include <fmt/base.h>
 
+#include "../src/FlagPost.h"
 #include "Coin.h"
 #include "Colors.h"
 #include "DynTile.h"
@@ -37,10 +38,11 @@ struct GameScene {
   Map mapMidLayer;
   Map mapFgLayer;
 
-  Player player{};
-  SDL_Texture *bgTex1;   // Rendered texture for bgLayer1
-  SDL_Texture *bgTex2;   // Rendered texture for bgLayer2
-  SDL_Texture *fgTex;    // Rendered texture for fgLayer (gameplay collisions)
+  Player player;
+  FlagPost flagPost;
+  SDL_Texture *bgTex1;  // Rendered texture for bgLayer1
+  SDL_Texture *bgTex2;  // Rendered texture for bgLayer2
+  SDL_Texture *fgTex;   // Rendered texture for fgLayer
   std::vector<Slime> slimes;
   std::vector<StaticTile> staticTiles;  // Collidable ground tiles
   std::vector<DynTile> dynTiles;        // Moving platforms

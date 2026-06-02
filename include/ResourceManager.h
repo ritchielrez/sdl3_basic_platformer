@@ -9,6 +9,7 @@
 #include "SDL3/SDL_pixels.h"
 #include "SDL3/SDL_surface.h"
 #include "SDLState.h"
+#include "fmt/chrono.h"
 
 // Manages all textures (GPU-resident images) the game needs. Textures are
 // loaded from PNG files via stb_image, uploaded to GPU VRAM through SDL, then
@@ -20,6 +21,7 @@ class ResourceManager {
   SDL_Texture *worldTex;
   SDL_Texture *platformsTex;
   SDL_Texture *slimeTex;
+  SDL_Texture *flagPostTex;
   SDL_Texture *startSceneBgTex;
   SDL_Texture *deathSceneBgTex;
 
@@ -32,12 +34,16 @@ class ResourceManager {
         worldTex(nullptr),
         platformsTex(nullptr),
         slimeTex(nullptr),
-        startSceneBgTex(nullptr) {}
+        flagPostTex(nullptr),
+        startSceneBgTex(nullptr),
+        deathSceneBgTex(nullptr) {}
   // Load all game textures from disk. Each PNG is decoded via stb_image into
   // CPU-side pixel data, converted to an SDL_Surface (system RAM), and then
   // uploaded to an SDL_Texture (GPU VRAM). If any texture fails to load the
   // game exits with an error — there is no graceful fallback for missing art.
-  ResourceManager(SDLState &sdlState) {
+  // Mark this as `explicit` as this constructor only takes one parameter due to
+  // C++ standard guideline reasons.
+  explicit ResourceManager(const SDLState &sdlState) {
     coinTex = loadTex(sdlState, "assets/sprites/coin.png");
     if (!coinTex) {
       SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error",
@@ -71,6 +77,13 @@ class ResourceManager {
     if (!slimeTex) {
       SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error",
                                "Slime texture could not be loaded", nullptr);
+      exit(1);
+    }
+
+    flagPostTex = loadTex(sdlState, "assets/sprites/flag.png");
+    if (!flagPostTex) {
+      SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error",
+                               "Flagpost texture could not be loaded", nullptr);
       exit(1);
     }
 
@@ -137,6 +150,7 @@ class ResourceManager {
   [[nodiscard]] SDL_Texture *getWorldTex() const { return worldTex; }
   [[nodiscard]] SDL_Texture *getPlatformTex() const { return platformsTex; }
   [[nodiscard]] SDL_Texture *getSlimeTex() const { return slimeTex; }
+  [[nodiscard]] SDL_Texture *getFlagPostTex() const { return flagPostTex; }
   [[nodiscard]] SDL_Texture *getStartSceneBgTex() const {
     return startSceneBgTex;
   }
@@ -152,6 +166,7 @@ class ResourceManager {
     SDL_DestroyTexture(worldTex);
     SDL_DestroyTexture(platformsTex);
     SDL_DestroyTexture(slimeTex);
+    SDL_DestroyTexture(flagPostTex);
     SDL_DestroyTexture(startSceneBgTex);
     SDL_DestroyTexture(deathSceneBgTex);
   }
