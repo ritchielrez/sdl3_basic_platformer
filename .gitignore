@@ -61,3 +61,6 @@ dkms.conf
 
 # Rad debugger files
 raddbg
+
+# Game data
+points.dat
