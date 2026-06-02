@@ -38,12 +38,13 @@ void GameScene::createPlayer() {
   playerAnims[PlayerAnim::slide] = Frames(
       glm::vec2(2 * PLAYER_SIZE, 2 * PLAYER_SIZE), PLAYER_SIZE, PLAYER_SIZE);
   playerAnims[PlayerAnim::death] = Frames(
-      4, 0.20f,
+      4, 0.3f,
       std::vector<glm::vec2>{glm::vec2(0.0f, 7 * PLAYER_SIZE),
                              glm::vec2(1 * PLAYER_SIZE, 7 * PLAYER_SIZE),
                              glm::vec2(2 * PLAYER_SIZE, 7 * PLAYER_SIZE),
                              glm::vec2(3 * PLAYER_SIZE, 7 * PLAYER_SIZE)},
       PLAYER_SIZE, PLAYER_SIZE);
+  playerAnims[PlayerAnim::death].loop = false;
 
   // player.pos = glm::vec2(0, SDLState::logicalHeight - 3 * PLAYER_SIZE);
   player.pos = glm::vec2(1827, 72);
