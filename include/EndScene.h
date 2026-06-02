@@ -20,7 +20,6 @@ enum {
 class EndScene {
   const SDLState &sdlState;
   const ResourceManager &resourceManager;
-  Text congratsText;
   Text pointsText;
   Text bestText;
   Text retryText;
@@ -37,16 +36,12 @@ class EndScene {
   EndScene(const SDLState &sdlState, const ResourceManager &resourceManager)
       : sdlState(sdlState),
         resourceManager(resourceManager),
-        congratsText(sdlState, "Congratulations!!!", glm::vec2(0)),
         pointsText(sdlState, "", glm::vec2(0)),
         bestText(sdlState, "", glm::vec2(0)),
         retryText(sdlState, "Retry", glm::vec2(0)),
         backToStartText(sdlState, "Back to Start", glm::vec2(0)),
         selectedBtn(EndSceneBtns::RETRY) {
-    congratsText.setColor(Colors::fg.r, Colors::fg.g, Colors::fg.b,
-                          Colors::fg.a);
-    pointsText.setColor(Colors::fg.r, Colors::fg.g, Colors::fg.b,
-                        Colors::fg.a);
+    pointsText.setColor(Colors::fg.r, Colors::fg.g, Colors::fg.b, Colors::fg.a);
     bestText.setColor(Colors::fg.r, Colors::fg.g, Colors::fg.b, Colors::fg.a);
   }
 
@@ -69,23 +64,18 @@ class EndScene {
       }
     }
 
-    pointsText.assign(
-        fmt::format("Points: {} ({} coins + {} enemies x3)", currentPoints,
-                     collectedCoins, slainSlimes));
+    pointsText.assign(fmt::format("Points: {} ({} coins + {} enemies x3)",
+                                  currentPoints, collectedCoins, slainSlimes));
     bestText.assign(fmt::format("Best: {}", bestPoints));
 
-    int congratsTextWidth, congratsTextHeight, pointsTextWidth, pointsTextHeight,
-        bestTextWidth, bestTextHeight, retryTextWidth, retryTextHeight,
-        backToStartTextWidth, backToStartTextHeight;
-    congratsText.getSize(&congratsTextWidth, &congratsTextHeight);
+    int pointsTextWidth, pointsTextHeight, bestTextWidth, bestTextHeight,
+        retryTextWidth, retryTextHeight, backToStartTextWidth,
+        backToStartTextHeight;
     pointsText.getSize(&pointsTextWidth, &pointsTextHeight);
     bestText.getSize(&bestTextWidth, &bestTextHeight);
     retryText.getSize(&retryTextWidth, &retryTextHeight);
     backToStartText.getSize(&backToStartTextWidth, &backToStartTextHeight);
 
-    congratsText.pos = {
-        (SDLState::logicalWidth - static_cast<float>(congratsTextWidth)) / 2.0f,
-        (SDLState::logicalHeight / 2.0f) - 50.0f};
     pointsText.pos = {
         (SDLState::logicalWidth - static_cast<float>(pointsTextWidth)) / 2.0f,
         (SDLState::logicalHeight / 2.0f) - 30.0f};
@@ -202,7 +192,6 @@ class EndScene {
   void draw() {
     SDL_RenderTexture(sdlState.renderer, resourceManager.getEndSceneBgTex(),
                       nullptr, nullptr);
-    congratsText.draw();
     pointsText.draw();
     bestText.draw();
     retryText.draw();
