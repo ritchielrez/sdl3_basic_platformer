@@ -111,7 +111,8 @@ struct Game {
 
 #ifdef DEBUG
       debugUI.newFrame();
-      debugUI.drawFrame(player, sceneManager.gameScene.slimes,
+      debugUI.drawFrame(sceneManager.gameScene.player,
+                        sceneManager.gameScene.slimes,
                         sceneManager.gameScene.cam);
 #endif
 
