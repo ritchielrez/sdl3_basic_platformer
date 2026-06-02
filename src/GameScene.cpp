@@ -642,10 +642,6 @@ void GameScene::createEntities() {
                             flagPost.h);
           flagPost.tex = resourceManager.getFlagPostTex();
           SDL_SetTextureColorMod(flagPost.tex, 255, 155, 0);
-          flagPost.collider.x = 20;
-          flagPost.collider.y = 0;
-          flagPost.collider.w = flagPost.w;
-          flagPost.collider.h = flagPost.h;
           constexpr size_t FLAGPOST_ANIM_FRAMES = 5;
           std::vector<glm::vec2> flagPostTexCoords{};
           flagPostTexCoords.resize(FLAGPOST_ANIM_FRAMES);
@@ -721,21 +717,14 @@ void GameScene::update(float dt) {
     player.currAnim = PlayerAnim::death;
   }
 
-  // Check if the player reaches the flagpost.
-  if (!shouldLevelComplete && player.currAnim != PlayerAnim::death) {
-    SDL_FRect playerCollider = {.x = player.pos.x + player.collider.x,
-                                .y = player.pos.y + player.collider.y,
-                                .w = player.collider.w,
-                                .h = player.collider.h};
-    SDL_FRect flagPostCollider = {.x = flagPost.pos.x + flagPost.collider.x,
-                                  .y = flagPost.pos.y + flagPost.collider.y,
-                                  .w = flagPost.collider.w,
-                                  .h = flagPost.collider.h};
-    SDL_FRect intersection;
-    if (SDL_GetRectIntersectionFloat(&playerCollider, &flagPostCollider,
-                                     &intersection)) {
-      shouldLevelComplete = true;
-    }
+  // Check if the player reaches the flagpost, which indicates the level is
+  // complete. Set the level complete flag and reset the player animation to
+  // idle.
+  if (!shouldLevelComplete && player.pos.x >= flagPost.pos.x &&
+      player.grounded && player.currAnim != PlayerAnim::death) {
+    player.currAnim = PlayerAnim::idle;
+    player.anims[player.currAnim].reset();
+    shouldLevelComplete = true;
   }
 }
 

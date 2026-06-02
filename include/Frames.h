@@ -6,6 +6,7 @@
 #include <vector>
 
 #include "Timer.h"
+#include "glm/fwd.hpp"
 
 // Represents a sprite animation: a sequence of frames displayed over time.
 // Handles frame indexing from elapsed time so the animation plays at a
@@ -14,7 +15,8 @@ class Frames {
   // Internal looping timer. Its total length is `len * frameCount` so it
   // cycles through all frames once per full loop.
   Timer timer;
-  // Number of frames in this animation sequence. 1 = static/single-frame sprite.
+  // Number of frames in this animation sequence. 1 = static/single-frame
+  // sprite.
   size_t frameCount;
   // Dimensions (in pixels) of a single frame in the sprite sheet.
   uint16_t frameWidth, frameHeight;
@@ -41,7 +43,7 @@ class Frames {
   // for `len` seconds. Accepts rvalue vector of tex coords.
   Frames(int frameCount, float len, std::vector<glm::vec2> &&texCoords,
          uint16_t frameWidth, uint16_t frameHeight)
-      : timer(len * frameCount),
+      : timer(len * static_cast<float>(frameCount)),
         frameCount(frameCount),
         frameWidth(frameWidth),
         frameHeight(frameHeight),
@@ -49,11 +51,13 @@ class Frames {
   // Same as above but accepts an lvalue reference vector.
   Frames(int frameCount, float len, std::vector<glm::vec2> &texCoords,
          uint16_t frameWidth, uint16_t frameHeight)
-      : timer(len * frameCount),
+      : timer(len * static_cast<float>(frameCount)),
         frameCount(frameCount),
         frameWidth(frameWidth),
         frameHeight(frameHeight),
         texCoords(texCoords) {}
+
+  void reset() { timer.reset(); }
 
   // Compute the current frame index by mapping the timer's progress through
   // one full cycle onto the frame range [0, frameCount). Single-frame
@@ -63,7 +67,8 @@ class Frames {
     assert(frameCount != 0);
     if (frameCount == 1) return 0;
     if (!loop && timer.isTimeOut()) return static_cast<int>(frameCount) - 1;
-    return static_cast<int>(timer.getTime() / timer.getLen() * frameCount);
+    return static_cast<int>(timer.getTime() / timer.getLen() *
+                            static_cast<float>(frameCount));
   }
   [[nodiscard]] bool isTimeOut() const { return timer.isTimeOut(); }
   [[nodiscard]] bool isStarted() const { return timer.isStarted(); }

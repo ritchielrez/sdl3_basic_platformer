@@ -5,6 +5,7 @@
 #include <cstdint>
 
 #include "Colors.h"
+#include "ResourceManager.h"
 #include "SDLState.h"
 #include "Text.h"
 

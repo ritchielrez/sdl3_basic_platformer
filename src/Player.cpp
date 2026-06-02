@@ -31,6 +31,9 @@ void Player::update(const SDLState& sdlState, SDL_FRect& cam, float worldWidth,
   const bool jumpJustPressed = jumpDown && !wasJumpDown;
   wasJumpDown = jumpDown;
 
+  // Reset the jump buffer timer on a new jump key press, and step it forward
+  // otherwise. This is because we don't want multiple jump key events to queue
+  // up.
   if (jumpJustPressed) {
     jumpBufferTimer.reset();
     jumpBufferTimer.step(dt);
@@ -50,9 +53,12 @@ void Player::update(const SDLState& sdlState, SDL_FRect& cam, float worldWidth,
   const bool jumpBuffered =
       jumpBufferTimer.isStarted() && !jumpBufferTimer.isTimeOut();
 
+  bool justJumped = false;
+
   if (canJump && (jumpJustPressed || jumpBuffered)) {
     vel.y = jumpVel;
     currAnim = PlayerAnim::jump;
+    justJumped = true;
     // Consume both the buffer and the coyote window so they don't re-trigger.
     jumpBufferTimer.reset();
     coyoteTimer.reset();
@@ -128,6 +134,19 @@ void Player::update(const SDLState& sdlState, SDL_FRect& cam, float worldWidth,
         currAnim = PlayerAnim::run;
       } else if (vel.x * static_cast<float>(currDir) == 0 && grounded) {
         currAnim = PlayerAnim::idle;
+      }
+      break;
+    }
+    case PlayerAnim::jump: {
+      // Exit jump state when player lands on ground.
+      // `grounded` still reflects the *previous* frame here (collision
+      // hasn't run yet), so exclude the frame the jump was just initiated.
+      if (grounded && !justJumped) {
+        if (currDir != 0) {
+          currAnim = PlayerAnim::run;
+        } else {
+          currAnim = PlayerAnim::idle;
+        }
       }
       break;
     }

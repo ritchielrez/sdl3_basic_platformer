@@ -25,9 +25,9 @@ enum class TransitionPhase { none, fadingOut, fadingIn };
 class SceneManager {
   const SDLState &sdlState;
   SceneType current;
-  TransitionPhase phase = TransitionPhase::none;
-  Timer timer{0.5f};
   SceneType target;
+  TransitionPhase phase = TransitionPhase::none;
+  Timer timer{0.75f};
 
  public:
   // All three scenes are instantiated at startup and persist for the game's
@@ -41,6 +41,7 @@ class SceneManager {
   SceneManager(const SDLState &sdlState, const ResourceManager &resourceManager)
       : sdlState(sdlState),
         current(SceneType::start),
+        target(SceneType::start),
         startScene(sdlState, resourceManager),
         gameScene(sdlState, resourceManager),
         deathScene(sdlState, resourceManager),

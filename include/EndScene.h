@@ -4,9 +4,9 @@
 
 #include <cstdint>
 #include <cstdio>
-#include <string>
 
 #include "Colors.h"
+#include "ResourceManager.h"
 #include "SDLState.h"
 #include "Text.h"
 
