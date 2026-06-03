@@ -134,16 +134,17 @@ struct Game {
       SDL_SetRenderDrawColor(sdlState.renderer, 0, 0, 0, 255);
       SDL_RenderClear(sdlState.renderer);
 
-      //
+      // The SceneManager handles updating and drawing the current scene.
       sceneManager.update(dt);
       sceneManager.draw();
 
 #ifdef DEBUG
+      // Draw the debug overlay on top of the scene.
       debugUI.presentFrame();
 #endif
 
       // Double buffering: the renderer draws to a hidden backbuffer while the
-      // frontbuffer is displayed. SDL_RenderPresent swaps them atomically on
+      // frontbuffer is displayed. SDL_RenderPresent swaps them on
       // the vertical blank (when VSync is enabled), preventing visible tearing.
       SDL_RenderPresent(sdlState.renderer);
 

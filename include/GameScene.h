@@ -3,10 +3,10 @@
 #include <SDL3/SDL.h>
 #include <fmt/base.h>
 
-#include "../src/FlagPost.h"
 #include "Coin.h"
 #include "Colors.h"
 #include "DynTile.h"
+#include "FlagPost.h"
 #include "Map.h"
 #include "Player.h"
 #include "ResourceManager.h"
