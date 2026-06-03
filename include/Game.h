@@ -61,6 +61,9 @@ struct Game {
   //   6. Debug UI end — render and present the ImGui overlay.
   //   7. Present — swap the front and back buffers (double buffering).
   //
+  // A buffer in this context is a temporary storage area for rendering
+  // graphics.
+  //
   // Delta time (dt) is computed as the wall-clock time elapsed since the
   // previous frame, clamped to prevent spiral-of-death on lag spikes.
   void run() {
