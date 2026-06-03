@@ -32,8 +32,6 @@ struct Game {
   DebugUI debugUI{sdlState, "assets/fonts/Roboto-Regular.ttf", 20.0f};
 #endif
 
-  SDL_FRect noiseRect;
-
   // Static flag readable from anywhere (including Log::debug). Toggled with F1
   // to show/hide the debug overlay and enable verbose logging.
   static inline bool debug = false;
@@ -44,8 +42,7 @@ struct Game {
   Game(const char *winTitle, SDL_WindowFlags winFlags, const char *rendererName)
       : sdlState(winTitle, winFlags, rendererName),
         resourceManager(sdlState),
-        sceneManager(sdlState, resourceManager),
-        noiseRect{0.0f, 0.0f, SDLState::logicalWidth, SDLState::logicalHeight} {
+        sceneManager(sdlState, resourceManager) {
     // Initialize SDL3 for rendering graphics. If initialization fails exit
     // early.
     if (!SDL_Init(SDL_INIT_VIDEO)) {
