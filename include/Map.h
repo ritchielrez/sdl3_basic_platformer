@@ -94,14 +94,19 @@ struct Map {
   // against it. Empty lines are skipped. An error dialog is shown if the
   // file cannot be opened or has inconsistent row lengths.
   bool parse(const std::string& filePath) {
-    std::ifstream input{filePath};
+    // Reserve space for 10,000 tiles to avoid memory reallocations when the
+    // vector grows.
     tiles.reserve(10000);
 
+    std::ifstream input{filePath};
+    // is_open() returns false if the file could not be opened, we use it to
+    // show an error message and exit if the file cannot be opened.
     if (!input.is_open()) {
       SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error",
                                "Could not open tilemap from disk", nullptr);
       exit(1);
     }
+
     std::string cell, line;
     for (; std::getline(input, line); rows++) {
       if (line.empty()) continue;

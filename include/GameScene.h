@@ -65,11 +65,11 @@ struct GameScene {
   // Build the player entity: configure sprite animations, physics values,
   // and starting position from the map data.
   void createPlayer();
-  // Bake background tile layers (bg1, bg2) into off-screen textures for
-  // parallax rendering. Each layer is drawn at a different camera scale.
+  // Bake background tile layers (bg1, bg2) into off-screen textures to prevent
+  // weird cracks when camera is moving due to subpixel movement.
   void createBg();
-  // Bake the foreground gameplay layer into an off-screen texture. This
-  // layer scrolls with the camera and contains terrain visuals.
+  // Bake foreground tile layer (fg) into off-screen texture to prevent
+  // weird cracks when camera is moving to subpixel movement.
   void createFg();
   // Spawn all dynamic entities (coins, slimes, moving platforms) from
   // tile-map metadata. Static ground tiles are also collected here.
@@ -147,7 +147,14 @@ struct GameScene {
 
   // Advance the game world by dt seconds: player input & physics, entity
   // AI, collision detection/resolution, animation stepping, and camera
-  // follow. Uses fixed-size sub-steps for stable simulation.
+  // follow. This is important that the movement simulation relies on the dt
+  // value to ensure consistent physics behavior across different frame rates.
+  // If an entity moves a specific number of pixels every frame, then the frame
+  // rate will determine how many pixels the entity moves in a given time.
+  // Instead if we have a fixed movement speed (pixels per second), we can
+  // multiply that by dt to find how many pixels the entity needs to move per
+  // frame in order to achieve that speed. This is the basic behind frame
+  // independence: physics calculations should not depend on the frame rate.
   void update(float dt);
   // Render the visible game world: parallax backgrounds, foreground
   // terrain, all entities (player, coins, slimes), and the HUD overlay.
