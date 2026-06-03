@@ -85,6 +85,8 @@ struct Game {
       // actions, but not for held-key movement (which uses keyboard state).
       while (SDL_PollEvent(&event)) {
 #ifdef DEBUG
+        // Let our debug overlay process the event first, so it can consume it
+        // before the scene does.
         if (debug) ImGui_ImplSDL3_ProcessEvent(&event);
 #endif
         // Send the event to the currently active scene (menu, death screen,
