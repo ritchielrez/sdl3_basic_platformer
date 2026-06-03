@@ -17,19 +17,18 @@
 #include "Slime.h"
 
 // Holds a reference to the shared SDL window and renderer so ImGui can draw on
-// top of the game.  fontHeight controls the size of the UI text.  Two
-// constructors are provided — one with a default 18px font, one that lets the
-// caller pick a custom size.  The constructor initialises a fresh ImGui
-// context, enables keyboard navigation and window docking, loads a TTF font,
-// and connects ImGui to the SDL window and SDL_Renderer so it can receive
-// input and issue draw calls through the same rendering pipeline the game
-// already uses.
+// top of the game. fontHeight controls the size of the UI text.
 struct DebugUI {
   const SDLState &sdlState;
   float fontHeight;
 
+  // No default no argument constructor — an SDLState and font path are always required.
   DebugUI() = delete;
 
+  // Constructor using a default 18px font size. Creates an ImGui context,
+  // enables keyboard navigation and window docking, applies the dark colour
+  // scheme, hooks ImGui into the existing SDL window and SDL_Renderer so it
+  // can receive input and issue draw calls, then loads a TTF font from disk.
   DebugUI(const SDLState &sdlState, const std::string_view &fontPath)
       : sdlState(sdlState) {
     fontHeight = 18.0f;
@@ -47,6 +46,8 @@ struct DebugUI {
 
     io.Fonts->AddFontFromFileTTF(fontPath.data(), fontHeight);
   }
+  // Constructor that accepts an explicit font size.  Otherwise identical to
+  // the one above — stores the given fontHeight instead of using 18px.
   DebugUI(const SDLState &sdlState, const std::string_view &fontPath,
           const float fontHeight)
       : sdlState(sdlState), fontHeight(fontHeight) {
@@ -64,23 +65,39 @@ struct DebugUI {
     io.Fonts->AddFontFromFileTTF(fontPath.data(), fontHeight);
   }
 
-  // Each of these opens an ImGui window showing a different piece of game
-  // state — the player's position and stats, the camera viewport, and a
-  // foldable list of every slime currently alive in the scene.
+  // Opens an ImGui window titled "Player" showing the player's position,
+  // velocity, health, and other internal state from Player::inspect().
   void drawPlayerInfo(const Player &player);
+
+  // Opens an ImGui window titled "Camera" showing the viewport's current
+  // (x, y) position in the world.
   void drawCameraInfo(const SDL_FRect &cam);
+
+  // Opens an ImGui window titled "Slimes" listing every slime enemy alive in
+  // the scene. Each slime is shown in a foldable section (CollapsingHeader)
+  // to keep the list compact when there are many enemies.
   void drawSlimesInfo(const std::vector<Slime> &slimes);
 
-  // Called once per frame between SDL_RenderClear and SDL_RenderPresent.
-  // newFrame() tells ImGui to start processing input for the new frame,
-  // drawFrame() builds all the UI windows and converts them into GPU draw
-  // commands, and presentFrame() submits those commands through SDL so the
-  // overlay appears on screen.
+  // Starts a fresh ImGui frame. Must be called after SDL_RenderClear and
+  // before any ImGui windows are created. Resets the renderer backend, input
+  // backend, and core ImGui state, then creates a transparent full-screen
+  // docking area so debug windows can be arranged freely without blocking
+  // clicks on the game beneath.
   void newFrame();
+
+  // Builds every debug window by calling the three draw*Info methods, then
+  // calls ImGui::Render() to bake the UI into GPU draw commands.
   void drawFrame(const Player &player, const std::vector<Slime> &slimes,
                  const SDL_FRect &cam);
+
+  // Submits the buffered ImGui draw commands through SDL so the overlay
+  // appears on screen. Temporarily disables logical presentation first
+  // because the game uses a fixed internal resolution — ImGui expects raw
+  // window pixel coordinates, not the scaled game resolution.
   void presentFrame() const;
 
+  // Shuts down the ImGui-SDL backends and destroys the ImGui context,
+  // releasing all GPU resources and UI state.
   ~DebugUI() {
     ImGui_ImplSDLRenderer3_Shutdown();
     ImGui_ImplSDL3_Shutdown();

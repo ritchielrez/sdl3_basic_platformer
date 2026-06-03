@@ -2,7 +2,6 @@
 
 #include "Game.h"
 
-// --- drawPlayerInfo ---
 // Opens an ImGui window titled "Player" and dumps the player's internal state
 // (position, velocity, health, etc.) as formatted text from Player::inspect().
 // ImGui::Begin / End create a draggable, resizable window; every widget call
@@ -16,7 +15,6 @@ void DebugUI::drawPlayerInfo(const Player &player) {
   ImGui::End();
 }
 
-// --- drawCameraInfo ---
 // Shows the camera's current (x, y) position.  The camera is an SDL_FRect
 // defining which portion of the world is visible — it acts like a viewport
 // that follows the player around the level.
@@ -29,7 +27,6 @@ void DebugUI::drawCameraInfo(const SDL_FRect &cam) {
   ImGui::End();
 }
 
-// --- drawSlimesInfo ---
 // Lists every slime enemy currently alive.  Shows the total count first, then
 // each slime in a foldable section (ImGui::CollapsingHeader) so the list
 // stays compact when there are many enemies on screen.
@@ -48,7 +45,6 @@ void DebugUI::drawSlimesInfo(const std::vector<Slime> &slimes) {
   ImGui::End();
 }
 
-// --- newFrame ---
 // Prepares ImGui to receive input and build UI for the current frame.  Must
 // be called after SDL_RenderClear and before any ImGui windows are created.
 // The three NewFrame calls reset each layer of ImGui's internal state (the
@@ -68,7 +64,6 @@ void DebugUI::newFrame() {
                                ImGuiDockNodeFlags_PassthruCentralNode);
 }
 
-// --- drawFrame ---
 // Builds every debug window by calling the sub-panel functions, then calls
 // ImGui::Render() to bake the window descriptions into GPU draw commands
 // (vertex buffers, textures, etc.).  Those commands are stored internally and
@@ -85,7 +80,6 @@ void DebugUI::drawFrame(const Player &player, const std::vector<Slime> &slimes,
   ImGui::Render();
 }
 
-// --- presentFrame ---
 // Submits the ImGui draw data to SDL so the overlay appears on screen.
 // Logical presentation is temporarily disabled beforehand because the game
 // uses a fixed internal resolution (e.g. 640×360) that SDL scales and
