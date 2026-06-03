@@ -147,9 +147,12 @@ class SceneManager {
     }
   }
 
-  // Only the menu scenes (start, death) handle keyboard/mouse events. During
-  // gameplay, input is polled directly from SDL_GetKeyboardState for
-  // responsiveness (see Player::update).
+  // This runs every time the player does something — pressing a key, clicking
+  // the mouse, etc. It checks which screen is currently active (the title menu,
+  // the death screen, or the victory screen) and sends the event to that
+  // screen's own handleEvent() so it can react. The gameplay scene is skipped
+  // here because during gameplay we read the keyboard directly every frame
+  // instead (see Player::update).
   void handleEvent(const SDL_Event &event) {
     switch (current) {
       case SceneType::start:

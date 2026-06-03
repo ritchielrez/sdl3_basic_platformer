@@ -1,6 +1,7 @@
 // RAII scope guard inspired by D and Go's `defer` statement.
-// Schedules a lambda to execute when the current scope exits (normal return
-// or exception), ensuring cleanup code runs even on early returns.
+// Schedules a lambda/no-name function to execute when the current 
+// scope exits (normal return or exception), ensuring cleanup code 
+// runs even on early returns.
 //
 // Usage:
 //   {

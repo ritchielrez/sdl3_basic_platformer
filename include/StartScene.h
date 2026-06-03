@@ -26,8 +26,7 @@ class StartScene {
   const ResourceManager &resourceManager;
   Text playText;  // "Play" button --- starts the game
   Text exitText;  // "Exit" button --- closes the game
-  // Currently highlighted button index (0 = Play, 1 = Exit). Modulo-wrapped
-  // on up/down input.
+  // Currently highlighted button index (0 = Play, 1 = Exit).
   uint8_t selectedBtn;
 
  public:
@@ -99,21 +98,33 @@ class StartScene {
     }
   }
 
+  // Called whenever the player does something (a key press, a mouse click,
+  // etc.). SDL wraps that info in an "event" and sends it here so the active
+  // screen can react to what happened.
   void handleEvent(const SDL_Event &event) {
+    // ---- KEYBOARD INPUT ----
+    // First, check if the event is a key being pressed down.
     if (event.type == SDL_EVENT_KEY_DOWN) {
+      // "Scancode" identifies which physical key was hit (not which character
+      // it produces). We switch on it to run different code per key.
       switch (event.key.scancode) {
+        // UP / W — highlight the previous button.
         case SDL_SCANCODE_UP:
         case SDL_SCANCODE_W:
           selectedBtn -= 1;
+          // If we moved past the first button, wrap back around to the last.
           if (selectedBtn > StartSceneBtns::EXIT)
             selectedBtn = StartSceneBtns::PLAY;
           break;
+        // DOWN / S — highlight the next button.
         case SDL_SCANCODE_DOWN:
         case SDL_SCANCODE_S:
           selectedBtn += 1;
+          // If we moved past the last button, stay on the last one.
           if (selectedBtn > StartSceneBtns::EXIT)
             selectedBtn = StartSceneBtns::EXIT;
           break;
+        // ENTER / SPACE — activate whichever button is currently highlighted.
         case SDL_SCANCODE_RETURN:
         case SDL_SCANCODE_SPACE:
           if (selectedBtn == StartSceneBtns::PLAY)
@@ -124,8 +135,14 @@ class StartScene {
         default:
           break;
       }
+    // ---- MOUSE INPUT ----
+    // Otherwise, check if the event is a mouse button click.
     } else if (event.type == SDL_EVENT_MOUSE_BUTTON_DOWN) {
+      // Only react to the left mouse button.
       if (event.button.button == SDL_BUTTON_LEFT) {
+        // The click coordinates come in real window pixels (say 1280x720),
+        // but our game runs in a tiny 320x180 logical space. We need to
+        // convert so the click lands on the right button.
         float windowMouseX = event.button.x;
         float windowMouseY = event.button.y;
         float mouseX = windowMouseX;
@@ -137,10 +154,14 @@ class StartScene {
         playText.getSize(&playTextWidth, &playTextHeight);
         exitText.getSize(&exitTextWidth, &exitTextHeight);
 
+        // Now check if the converted click falls inside any button's area.
+        // A button is just a rectangle — we compare the mouse X and Y
+        // against its left, right, top, and bottom edges.
         if (mouseX >= playText.pos.x &&
             mouseX <= playText.pos.x + static_cast<float>(playTextWidth) &&
             mouseY >= playText.pos.y &&
             mouseY <= playText.pos.y + static_cast<float>(playTextHeight)) {
+          // Clicked "Play" — start the game.
           shouldStartGame = true;
         } else if (mouseX >= exitText.pos.x &&
                    mouseX <=
@@ -148,6 +169,7 @@ class StartScene {
                    mouseY >= exitText.pos.y &&
                    mouseY <=
                        exitText.pos.y + static_cast<float>(exitTextHeight)) {
+          // Clicked "Exit" — close the game.
           shouldQuit = true;
         }
       }

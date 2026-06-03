@@ -73,6 +73,8 @@ struct Game {
       // cap in GameScene::maxPhysicsDt handles excessive time steps.
       float dt = static_cast<float>((nowTime - prevTime)) / 1000.0f;
 
+      // This is a container that SDL fills with info about whatever the
+      // player just did — e.g. which key they pressed or where they clicked.
       SDL_Event event{0};
       // Poll all pending OS events. Unlike continuous key state polling
       // (SDL_GetKeyboardState), events are discrete — they fire once per
@@ -82,6 +84,8 @@ struct Game {
 #ifdef DEBUG
         if (debug) ImGui_ImplSDL3_ProcessEvent(&event);
 #endif
+        // Send the event to the currently active scene (menu, death screen,
+        // etc.) so it can react to the key press or mouse click.
         sceneManager.handleEvent(event);
 
         switch (event.type) {
