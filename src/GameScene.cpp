@@ -7,6 +7,8 @@
 #include "DynTile.h"
 #include "Map.h"
 
+// Initialise the player entity: set up animation frames, physics values
+// (speed, jump velocity, acceleration), starting position, and collision box.
 void GameScene::createPlayer() {
   constexpr size_t PLAYER_RUN_FRAMES = 16;
   constexpr uint16_t PLAYER_SIZE = 32;
@@ -62,6 +64,8 @@ void GameScene::createPlayer() {
   player.collider.h = 10.0f;
 }
 
+// Bake both background layers (bg1 and bg2) into render-target textures so
+// they can be drawn efficiently each frame with parallax scrolling.
 void GameScene::createBg() {
   bgTex1 = SDL_CreateTexture(
       sdlState.renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET,
@@ -332,6 +336,8 @@ void GameScene::createBg() {
   SDL_SetRenderTarget(sdlState.renderer, nullptr);
 }
 
+// Bake the foreground layer (water, waves) into a render-target texture with
+// a slight yellow tint and alpha transparency for a subtle overlay effect.
 void GameScene::createFg() {
   fgTex = SDL_CreateTexture(
       sdlState.renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET,
@@ -385,6 +391,9 @@ void GameScene::createFg() {
   SDL_SetRenderTarget(sdlState.renderer, nullptr);
 }
 
+// Spawn all gameplay entities from the mid-layer tile map: static tiles
+// (ground, dirt, bridges, boxes), moving platforms, coins, slimes, and the
+// flagpost at their mapped positions.
 void GameScene::createEntities() {
   staticTiles.reserve(1000);
   dynTiles.reserve(10);
@@ -671,6 +680,9 @@ void GameScene::createEntities() {
   }
 }
 
+// Advance the game scene by one frame: step animations, update entities
+// (dynTiles, coins, slimes, player), check for death (fall off screen) and
+// level completion (reach the flagpost).
 void GameScene::update(float dt) {
   dt = glm::min(dt, maxPhysicsDt);
 
@@ -727,6 +739,8 @@ void GameScene::update(float dt) {
   }
 }
 
+// Render the entire scene: parallax background layers, static tiles, moving
+// platforms, coins, slimes, HUD text, flagpost, player, and foreground overlay.
 void GameScene::draw() {
   constexpr float parallaxFactor[] = {-0.3f, -0.4f};
 

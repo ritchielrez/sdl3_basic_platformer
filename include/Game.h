@@ -89,6 +89,7 @@ struct Game {
         sceneManager.handleEvent(event);
 
         switch (event.type) {
+          // Stop the game when the game window is closed.
           case SDL_EVENT_QUIT: {
             running = false;
             break;
@@ -102,6 +103,7 @@ struct Game {
           }
           case SDL_EVENT_KEY_DOWN: {
 #ifdef DEBUG
+            // Toggle debug overlay when F1 pressed.
             if (event.key.scancode == SDL_SCANCODE_F1) debug = !debug;
 #endif
             break;
@@ -109,10 +111,12 @@ struct Game {
         }
       }
 
+      // If the user clicks on quit button on the start scene, close the game.
       if (sceneManager.startScene.shouldQuit) {
         running = false;
       }
 
+      // Draw debug overlay on debug builds.
 #ifdef DEBUG
       debugUI.newFrame();
       debugUI.drawFrame(sceneManager.gameScene.player,
@@ -125,6 +129,7 @@ struct Game {
       SDL_SetRenderDrawColor(sdlState.renderer, 0, 0, 0, 255);
       SDL_RenderClear(sdlState.renderer);
 
+      //
       sceneManager.update(dt);
       sceneManager.draw();
 
@@ -141,5 +146,6 @@ struct Game {
     }
   }
 
+  // Cleanup SDL related data at the end of the game.
   ~Game() { SDL_Quit(); }
 };

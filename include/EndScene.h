@@ -88,6 +88,7 @@ class EndScene {
                                   currentPoints, collectedCoins, slainSlimes));
     bestText.assign(fmt::format("Best: {}", bestPoints));
 
+    // Calculate widths and heights of all texts in the scene.
     int pointsTextWidth, pointsTextHeight, bestTextWidth, bestTextHeight,
         retryTextWidth, retryTextHeight, backToStartTextWidth,
         backToStartTextHeight;
@@ -116,6 +117,9 @@ class EndScene {
         (SDLState::logicalHeight / 2.0f) + 10.0f};
   }
 
+  // `dt` (delta time) is unused here because menu screens don't need
+  // frame-rate-independent logic — they only react to input. The
+  // [[maybe_unused]] attribute silences the compiler warning.
   void update([[maybe_unused]] float dt) {
     // Mouse coordinates come in window pixels (e.g. 1280x720) and need to be
     // converted to logical coordinates (320x180) for accurate hit-testing.

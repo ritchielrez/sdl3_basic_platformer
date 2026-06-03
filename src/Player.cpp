@@ -15,6 +15,9 @@
 
 #include "SDLState.h"
 
+// Main player update: reads input, applies movement physics (acceleration,
+// jumping, dashing), handles coyote time and jump buffering, then runs
+// collision resolution and updates the camera to follow the player.
 void Player::update(const SDLState& sdlState, SDL_FRect& cam, float worldWidth,
                     const std::vector<StaticTile>& staticTiles,
                     const std::vector<DynTile>& dynTiles,
@@ -223,6 +226,9 @@ void Player::update(const SDLState& sdlState, SDL_FRect& cam, float worldWidth,
   }
 }
 
+// AABB collision detection and response against static tiles, moving
+// platforms, coins, and slimes. Pushes the player out of overlaps, handles
+// coin pickups, slime stomps, and squish death from moving platforms.
 void Player::collision(const std::vector<StaticTile>& staticTiles,
                        const std::vector<DynTile>& dynTiles,
                        std::vector<Coin>& coins, size_t& collectedCoins,

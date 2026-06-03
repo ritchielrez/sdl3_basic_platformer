@@ -40,7 +40,8 @@ class Frames {
         frameHeight(frameHeight),
         texCoords(1, texCoord) {}
   // Multi-frame animation: `frameCount` evenly-spaced frames, each displayed
-  // for `len` seconds. Accepts rvalue vector of tex coords.
+  // for `len` seconds. Accepts rvalue vector of tex coords. A rvalue represents
+  // a temporary object.
   Frames(int frameCount, float len, std::vector<glm::vec2> &&texCoords,
          uint16_t frameWidth, uint16_t frameHeight)
       : timer(len * static_cast<float>(frameCount)),
@@ -48,7 +49,8 @@ class Frames {
         frameWidth(frameWidth),
         frameHeight(frameHeight),
         texCoords(texCoords) {}
-  // Same as above but accepts an lvalue reference vector.
+  // Same as above but accepts an lvalue reference vector. A lvalue represents
+  // a object stored in RAM for significant amount of time.
   Frames(int frameCount, float len, std::vector<glm::vec2> &texCoords,
          uint16_t frameWidth, uint16_t frameHeight)
       : timer(len * static_cast<float>(frameCount)),
@@ -70,6 +72,7 @@ class Frames {
     return static_cast<int>(timer.getTime() / timer.getLen() *
                             static_cast<float>(frameCount));
   }
+  // Bunch of helper methods
   [[nodiscard]] bool isTimeOut() const { return timer.isTimeOut(); }
   [[nodiscard]] bool isStarted() const { return timer.isStarted(); }
   [[nodiscard]] float getLen() const { return timer.getLen(); }
@@ -80,5 +83,6 @@ class Frames {
     return texCoords.at(frameIdx());
   }
 
+  // Step through the animation timer by `dt` (the time it takes each frame to process).
   void step(float dt) { timer.step(dt); }
 };

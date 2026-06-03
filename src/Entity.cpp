@@ -5,6 +5,8 @@
 #include "Game.h"
 #include "SDL3/SDL_rect.h"
 
+// Render the entity's current animation frame at its world position, adjusted
+// by the camera offset. When debug mode is on, also draws the collision box.
 void Entity::draw(const SDLState &sdlState, const SDL_FRect &cam) {
   // NOTE: An without an actual animation has a `currAnim` of -1.
   // However it still has an initialized `anims` object, so we can access
@@ -20,6 +22,7 @@ void Entity::draw(const SDLState &sdlState, const SDL_FRect &cam) {
   SDL_RenderTextureRotated(sdlState.renderer, tex, &src, &dst, 0, nullptr,
                            flipMode);
 
+  // If debug mode if enabled, draw the collider (hitbox) as well.
   if (Game::debug) {
     SDL_FRect colliderRect{0, 0, 0, 0};
     colliderRect.x = pos.x + collider.x - cam.x;

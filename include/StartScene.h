@@ -69,6 +69,9 @@ class StartScene {
     SDL_RenderCoordinatesFromWindow(sdlState.renderer, windowMouseX,
                                     windowMouseY, &mouseX, &mouseY);
 
+    // Calculate widths and heights of all texts. These calculations help us 
+    // detect what button the user is hovering on. Change `selectedBtn` based
+    // on the button the user is hovering on.
     int playTextWidth, playTextHeight;
     playText.getSize(&playTextWidth, &playTextHeight);
     if (mouseX >= playText.pos.x &&
@@ -87,8 +90,9 @@ class StartScene {
       selectedBtn = StartSceneBtns::EXIT;
     }
 
-    // Highlight the selected button in yellow, dim the other to the default
-    // foreground color. Provides visual feedback for which option is active.
+    // Highlight the selected button in highlighting foreground color set in Colors.h, 
+    // dim the other to the default foreground color. Provides visual feedback for which 
+    // option is active.
     if (selectedBtn == StartSceneBtns::PLAY) {
       playText.setColor(Colors::hl.r, Colors::hl.g, Colors::hl.b, Colors::hl.a);
       exitText.setColor(Colors::fg.r, Colors::fg.g, Colors::fg.b, Colors::fg.a);

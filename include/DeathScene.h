@@ -85,6 +85,9 @@ class DeathScene {
     SDL_RenderCoordinatesFromWindow(sdlState.renderer, windowMouseX,
                                     windowMouseY, &mouseX, &mouseY);
 
+    // Calculate widths and heights of all texts. These calculations help us 
+    // detect what button the user is hovering on. Change `selectedBtn` based
+    // on the button the user is hovering on.
     int retryTextWidth, retryTextHeight;
     retryText.getSize(&retryTextWidth, &retryTextHeight);
     if (mouseX >= retryText.pos.x &&
@@ -105,8 +108,9 @@ class DeathScene {
       selectedBtn = DeathSceneBtns::BACK_TO_START;
     }
 
-    // Highlight the selected button in yellow, dim the other to the default
-    // foreground color. Provides visual feedback for which option is active.
+    // Highlight the selected button in highlighting foreground color set in Colors.h, 
+    // dim the other to the default foreground color. Provides visual feedback for which 
+    // option is active.
     if (selectedBtn == DeathSceneBtns::RETRY) {
       retryText.setColor(Colors::hl.r, Colors::hl.g, Colors::hl.b,
                          Colors::hl.a);

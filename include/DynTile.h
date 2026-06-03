@@ -17,12 +17,12 @@ struct DynTile : public Entity {
   glm::vec2 origin;
   bool collided;
 
-  // Default constructor.  Initialises the patrol origin to (0, 0) and marks
+  // Default constructor. Initialises the patrol origin to (0, 0) and marks
   // the tile as not yet collided with anything.
   DynTile() : origin(glm::vec2(0, 0)), collided(false) {}
 
-  // Moves the platform along its patrol route.  Only updates if the tile is
-  // visible within the camera's rectangle.  The platform oscillates ±2 tiles
+  // Moves the platform along its patrol route. Only updates if the tile is
+  // visible within the camera's rectangle. The platform oscillates ±2 tiles
   // (32 px) from its spawn origin — it reverses direction when either
   // boundary is reached.
   void update(float dt, const SDL_FRect& cam) {
@@ -43,7 +43,7 @@ struct DynTile : public Entity {
   }
 
   // Returns a human-readable string of the tile's current position, velocity,
-  // and collision state.  Used by the debug overlay (DebugUI) to display live
+  // and collision state. Used by the debug overlay (DebugUI) to display live
   // tile information.
   [[nodiscard]] std::string inspect() const {
     return fmt::format(
