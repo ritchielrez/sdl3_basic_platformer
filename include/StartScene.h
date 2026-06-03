@@ -37,6 +37,9 @@ class StartScene {
   // button. Read by Game::run to break the main loop.
   bool shouldQuit = false;
 
+  // Construct the start menu. Creates "Play" and "Exit" text objects,
+  // positions them centered on screen, and defaults to the Play button
+  // being selected.
   StartScene(const SDLState &sdlState, const ResourceManager &resourceManager)
       : sdlState(sdlState),
         resourceManager(resourceManager),
@@ -58,6 +61,9 @@ class StartScene {
         (SDLState::logicalHeight / 2.0f) + 10.0f};
   }
 
+  // Poll mouse position for hover highlighting of buttons. Converts
+  // window-space coordinates to logical (320x180) for accurate hit-testing.
+  // Updates button colors based on which button is selected.
   void update([[maybe_unused]] float dt) {
     // Mouse coordinates come in window pixels (e.g. 1280×720) and need to be
     // converted to logical coordinates (320×180) for accurate hit-testing.
@@ -180,6 +186,8 @@ class StartScene {
     }
   }
 
+  // Draw the background image and both menu buttons (Play, Exit) at
+  // their pre-computed screen positions.
   void draw() {
     // Draw the background image stretched to fill the entire screen.
     SDL_RenderTexture(sdlState.renderer, resourceManager.getStartSceneBgTex(),

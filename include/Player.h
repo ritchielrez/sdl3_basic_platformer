@@ -67,6 +67,9 @@ struct Player : public Entity {
   // happened" frustration.
   Timer jumpBufferTimer;
 
+  // Construct the player with all movement mechanics and timers at their
+  // default values. Acceleration, speeds, and cooldown durations are set
+  // here — they are tuned for responsive platformer feel.
   Player()
       : accel(glm::vec2(0)),
         maxSpeed(glm::vec2(0)),

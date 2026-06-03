@@ -62,9 +62,17 @@ struct GameScene {
   Text dashCooldownText;
 
  private:
+  // Build the player entity: configure sprite animations, physics values,
+  // and starting position from the map data.
   void createPlayer();
+  // Bake background tile layers (bg1, bg2) into off-screen textures for
+  // parallax rendering. Each layer is drawn at a different camera scale.
   void createBg();
+  // Bake the foreground gameplay layer into an off-screen texture. This
+  // layer scrolls with the camera and contains terrain visuals.
   void createFg();
+  // Spawn all dynamic entities (coins, slimes, moving platforms) from
+  // tile-map metadata. Static ground tiles are also collected here.
   void createEntities();
 
   // Load all four CSV tilemaps, then bake background/foreground textures and
@@ -95,6 +103,8 @@ struct GameScene {
   }
 
  public:
+  // Construct the full game scene: load map CSVs, bake textures, spawn
+  // entities and the player. Also sets up the HUD text objects.
   GameScene(const SDLState &sdlState, const ResourceManager &resourceManager)
       : sdlState(sdlState),
         resourceManager(resourceManager),
@@ -135,9 +145,15 @@ struct GameScene {
     init();
   }
 
+  // Advance the game world by dt seconds: player input & physics, entity
+  // AI, collision detection/resolution, animation stepping, and camera
+  // follow. Uses fixed-size sub-steps for stable simulation.
   void update(float dt);
+  // Render the visible game world: parallax backgrounds, foreground
+  // terrain, all entities (player, coins, slimes), and the HUD overlay.
   void draw();
 
+  // Clean up GPU-side background textures created during baking.
   ~GameScene() {
     SDL_DestroyTexture(bgTex1);
     SDL_DestroyTexture(bgTex2);

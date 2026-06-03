@@ -38,6 +38,9 @@ class DeathScene {
   // scene and transitions to SceneType::start.
   bool shouldBeBackToStart = false;
 
+  // Construct the death screen. Creates "You Died!!!", "Retry", and
+  // "Back to Start" text objects, positions them centered on screen,
+  // and defaults to the Retry button being selected.
   DeathScene(const SDLState &sdlState, const ResourceManager &resourceManager)
       : sdlState(sdlState),
         resourceManager(resourceManager),
@@ -203,6 +206,8 @@ class DeathScene {
     }
   }
 
+  // Draw the background image and all three text elements (death header,
+  // retry button, back-to-start button).
   void draw() {
     // Draw the background image stretched to fill the entire screen.
     SDL_RenderTexture(sdlState.renderer, resourceManager.getDeathSceneBgTex(),

@@ -44,6 +44,8 @@ class EndScene {
   // scene and transitions to SceneType::start.
   bool shouldBeBackToStart = false;
 
+  // Construct the victory screen. Creates score display and button text
+  // objects, sets default colors, and defaults to the Retry button.
   EndScene(const SDLState &sdlState, const ResourceManager &resourceManager)
       : sdlState(sdlState),
         resourceManager(resourceManager),
@@ -245,6 +247,8 @@ class EndScene {
     }
   }
 
+  // Draw the background image, score display (points + best), and both
+  // menu buttons (Retry, Back to Start).
   void draw() {
     // Draw the background image stretched to fill the entire screen.
     SDL_RenderTexture(sdlState.renderer, resourceManager.getEndSceneBgTex(),

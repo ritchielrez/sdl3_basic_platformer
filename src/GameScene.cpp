@@ -48,7 +48,8 @@ void GameScene::createPlayer() {
       PLAYER_SIZE, PLAYER_SIZE);
   playerAnims[PlayerAnim::death].loop = false;
 
-  player.pos = glm::vec2(0, SDLState::logicalHeight - 3 * PLAYER_SIZE);
+  // player.pos = glm::vec2(0, SDLState::logicalHeight - 3 * PLAYER_SIZE);
+  player.pos = glm::vec2(1100, SDLState::logicalHeight - 3 * PLAYER_SIZE);
   player.tex = resourceManager.getPlayerTex();
   player.maxSpeed = glm::vec2(130.0f, 350.0f);
   player.dashSpeed = 200.0f;

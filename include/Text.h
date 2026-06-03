@@ -24,6 +24,8 @@ class Text {
   glm::vec2 pos;
 
   Text() : ttfText(nullptr), pos(glm::vec2(0, 0)) {}
+  // Create a text object at a fixed screen position. Allocates a GPU-side
+  // TTF_Text via the SDL_ttf engine and sets the default white color.
   Text(const SDLState &sdlState, const std::string_view str,
        const glm::vec2 &pos)
       : pos(pos) {
@@ -59,10 +61,14 @@ class Text {
   // positioning UI elements (e.g. centering text on screen).
   void getSize(int *w, int *h) const { TTF_GetTextSize(ttfText, w, h); }
 
+  // Change the text color in RGBA. Alpha defaults to fully opaque. This
+  // updates the GPU-side text immediately.
   void setColor(uint8_t r, uint8_t g, uint8_t b, uint8_t a = 255) {
     TTF_SetTextColor(ttfText, r, g, b, a);
   }
 
+  // Set a maximum line width in logical pixels. Text wider than this is
+  // automatically wrapped to the next line.
   void setWrapWidth(int w) const {
     TTF_SetTextWrapWidth(ttfText, w);
   }

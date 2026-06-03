@@ -30,6 +30,8 @@ struct Entity {
   // the entity changes direction.
   int16_t dir;
 
+  // Zero-initialize all entity fields. Position and velocity start at the
+  // origin, no animation is active, and the texture pointer is null.
   Entity()
       : pos(glm::vec2(0)),
         vel(glm::vec2(0)),

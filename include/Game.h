@@ -38,6 +38,9 @@ struct Game {
   // to show/hide the debug overlay and enable verbose logging.
   static inline bool debug = false;
 
+  // Construct SDL state, load resources, and create the scene state
+  // machine. Also initializes SDL video — exits with a message box on
+  // failure.
   Game(const char *winTitle, SDL_WindowFlags winFlags, const char *rendererName)
       : sdlState(winTitle, winFlags, rendererName),
         resourceManager(sdlState),

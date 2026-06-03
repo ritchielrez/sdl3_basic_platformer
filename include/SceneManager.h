@@ -38,6 +38,8 @@ class SceneManager {
   DeathScene deathScene;
   EndScene endScene;
 
+  // Construct the scene state machine. All four scenes (start, game, death,
+  // end) are created immediately and persist for the game's lifetime.
   SceneManager(const SDLState &sdlState, const ResourceManager &resourceManager)
       : sdlState(sdlState),
         current(SceneType::start),
@@ -47,12 +49,16 @@ class SceneManager {
         deathScene(sdlState, resourceManager),
         endScene(sdlState, resourceManager) {}
 
+  // Begin a cross-fade transition to the destination scene. The current
+  // scene freezes while fading to black, then the new scene appears.
   void startTransition(SceneType dest) {
     phase = TransitionPhase::fadingOut;
     target = dest;
     timer.reset();
   }
 
+  // Tick the currently active scene without processing any transition
+  // logic. Used internally during the fade-in phase.
   void updateSceneOnly(float dt) {
     switch (current) {
       case SceneType::start:
@@ -169,6 +175,8 @@ class SceneManager {
     }
   }
 
+  // Render the currently active scene and, if a transition is in progress,
+  // draw a black overlay whose alpha drives the fade-in/fade-out effect.
   void draw() {
     switch (current) {
       case SceneType::start:
