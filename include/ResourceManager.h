@@ -47,6 +47,8 @@ class ResourceManager {
   // C++ standard guideline reasons.
   explicit ResourceManager(const SDLState &sdlState) {
     coinTex = loadTex(sdlState, "assets/sprites/coin.png");
+    // loadTex returns nullptr if the texture could not be loaded, we use it to
+    // show an error message and exit if the texture cannot be loaded.
     if (!coinTex) {
       SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error",
                                "Coin texture could not be loaded", nullptr);
@@ -111,12 +113,15 @@ class ResourceManager {
     if (!endSceneBgTex) {
       SDL_ShowSimpleMessageBox(
           SDL_MESSAGEBOX_ERROR, "Error",
-          "The background texture for end scene could not be loaded",
-          nullptr);
+          "The background texture for end scene could not be loaded", nullptr);
       exit(1);
     }
   }
 
+  // Copy constructor, copy assignment operator, move constructor and move
+  // assignment operator are deleted to prevent copying of the resource manager,
+  // which would lead to multiple texture handles pointing to the same VRAM
+  // allocation. It's important to prevent these kinds of avoid memory leaks.
   ResourceManager(const ResourceManager &) = delete;
   ResourceManager &operator=(const ResourceManager &) = delete;
   ResourceManager(ResourceManager &&) noexcept = delete;
@@ -168,9 +173,7 @@ class ResourceManager {
   [[nodiscard]] SDL_Texture *getDeathSceneBgTex() const {
     return deathSceneBgTex;
   }
-  [[nodiscard]] SDL_Texture *getEndSceneBgTex() const {
-    return endSceneBgTex;
-  }
+  [[nodiscard]] SDL_Texture *getEndSceneBgTex() const { return endSceneBgTex; }
 
   // Destructor releases all GPU memory. Each SDL_DestroyTexture decrements
   // the texture's internal reference count and frees the VRAM allocation.
