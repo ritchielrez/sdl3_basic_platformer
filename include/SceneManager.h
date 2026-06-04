@@ -13,6 +13,16 @@
 //   Start → Game → Death → (Retry → Game | Back To Start → Start)
 // Each scene owns its own update/draw/handleEvent logic; the SceneManager
 // delegates to whichever scene is currently active.
+//
+// Scene changes use a two-phase cross-fade transition:
+//   Phase 1 (fadingOut): a black overlay fades in over the current scene,
+//                         hiding it completely. The scene is NOT updated so
+//                         it appears frozen.
+//   Phase 2 (fadingIn):  the new scene is swapped in and begins updating
+//                         behind the black overlay, which now fades out to
+//                         reveal it.
+// Between phases the current scene is atomically swapped to the target,
+// invisible behind the fully opaque overlay.
 enum class SceneType {
   start,
   game,
@@ -24,10 +34,10 @@ enum class TransitionPhase { none, fadingOut, fadingIn };
 
 class SceneManager {
   const SDLState &sdlState;
-  SceneType current;
-  SceneType target;
-  TransitionPhase phase = TransitionPhase::none;
-  Timer timer{0.75f};
+  SceneType current;           // The scene currently being rendered (and updated when not transitioning)
+  SceneType target;            // The scene to switch to once the fade-out completes
+  TransitionPhase phase = TransitionPhase::none;  // Which stage of the cross-fade we are in
+  Timer timer{0.75f};          // Duration of each transition half (fade-out and fade-in), in seconds
 
  public:
   // All three scenes are instantiated at startup and persist for the game's
@@ -51,6 +61,11 @@ class SceneManager {
 
   // Begin a cross-fade transition to the destination scene. The current
   // scene freezes while fading to black, then the new scene appears.
+  //
+  // This kicks off Phase 1 (fadingOut): the current scene stops updating and
+  // a black overlay grows opaque over it. Once fully black, the scene pointer
+  // is swapped to `dest` behind the overlay (in update()), and Phase 2
+  // (fadingIn) begins — the new scene updates while the overlay fades out.
   void startTransition(SceneType dest) {
     phase = TransitionPhase::fadingOut;
     target = dest;
@@ -83,17 +98,29 @@ class SceneManager {
   //   - Death → Game (retry) or Death → Start (back to menu)
   //   - End → Game (retry) or End → Start (back to menu)
   void update(float dt) {
+    // --- Transition handling ---
+    // When a transition is active, we bypass the normal per-scene update
+    // logic below and instead run the two-phase fade sequence.
     if (phase != TransitionPhase::none) {
       timer.step(dt);
       if (phase == TransitionPhase::fadingOut) {
-        // Phase 1: fade out — freeze the outgoing scene
+        // Phase 1: fade out — freeze the outgoing scene.
+        // The current scene is NOT updated so it appears frozen in place.
+        // The draw() method paints an increasingly opaque black overlay on
+        // top, so the scene gradually disappears into blackness.
+        // Once the timer finishes, we atomically swap to the target scene
+        // (invisible behind the fully opaque overlay) and begin fading in.
         if (timer.isTimeOut()) {
           current = target;
           phase = TransitionPhase::fadingIn;
           timer.reset();
         }
       } else {
-        // Phase 2: fade in — new scene runs behind shrinking overlay
+        // Phase 2: fade in — new scene runs behind shrinking overlay.
+        // The new scene (now `current`) begins updating normally, but the
+        // draw() method still paints a black overlay that starts fully opaque
+        // and shrinks to transparent. When the timer finishes, the transition
+        // is complete and we resume normal single-scene rendering.
         updateSceneOnly(dt);
         if (timer.isTimeOut()) {
           phase = TransitionPhase::none;
@@ -177,6 +204,12 @@ class SceneManager {
 
   // Render the currently active scene and, if a transition is in progress,
   // draw a black overlay whose alpha drives the fade-in/fade-out effect.
+  //
+  // The overlay is a full-screen black rectangle drawn with blending enabled.
+  // Its alpha interpolates from 0 → 1 during fadingOut (the outgoing scene
+  // grows darker), and from 1 → 0 during fadingIn (the new scene emerges).
+  // This creates a smooth cross-fade between scenes without needing to render
+  // both scenes simultaneously.
   void draw() {
     switch (current) {
       case SceneType::start:
@@ -193,11 +226,15 @@ class SceneManager {
         break;
     }
     if (phase != TransitionPhase::none) {
+      // `t` goes from 0 → 1 over the duration of each transition half.
       float t = timer.getTime() / timer.getLen();
+      // In fadingOut:  alpha ramps  0 → 1  (scene disappears into black).
+      // In fadingIn:   alpha ramps  1 → 0  (black overlay lifts to reveal).
       float alpha = phase == TransitionPhase::fadingOut ? t : 1.0f - t;
       SDL_SetRenderDrawColor(sdlState.renderer, 0, 0, 0,
                              static_cast<uint8_t>(alpha * 255.0f));
       SDL_SetRenderDrawBlendMode(sdlState.renderer, SDL_BLENDMODE_BLEND);
+      // Passing nullptr as the rect means "the entire render target".
       SDL_RenderFillRect(sdlState.renderer, nullptr);
     }
   }
