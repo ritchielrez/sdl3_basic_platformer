@@ -93,41 +93,43 @@ struct Map {
   // determines the expected column count; subsequent rows are validated
   // against it. Empty lines are skipped. An error dialog is shown if the
   // file cannot be opened or has inconsistent row lengths.
+  // Entry point: opens and parses a CSV file to populate the tile grid.
   bool parse(const std::string& filePath) {
     // Reserve space for 10,000 tiles to avoid memory reallocations when the
     // vector grows.
-    tiles.reserve(10000);
+    tiles.reserve(10000);  // Pre-allocate capacity for up to 10k tiles.
 
-    std::ifstream input{filePath};
+    std::ifstream input{filePath};  // Attempt to open the file for reading.
     // is_open() returns false if the file could not be opened, we use it to
     // show an error message and exit if the file cannot be opened.
-    if (!input.is_open()) {
+    if (!input.is_open()) {  // Check whether the file stream is valid.
       SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error",
                                "Could not open tilemap from disk", nullptr);
-      exit(1);
+      exit(1);  // Terminate immediately on file-open failure.
     }
 
-    std::string cell, line;
-    for (; std::getline(input, line); rows++) {
-      if (line.empty()) continue;
-      std::istringstream ss(std::move(line));
+    std::string cell, line;  // Buffer for a single CSV cell and a full row.
+    for (; std::getline(input, line); rows++) {  // Read file line by line; increment row counter.
+      if (line.empty()) continue;  // Skip blank lines.
+      std::istringstream ss(std::move(line));  // Wrap line in a string stream for tokenising/breaking 
+                                               // a line of text into smaller chunks (tokens).
 
-      for (size_t c = 1; std::getline(ss, cell, ','); c++) {
-        if (rows == 0)
-          cols = c;
-        else if (c > cols) {
+      for (size_t c = 1; std::getline(ss, cell, ','); c++) {  // Split on commas; c is the column index (1-based).
+        if (rows == 0)  // First data row sets the expected column count.
+          cols = c;  // Store the number of columns from the first row.
+        else if (c > cols) {  // Subsequent rows must not exceed the expected column count.
           SDL_ShowSimpleMessageBox(
               SDL_MESSAGEBOX_ERROR, "Error",
               "Could not parse tilemap from disk, the number of columns for "
               "all rows should be the same",
               nullptr);
-          return false;
+          return false;  // Abort parsing on column-count mismatch.
         }
-        tiles.push_back(static_cast<uint16_t>(std::stoul(cell)));
+        tiles.push_back(static_cast<uint16_t>(std::stoul(cell)));  // Convert cell text to unsigned long, cast to uint16_t, and store.
       }
     }
 
-    return true;
+    return true;  // Parsing completed successfully.
   }
 
   [[nodiscard]] size_t getRows() const { return rows; }
