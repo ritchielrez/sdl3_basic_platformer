@@ -18,6 +18,17 @@
 // Main player update: reads input, applies movement physics (acceleration,
 // jumping, dashing), handles coyote time and jump buffering, then runs
 // collision resolution and updates the camera to follow the player.
+//
+// The update order is carefully sequenced:
+//   1. Save previous frame state (wasGrounded, wasJumpDown)
+//   2. Process jump input with buffering and coyote time
+//   3. Apply variable jump height on key release
+//   4. Manage dash state (cooldown, duration, velocity impulse)
+//   5. Read horizontal movement input (A/D)
+//   6. Update animation state machine (idle/run/slide)
+//   7. Apply acceleration, gravity, and speed limits
+//   8. Run collision detection and response
+//   9. Update camera to follow player
 void Player::update(const SDLState& sdlState, SDL_FRect& cam, float worldWidth,
                     const std::vector<StaticTile>& staticTiles,
                     const std::vector<DynTile>& dynTiles,
@@ -28,15 +39,17 @@ void Player::update(const SDLState& sdlState, SDL_FRect& cam, float worldWidth,
   wasGrounded = grounded;
 
   // --- Jump Buffering: Record a jump press for use on the next landing ---
+  // This allows the player to press Space slightly before landing and still
+  // have the jump register, making the controls feel more responsive.
   const bool jumpDown = sdlState.keys[SDL_SCANCODE_SPACE];
 
-  // We only want the rising edge of the Space key press.
+  // We only want the rising edge of the Space key press (ignore holding).
   const bool jumpJustPressed = jumpDown && !wasJumpDown;
   wasJumpDown = jumpDown;
 
-  // Reset the jump buffer timer on a new jump key press, and step it forward
-  // otherwise. This is because we don't want multiple jump key events to queue
-  // up.
+  // On a fresh key press, start the buffer timer. On subsequent frames while
+  // the buffer is active, just advance it. Once the buffer expires, the
+  // buffered jump is lost.
   if (jumpJustPressed) {
     jumpBufferTimer.reset();
     jumpBufferTimer.step(dt);
@@ -45,35 +58,46 @@ void Player::update(const SDLState& sdlState, SDL_FRect& cam, float worldWidth,
   }
 
   // Determine whether the player is allowed to jump right now:
-  //   - grounded, OR within the coyote window
+  //   - grounded, OR within the coyote window (brief grace period after
+  //     walking off a ledge)
   const bool canJump =
       (wasGrounded || (coyoteTimer.isStarted() && !coyoteTimer.isTimeOut())) &&
       currAnim != PlayerAnim::death;
 
   // Trigger jump if:
   //   - Space was just pressed (or is buffered from a recent press), AND
-  //   - the player is in a jumpable state
+  //   - the player is in a jumpable state (grounded or coyote)
   const bool jumpBuffered =
       jumpBufferTimer.isStarted() && !jumpBufferTimer.isTimeOut();
 
   if (canJump && (jumpJustPressed || jumpBuffered)) {
     vel.y = jumpVel;
     currAnim = PlayerAnim::jump;
-    // Consume both the buffer and the coyote window so they don't re-trigger.
+    // Consume both the buffer and the coyote window so they don't re-trigger
+    // multiple jumps from a single press or edge fall.
     jumpBufferTimer.reset();
     coyoteTimer.reset();
   }
 
   // --- Variable Jump Height: Cut upward velocity when Space is released ---
-  // Only applies while the player is still rising from a jump.
+  // Holding Space makes the player jump full height; releasing early shortens
+  // the jump. This is done by damping upward velocity each frame the key is
+  // released, which gives a natural-feeling "soft cut" instead of an instant
+  // stop.
   if (!jumpDown && vel.y < 0) {
-    vel.y *= 0.90f;  // Dampen rise per-frame; acts as a soft cut
+    vel.y *= 0.90f;
   }
 
+  // --- Dash state management ---
+  // If a dash cooldown is active, tick it down so the player can dash again
+  // once it expires.
   if (dashCooldown.isStarted() && !dashCooldown.isTimeOut()) {
     dashCooldown.step(dt);
   }
 
+  // Trigger dash: only when running or jumping, cooldown is finished, and
+  // Shift is pressed. Resetting both dashDuration and dashCooldown starts
+  // the dash window and the cooldown timer simultaneously.
   if ((currAnim == PlayerAnim::run || currAnim == PlayerAnim::jump) &&
       (!dashCooldown.isStarted() || dashCooldown.isTimeOut()) &&
       sdlState.keys[SDL_SCANCODE_LSHIFT]) {
@@ -83,11 +107,16 @@ void Player::update(const SDLState& sdlState, SDL_FRect& cam, float worldWidth,
     dashCooldown.step(dt);
   }
 
+  // Apply dash velocity impulse while the dash window is active. The impulse
+  // is added on top of normal movement velocity.
   if (dashDuration.isStarted() && !dashDuration.isTimeOut()) {
     vel.x += static_cast<float>(dir) * dashSpeed * dt;
     dashDuration.step(dt);
   }
 
+  // --- Horizontal input (A/D keys) ---
+  // currDir is -1 (left), +1 (right), or 0 (none). Death animation locks
+  // horizontal input so the player corpse doesn't slide around.
   int16_t currDir = 0;
   if (currAnim != PlayerAnim::death && sdlState.keys[SDL_SCANCODE_A]) {
     currDir -= 1;
@@ -99,11 +128,18 @@ void Player::update(const SDLState& sdlState, SDL_FRect& cam, float worldWidth,
     dir = currDir;
   }
 
+  // --- Animation state machine (idle / run / slide) ---
+  // Transitions depend on horizontal input (currDir), current velocity, and
+  // grounded state. The death and jump animations are set externally (by
+  // collision or jump trigger) and are not managed here.
   switch (currAnim) {
     case PlayerAnim::idle: {
+      // Start running if the player presses left or right.
       if (currDir != 0) {
         currAnim = PlayerAnim::run;
       } else if (vel.x != 0) {
+        // No input but still moving — apply friction (deceleration at 1.5x
+        // the normal acceleration rate) until velocity reaches zero.
         const float deaccelFactor = vel.x > 0 ? -1.5f : 1.5f;
         float deaccelVel = deaccelFactor * accel.x * dt;
 
@@ -116,20 +152,21 @@ void Player::update(const SDLState& sdlState, SDL_FRect& cam, float worldWidth,
       break;
     }
     case PlayerAnim::run: {
+      // Release horizontal input → return to idle.
       if (currDir == 0) {
         currAnim = PlayerAnim::idle;
       }
 
-      // NOTE: If `vel.x` and `dir` have different signs, their product is
-      // less than zero.
+      // If the player is grounded and holding the opposite direction, skid
+      // into slide animation. Detected when vel.x and dir have opposite signs.
       if (vel.x * static_cast<float>(dir) < 0 && grounded) {
         currAnim = PlayerAnim::slide;
       }
       break;
     }
     case PlayerAnim::slide: {
-      // NOTE: If `vel.x` and `currDir` have the same signs, their product is
-      // greater than zero.
+      // If the player starts moving in the direction they're facing again,
+      // go back to running. If they release all input, return to idle.
       if (vel.x * static_cast<float>(currDir) > 0 && grounded) {
         currAnim = PlayerAnim::run;
       } else if (vel.x * static_cast<float>(currDir) == 0 && grounded) {
@@ -139,26 +176,36 @@ void Player::update(const SDLState& sdlState, SDL_FRect& cam, float worldWidth,
     }
   }
 
+  // --- Apply horizontal acceleration ---
+  // currDir (-1, 0, +1) multiplied by accel gives the frame's velocity delta.
+  // This produces smooth acceleration rather than instant max speed.
   vel += static_cast<float>(currDir) * accel * dt;
 
+  // Clamp horizontal speed to maxSpeed (or maxSpeed + dashSpeed during a dash).
   if (!dashDuration.isStarted() || dashDuration.isTimeOut()) {
     vel.x = glm::clamp(vel.x, -maxSpeed.x, maxSpeed.x);
   } else {
     vel.x = glm::clamp(vel.x, -maxSpeed.x - dashSpeed, maxSpeed.x + dashSpeed);
   }
 
+  // --- Apply gravity ---
+  // Gravity only pulls when airborne (not grounded).
   constexpr float gravity = 980.0f;
   if (!grounded) vel.y += gravity * dt;
 
   vel.y = glm::clamp(vel.y, -maxSpeed.y, maxSpeed.y);
 
+  // --- Compute frame displacement ---
   glm::vec2 velFrame = vel * dt;
 
+  // Prevent the player from moving more than one tile per frame vertically.
+  // This avoids tunnelling through thin platforms at high speeds.
   if (velFrame.y >= Map::TILE_SIZE) {
     velFrame.y = Map::TILE_SIZE - 1;
     vel.y = velFrame.y / dt;
   }
 
+  // --- Apply displacement and clamp to world bounds ---
   pos += velFrame;
   if (pos.x <= 0)
     pos.x = 0;
@@ -167,22 +214,30 @@ void Player::update(const SDLState& sdlState, SDL_FRect& cam, float worldWidth,
   collision(staticTiles, dynTiles, coins, collectedCoins, slimes, slainSlimes,
             dt);
 
+  // --- Camera and post-movement updates (only while alive) ---
+  // Skip camera tracking and coyote time when the death animation is active.
   if (currAnim != PlayerAnim::death) {
     // --- Horizontal Camera System ---
-    // The 'camRuler' is the point where the player is exactly in the center of
-    // the screen.
+    // The camera smoothly follows the player using lerp. Several refinements
+    // make the tracking feel natural:
+    //
+    //   camRuler:     The X position that would centre the player on screen.
+    //   velocity look-ahead: Offsets the target slightly in the direction of
+    //                        movement to compensate for lerp lag.
+    //   threshold:    The camera stays fixed at x=0 until the player walks past
+    //                 the centre for the first time.
+    //   edge clamp:   Smoothly snaps to the far-right when near the world edge.
+    //   dash damping: Slows the camera during dashes (half smoothness) so the
+    //                 sudden speed burst doesn't jerk the view.
     float camRuler = (SDLState::logicalWidth - w) / 2;
     constexpr float camXSmoothness = 3.0f;
     float targetX = pos.x - camRuler;
 
-    // Velocity Look-Ahead:
-    // Standard lerp smoothing causes a steady-state lag where the camera trails
-    // the player. We offset the target by a fraction of the velocity to
-    // compensate.
+    // Compensate for lerp lag by looking ahead in the direction of movement.
     targetX += vel.x * 0.20f;
 
-    // Threshold Logic: The camera stays at 0 until the player first reaches the
-    // center of the screen, after which it begins smooth tracking.
+    // The camera stays at 0 until the player first reaches the centre of the
+    // screen, then begins smooth tracking.
     if (!passedCamRuler && pos.x >= camRuler) passedCamRuler = true;
     if (passedCamRuler) {
       if (pos.x + SDLState::logicalWidth >= worldWidth) {
@@ -199,9 +254,9 @@ void Player::update(const SDLState& sdlState, SDL_FRect& cam, float worldWidth,
     }
 
     // --- Vertical Camera System ---
-    // If the player is close to the top of the screen, then move the camera up
-    // slightly so it does not look like the player is touching the ceiling or
-    // going beyond it.
+    // When the player is near the top of the screen (pos.y <= 10), shift the
+    // camera upward by 30 pixels so the player doesn't appear to clip the
+    // ceiling. Otherwise smoothly reset to the default vertical position.
     constexpr float camYSmoothness = 5.0f;
 
     if (pos.y <= 10) {
@@ -211,8 +266,11 @@ void Player::update(const SDLState& sdlState, SDL_FRect& cam, float worldWidth,
     }
 
     // --- Coyote Time: Allow jumping briefly after walking off a ledge ---
-    // Start the coyote window on the first frame the player becomes airborne
-    // without having jumped (i.e., walked off an edge).
+    // When the player walks off a platform without pressing jump (wasGrounded
+    // true → grounded false), start the coyote timer. While the timer is
+    // active, the player can still jump as though they were on the ground.
+    // This small grace period makes edge-of-platform gameplay feel less
+    // punishing.
     if (wasGrounded && !grounded && currAnim != PlayerAnim::jump) {
       coyoteTimer.reset();
       coyoteTimer.step(dt);
@@ -220,6 +278,7 @@ void Player::update(const SDLState& sdlState, SDL_FRect& cam, float worldWidth,
       coyoteTimer.step(dt);
     }
 
+    // Transition out of the jump animation back to run once the player lands.
     if (currAnim == PlayerAnim::jump && grounded) {
       currAnim = PlayerAnim::run;
     }
@@ -229,11 +288,19 @@ void Player::update(const SDLState& sdlState, SDL_FRect& cam, float worldWidth,
 // AABB collision detection and response against static tiles, moving
 // platforms, coins, and slimes. Pushes the player out of overlaps, handles
 // coin pickups, slime stomps, and squish death from moving platforms.
+//
+// The collision resolution uses axis-separated push-out: for each overlapping
+// tile, we compare the intersection rect's width vs height to determine which
+// axis had the shallowest penetration, then push the player out along that
+// axis and zero the corresponding velocity. This prevents the player from
+// sliding through walls or getting stuck.
 void Player::collision(const std::vector<StaticTile>& staticTiles,
                        const std::vector<DynTile>& dynTiles,
                        std::vector<Coin>& coins, size_t& collectedCoins,
                        std::vector<Slime>& slimes, size_t& slainSlimes,
                        float dt) {
+  // Compute the player's effective collision box (sprite position + collider
+  // offset). This is typically smaller than the sprite for fairer hitboxes.
   SDL_FRect playerCollider{.x = pos.x + collider.x,
                            .y = pos.y + collider.y,
                            .w = collider.w,
