@@ -129,8 +129,12 @@ class SceneManager {
       return;
     }
 
+    // No transition running — tick the active scene normally and check
+    // for conditions that should trigger a transition to another scene.
     switch (current) {
       case SceneType::start: {
+        // Update the title menu. If the player confirmed "Play"
+        // (shouldStartGame set by handleEvent), fade to the game scene.
         startScene.update(dt);
         if (startScene.shouldStartGame) {
           startTransition(SceneType::game);
@@ -141,17 +145,21 @@ class SceneManager {
       case SceneType::game: {
         const Player &player = gameScene.player;
         gameScene.update(dt);
+        // Transition to the end/victory screen when the player reaches the flagpost.
         if (gameScene.shouldLevelComplete) {
           endScene.setPoints(gameScene.collectedCoins, gameScene.slainSlimes);
           startTransition(SceneType::end);
           break;
         }
+        // Transition to the death screen once the player's death animation finishes.
         if (player.anims[PlayerAnim::death].isStarted() &&
             player.anims[PlayerAnim::death].isTimeOut())
           startTransition(SceneType::death);
         break;
       }
       case SceneType::death: {
+        // Update the death menu. Player can choose retry or return to start.
+        // Either path resets gameScene so the level starts fresh.
         deathScene.update(dt);
         if (deathScene.shouldRetry) {
           gameScene.reset();
@@ -165,6 +173,7 @@ class SceneManager {
         break;
       }
       case SceneType::end: {
+        // Update the victory screen. Same retry / back-to-start choices as death.
         endScene.update(dt);
         if (endScene.shouldRetry) {
           gameScene.reset();

@@ -312,6 +312,9 @@ void Player::collision(const std::vector<StaticTile>& staticTiles,
   bool foundGround = false;
   bool collidedWithDynTile = false;
 
+  // --- Static tile collision ---
+  // Iterate all ground/terrain tiles. On overlap, push the player out of the
+  // tile along the shallowest axis and zero the corresponding velocity.
   for (auto& staticTile : staticTiles) {
     collidedRect.x = staticTile.pos.x + staticTile.collider.x;
     collidedRect.y = staticTile.pos.y + staticTile.collider.y;
@@ -322,7 +325,11 @@ void Player::collision(const std::vector<StaticTile>& staticTiles,
                                      &intersectionRect)) {
       collided = true;
 
+      // Resolve the collision along the shallowest penetration axis.
+      // If the overlap is wider than tall, it's a vertical collision (hit
+      // floor or ceiling). Otherwise it's horizontal (hit a wall).
       if (intersectionRect.w > intersectionRect.h) {
+        // Vertical push: player was moving down (landing) or up (bonking head).
         if (vel.y > 0) {
           pos.y -= intersectionRect.h;
         } else if (vel.y < 0) {
@@ -330,6 +337,7 @@ void Player::collision(const std::vector<StaticTile>& staticTiles,
         }
         vel.y = 0;
       } else {
+        // Horizontal push: player was moving right or left into a wall.
         if (vel.x > 0) {
           pos.x -= intersectionRect.w;
         } else if (vel.x < 0) {
@@ -338,16 +346,23 @@ void Player::collision(const std::vector<StaticTile>& staticTiles,
         vel.x = 0;
       }
 
-      // Recalculate playerCollider after the player has moved due to collision.
+      // Recalculate player collider after position correction so subsequent
+      // tile checks use the updated bounds.
       playerCollider.x = pos.x + collider.x;
       playerCollider.y = pos.y + collider.y;
 
+      // If the bottom of the player collider is at or above the top of the
+      // tile, the player is standing on this tile (grounded).
       if (playerCollider.y + playerCollider.h <= collidedRect.y) {
         foundGround = true;
       }
     }
   }
 
+  // --- Moving platform collision ---
+  // Same AABB resolution as static tiles, but also applies the platform's
+  // velocity to carry the player along. Only one dynTile collision per frame
+  // is processed (break after first hit).
   for (auto& dynTile : dynTiles) {
     collidedRect.x = dynTile.pos.x + dynTile.collider.x;
     collidedRect.y = dynTile.pos.y + dynTile.collider.y;
@@ -359,6 +374,7 @@ void Player::collision(const std::vector<StaticTile>& staticTiles,
       collided = true;
       collidedWithDynTile = true;
 
+      // Resolve along shallowest axis (same logic as static tiles).
       if (intersectionRect.w > intersectionRect.h) {
         if (vel.y > 0) {
           pos.y -= intersectionRect.h;
@@ -375,26 +391,26 @@ void Player::collision(const std::vector<StaticTile>& staticTiles,
         vel.x = 0;
       }
 
-      // Recalculate playerCollider after the player has moved due to collision.
+      // Recalculate player collider after position correction.
       playerCollider.x = pos.x + collider.x;
       playerCollider.y = pos.y + collider.y;
 
+      // Check if standing on top of the moving platform.
       if (playerCollider.y + playerCollider.h <= collidedRect.y) {
         foundGround = true;
       }
 
-      // The `dynTile` velocity carries or pushes the player.
+      // Carry the player horizontally with the platform's movement.
       pos.x += dynTile.vel.x * dt;
-      // A player can collide with one `dynTile` at a time, so if detected
-      // collision with one, stop checking for more collisions with other
-      // `dynTiles`.
+      // Only one dynTile collision per frame to avoid conflicting pushes.
       break;
     }
   }
 
-  // If the player collides with a `dynTile` then immediately collides with a
-  // `staticTile`, it means the player is being squished between two tiles. In
-  // that case the player should die.
+  // --- Squish detection (dynTile + staticTile sandwich) ---
+  // If the player is touching both a moving platform and a static tile
+  // simultaneously, they are being crushed. The player dies unless they
+  // are on top of the static tile (foundGround with it).
   if (collidedWithDynTile) {
     for (auto& staticTile : staticTiles) {
       collidedRect.x = staticTile.pos.x + staticTile.collider.x;
@@ -436,6 +452,10 @@ void Player::collision(const std::vector<StaticTile>& staticTiles,
     }
   }
 
+  // --- Coin overlap ---
+  // Simple overlap check: if the player touches a coin, remove it and
+  // increment the counter. Uses swap-and-pop (O(1) removal) by replacing
+  // the current coin with the last one and shrinking the vector.
   for (size_t j = 0; j < coins.size();) {
     collidedRect.x = coins[j].pos.x + coins[j].collider.x;
     collidedRect.y = coins[j].pos.y + coins[j].collider.y;
@@ -453,6 +473,12 @@ void Player::collision(const std::vector<StaticTile>& staticTiles,
     }
   }
 
+  // --- Slime overlap ---
+  // Two outcomes depending on approach direction:
+  //   1. Stomp (player coming from above): remove the slime, increment kill
+  //      counter, and bounce the player upward (velocity stays positive so
+  //      the player rises slightly).
+  //   2. Contact from the side or below: player dies.
   for (size_t k = 0; k < slimes.size();) {
     collidedRect.x = slimes[k].pos.x + slimes[k].collider.x;
     collidedRect.y = slimes[k].pos.y + slimes[k].collider.y;
@@ -463,19 +489,29 @@ void Player::collision(const std::vector<StaticTile>& staticTiles,
                                      &intersectionRect)) {
       collided = true;
 
+      // Stomp check: player must be falling (vel.y > 0) and the bottom of
+      // the player collider must be near the top of the slime's collision
+      // box (within 5 pixels). The 5-pixel tolerance makes stomps feel
+      // more forgiving.
       if (vel.y > 0 &&
           (playerCollider.y + playerCollider.h - intersectionRect.h) <=
               slimes[k].pos.y + slimes[k].collider.y + 5.0f) {
         slimes[k] = slimes.back();
         slimes.pop_back();
         slainSlimes++;
+        // Skip the k++ so the next iteration checks the swapped-in slime.
         continue;
       }
+      // Not a stomp → player takes damage.
       currAnim = PlayerAnim::death;
     }
     k++;
   }
 
+  // --- Update grounded state ---
+  // If the player's bottom overlapped any tile top this frame, they are
+  // grounded. Transition to the run animation on landing (overrides any
+  // airborne animation like jump or falling).
   if (currAnim != PlayerAnim::death && grounded != foundGround) {
     grounded = foundGround;
     if (foundGround) {

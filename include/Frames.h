@@ -72,6 +72,7 @@ class Frames {
     return static_cast<int>(timer.getTime() / timer.getLen() *
                             static_cast<float>(frameCount));
   }
+
   // Bunch of helper methods
   [[nodiscard]] bool isTimeOut() const { return timer.isTimeOut(); }
   [[nodiscard]] bool isStarted() const { return timer.isStarted(); }

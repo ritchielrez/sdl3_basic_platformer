@@ -6,7 +6,6 @@
 // (position, velocity, health, etc.) as formatted text from Player::inspect().
 // ImGui::Begin / End create a draggable, resizable window; every widget call
 // between them is placed inside that window.
-
 void DebugUI::drawPlayerInfo(const Player &player) {
   if (!Game::debug) return;
 
@@ -30,7 +29,6 @@ void DebugUI::drawCameraInfo(const SDL_FRect &cam) {
 // Lists every slime enemy currently alive.  Shows the total count first, then
 // each slime in a foldable section (ImGui::CollapsingHeader) so the list
 // stays compact when there are many enemies on screen.
-
 void DebugUI::drawSlimesInfo(const std::vector<Slime> &slimes) {
   if (!Game::debug) return;
 
@@ -52,7 +50,6 @@ void DebugUI::drawSlimesInfo(const std::vector<Slime> &slimes) {
 // DockSpaceOverViewport creates a full-screen docking area; the
 // PassthruCentralNode flag keeps the centre of the screen transparent so
 // mouse clicks and keyboard input pass through to the game underneath.
-
 void DebugUI::newFrame() {
   if (!Game::debug) return;
 
@@ -68,7 +65,6 @@ void DebugUI::newFrame() {
 // ImGui::Render() to bake the window descriptions into GPU draw commands
 // (vertex buffers, textures, etc.).  Those commands are stored internally and
 // submitted to the GPU during presentFrame().
-
 void DebugUI::drawFrame(const Player &player, const std::vector<Slime> &slimes,
                         const SDL_FRect &cam) {
   if (!Game::debug) return;
@@ -85,7 +81,6 @@ void DebugUI::drawFrame(const Player &player, const std::vector<Slime> &slimes,
 // uses a fixed internal resolution (e.g. 640×360) that SDL scales and
 // letterboxes to fit the window — ImGui expects raw pixel coordinates matching
 // the real window size, not the scaled game resolution.
-
 void DebugUI::presentFrame() const {
   if (!Game::debug) return;
   SDL_SetRenderLogicalPresentation(sdlState.renderer, 0, 0,
